@@ -63,7 +63,7 @@ const sampleStateMachine: StateMachine<SampleState, SampleStateAction> = StateMa
     {
         state: SampleState.Running,
         actions: [
-            [SampleStateAction.Stop, SampleState.Running]
+            [SampleStateAction.Stop, SampleState.Stopping]
         ]
     },
     {
