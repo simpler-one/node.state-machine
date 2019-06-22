@@ -4,8 +4,9 @@
   "description": "State Machine for NodeJS",
   "main": "src/index.js",
   "scripts": {
-    "build": "tsc -p src",
-    "test": "tsc -p spec & jasmine"
+    "build": "rimraf dist & tsc -p src",
+    "test": "rimraf spec/built & tsc -p spec & jasmine",
+    "prepare": "build"
   },
   "repository": {
     "type": "git",
@@ -24,7 +25,9 @@
   },
   "homepage": "https://github.com/work-work-komei/node.state-machine#readme",
   "devDependencies": {
+    "@types/jasmine": "^3.3.13",
     "jasmine": "^3.4.0",
+    "rimraf": "^2.6.3",
     "tsc": "^1.20150623.0",
     "typescript": "^3.5.2"
   }

@@ -5,7 +5,9 @@
         "sourceMap": true,
         "declaration": true,
         "rootDir": "src",
-        "outDir": "build"
+        "outDir": "build",
+        "skipLibCheck": true,
+        "newLine": "lf"
     },
     "include": [
         "src/**/*"

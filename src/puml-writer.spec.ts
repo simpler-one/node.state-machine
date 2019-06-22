@@ -55,7 +55,6 @@ describe('PumlWriter', () => {
                 expect(result.includes('[*] -->')).toBeTruthy();
                 expect(result.includes('-down->')).toBeTruthy();
                 expect(result.includes('(1)')).toBeFalsy();
-                console.log(result);
             });
         });
     });
