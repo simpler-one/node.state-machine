@@ -9,9 +9,6 @@
         "skipLibCheck": true,
         "newLine": "lf"
     },
-    "include": [
-        "src/**/*"
-    ],
     "exclude": [
         "../node_modules"
     ]
