@@ -1,9 +1,10 @@
 {
   "name": "@working-sloth/state-machine",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "State Machine for NodeJS",
   "main": "dist/index.js",
   "scripts": {
+    "tsc": "tsc",
     "build": "rimraf dist & tsc -p src",
     "test": "rimraf spec/built & tsc -p spec & jasmine",
     "prepare": "npm run build",
