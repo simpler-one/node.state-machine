@@ -7,7 +7,7 @@
     "build": "rimraf dist & tsc -p src",
     "test": "rimraf spec/built & tsc -p spec & jasmine",
     "prepare": "npm run build",
-    "postinstall": "npm run build"
+    "postinstall": "npm install & npm run build"
   },
   "repository": {
     "type": "git",
