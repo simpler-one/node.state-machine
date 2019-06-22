@@ -1,6 +1,6 @@
 {
   "name": "@working-sloth/state-machine",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "State Machine for NodeJS",
   "main": "src/index.js",
   "scripts": {
