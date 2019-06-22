@@ -2,54 +2,67 @@ import { StateMachine, MetaState, MetaStateAction } from "../src";
 import { PumlWriter } from "../src/puml-writer";
 
 
-enum SampleState {
+enum SlothState {
     Idle = 'Idle',
-    Preparing = 'Preparing',
-    Running = 'Running',
-    Stopping = 'Closing'
+    Working = 'Working',
+    Eating = 'Eating',
+    Sleepy = 'Sleepy',
+    Sleeping = 'Sleeping'
 }
 
-enum SampleStateAction {
-    Start = 'Start',
-    CompletePreparation = 'CompletePreparation',
-    Stop = 'Stop',
-    CompleteStop = 'CompleteStop',
-    ForceStop = 'ForceStop',
+enum SlothAction {
+    Work = 'Work',
+    Eat = 'Eat',
+    Sleep = 'Sleep',
+    Wake = 'Wake',
+    Stop = 'Stop'
 }
 
 
-const sampleStateMachine: StateMachine<SampleState, SampleStateAction> = StateMachine.fromString<SampleState, SampleStateAction>(
+const sampleStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fromString<SlothState, SlothAction>(
     'SampleState',
-    SampleState.Idle,
-    {
-        state: SampleState.Idle,
-        actions: [
-            [SampleStateAction.Start, SampleState.Preparing],
-        ]
-    },
-    {
-        state: SampleState.Preparing,
-        actions: [
-            [SampleStateAction.CompletePreparation, SampleState.Running],
-            [SampleStateAction.Stop, SampleState.Stopping]
-        ]
-    },
-    {
-        state: SampleState.Running,
-        actions: [
-            [SampleStateAction.Stop, SampleState.Stopping]
-        ]
-    },
-    {
-        state: SampleState.Stopping,
-        actions: [
-            [SampleStateAction.CompleteStop, SampleState.Idle]
-        ]
-    },
+    SlothState.Idle,
     {
         state: MetaState.Anytime,
         actions: [
-            [SampleStateAction.ForceStop, SampleState.Idle]
+            [SlothAction.Sleep, SlothState.Sleeping]
+        ]
+    },
+    {
+        state: SlothState.Idle,
+        actions: [
+            [SlothAction.Work, SlothState.Working],
+            [SlothAction.Eat, SlothState.Eating]
+        ]
+    },
+    {
+        state: SlothState.Working,
+        actions: [
+            [SlothAction.Stop, SlothState.Idle]
+        ]
+    },
+    {
+        state: SlothState.Sleeping,
+        actions: [
+            [SlothAction.Wake, SlothState.Idle]
+        ]
+    },
+    {
+        state: SlothState.Eating,
+        actions: [
+            [SlothAction.Stop, SlothState.Idle]
+        ]
+    },
+    {
+        state: SlothState.Sleeping,
+        actions: [
+            [SlothAction.Wake, SlothState.Sleepy]
+        ]
+    },
+    {
+        state: SlothState.Sleepy,
+        actions: [
+            [SlothAction.Wake, SlothState.Idle]
         ]
     }
 );
@@ -59,10 +72,10 @@ console.log(sampleStateMachine.export(PumlWriter.getWriter({autoNumber: true})))
 
 sampleStateMachine.do(MetaStateAction.DoStart); // Don't forget
 
-if (sampleStateMachine.can(SampleStateAction.Start)) {
-    sampleStateMachine.do(SampleStateAction.Start);
+if (sampleStateMachine.can(SlothAction.Sleep)) {
+    sampleStateMachine.do(SlothAction.Sleep);
 }
 
-if (sampleStateMachine.current === SampleState.Preparing || sampleStateMachine.current === SampleState.Stopping) {
-    // Show progress circle
+if (sampleStateMachine.current === SlothState.Sleeping) {
+    // PiyoPiyo
 }

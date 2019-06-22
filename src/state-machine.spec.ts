@@ -102,7 +102,7 @@ describe('StateMachine', () => {
                 // Given
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
-                    state: StringState.State1,
+                    state: TypedState.State1,
                     actions: [
                         [Action.Action1, TypedState.State2]
                     ]
@@ -120,7 +120,7 @@ describe('StateMachine', () => {
                 // Given
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
-                    state: StringState.State1,
+                    state: TypedState.State1,
                     actions: [
                     ]
                 });
@@ -143,7 +143,7 @@ describe('StateMachine', () => {
                     ]
                 },
                 {
-                    state: StringState.State1,
+                    state: TypedState.State1,
                     actions: [
                     ]
                 });
@@ -173,7 +173,7 @@ describe('StateMachine', () => {
                 // Given
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
-                    state: StringState.State1,
+                    state: TypedState.State1,
                     actions: [
                         [Action.Action1, TypedState.State2]
                     ]
@@ -191,7 +191,7 @@ describe('StateMachine', () => {
                 // Given
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
-                    state: StringState.State1,
+                    state: TypedState.State1,
                     actions: [
                     ]
                 });
@@ -214,7 +214,7 @@ describe('StateMachine', () => {
                     ]
                 },
                 {
-                    state: StringState.State1,
+                    state: TypedState.State1,
                     actions: [
                     ]
                 });
@@ -293,6 +293,12 @@ describe('StateMachine', () => {
                     name,
                     StringState.State1,
                     {
+                        state: MetaState.Anytime,
+                        actions: [
+                            [Action.Action3, StringState.State1]
+                        ]
+                    },
+                    {
                         state: StringState.State1,
                         actions: [
                             [Action.Action1, StringState.State2]
@@ -315,6 +321,12 @@ describe('StateMachine', () => {
                 const namedFsm = StateMachine.fromNamed<NamedState, Action>(
                     name,
                     NamedState.State1,
+                    {
+                        state: MetaState.Anytime,
+                        actions: [
+                            [Action.Action3, NamedState.State1]
+                        ]
+                    },
                     {
                         state: NamedState.State1,
                         actions: [
@@ -339,19 +351,25 @@ describe('StateMachine', () => {
                     name,
                     TypedState.State1,
                     {
-                        state: StringState.State1,
+                        state: MetaState.Anytime,
+                        actions: [
+                            [Action.Action3, TypedState.State1]
+                        ]
+                    },
+                    {
+                        state: TypedState.State1,
                         actions: [
                             [Action.Action1, TypedState.State2]
                         ]
                     },
                     {
-                        state: StringState.State2,
+                        state: TypedState.State2,
                         actions: [
                             [Action.Action2, TypedState.State3]
                         ]
                     },
                     {
-                        state: StringState.State3,
+                        state: TypedState.State3,
                         actions: [
                             [Action.Action1, TypedState.State2],
                             [Action.Action3, TypedState.State1]

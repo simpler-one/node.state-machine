@@ -4,18 +4,20 @@ import { StateType } from './interface'
  * Meta State
  */
 export namespace MetaState {
+    export const StartName: string = '[*]';
+    export const AnytimeName: string = '*';
+
     class AnytimeState implements StateType<any, any> {
-        readonly name: string = '*'
+        readonly name: string = AnytimeName;
         getState(): any {
             throw new Error('AnytimeState');
         }
         toString(): string {
-            return this.name;
+            return AnytimeName;
         }
     }    
 
     export const Start: undefined = undefined;
-    export const StartName: undefined = '[*]' as undefined;
     export const Anytime: undefined = new AnytimeState() as undefined;
 }
 

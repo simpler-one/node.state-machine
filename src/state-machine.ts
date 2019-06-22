@@ -42,6 +42,10 @@ export class StateMachine<S, A extends string, P = void> {
         start: S,
         ...items: StateMachineItem<S, S, A>[]
     ): StateMachine<S, A> {
+        const i = items.map(item => ({
+            state: item.state,
+            actions: item.actions.map(action => [action[0], new StringType(action[1])] as [A, StateType<S, A>])
+        }));
         return new StateMachine<S, A>(
             name,
             new StringType(start),
@@ -70,9 +74,16 @@ export class StateMachine<S, A extends string, P = void> {
     public static fromType<S, A extends string, P = void>(
         name: string,
         start: LooseStateType<S, A, P>,
-        ...items: StateMachineItem<string, LooseStateType<S, A, P>, A>[]
+        ...items: StateMachineItem<LooseStateType<S, A, P>, LooseStateType<S, A, P>, A>[]
     ): StateMachine<S, A, P> {
-        return new StateMachine<S, A, P>(name, start, items);
+        return new StateMachine<S, A, P>(
+            name,
+            start,
+            items.map((item) => ({
+                state: item.state.name,
+                actions: item.actions
+            } as Item<S, A, P>))
+        );
     }
 
 
@@ -81,7 +92,7 @@ export class StateMachine<S, A extends string, P = void> {
         start: StateType<S, A, P>,
         items: Item<S, A, P>[]
     ) {
-        const anytimeI: number = items.findIndex(item => item.state === MetaState.Anytime);
+        const anytimeI: number = items.findIndex(item => `${item.state}` === MetaState.AnytimeName);
         let anytimeActions: [A, StateType<S, A, P>][] = [];
         if (anytimeI >= 0) {
             anytimeActions = items.splice(anytimeI, 1)[0].actions;
@@ -94,7 +105,7 @@ export class StateMachine<S, A extends string, P = void> {
 
         this.map.set(MetaState.StartName, new Map([[MetaStateAction.DoStart, start]]));
 
-        this._current = new StateWrapper(new StringType(MetaState.StartName), MetaState.Start);
+        this._current = new StateWrapper(new StringType(MetaState.StartName as any), MetaState.Start);
     }
 
 

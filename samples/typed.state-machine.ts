@@ -1,82 +1,114 @@
-import { StateMachine, MetaState, MetaStateAction } from "../src";
+import { StateMachine, MetaState, MetaStateAction, StateType } from "../src";
 import { PumlWriter } from "../src/puml-writer";
 
 
-class SampleState {
-    public static readonly Idle = new SampleState('Idle', 'Start', true);
-    public static readonly Preparing = new SampleState('Preparing', 'Please wait...', false);
-    public static readonly Running = new SampleState('Running', 'Hello world!', true);
-    public static readonly Stopping = new SampleState('Stopping', 'Closing...', false);
-
+class SlothState {
     constructor(
-        public readonly name: string,
-        public readonly label: string,
-        public readonly buttonEnabled: boolean
+        public readonly energyIncrease: number,
+        public readonly sleepinessIncrease: number
     ) {
     }
 
     mainTask(): void {
         // Foo bar
     }
+
+    dispose(): void {
+        // Destroy
+    }
 }
 
-enum SampleStateAction {
-    Start = 'Start',
-    CompletePreparation = 'CompletePreparation',
-    Stop = 'Stop',
-    CompleteStop = 'CompleteStop',
-    ForceStop = 'ForceStop',
+enum SlothAction {
+    Work = 'Work',
+    Eat = 'Eat',
+    Sleep = 'Sleep',
+    Wake = 'Wake',
+    Stop = 'Stop'
+}
+
+class SlothStateType implements StateType<SlothState> {
+    public static readonly Idle = new SlothStateType('Idle', -0.1, 0.1);
+    public static readonly Working = new SlothStateType('Working', -1, 100);
+    public static readonly Eating = new SlothStateType('Eating', 10, 2);
+    public static readonly Sleepy = new SlothStateType('Sleepy', 0.05, 0);
+    public static readonly Sleeping = new SlothStateType('Sleeping', -0.01, -10);
+
+    constructor(
+        public readonly name: string,
+        public readonly energyIncrease: number,
+        public readonly sleepinessIncrease: number
+    ) {
+    }
+
+    getState() {
+        return new SlothState(this.energyIncrease, this.sleepinessIncrease);
+    }
+
+    onLeaveState(oldState: SlothState) {
+        oldState.dispose();
+    }
 }
 
 
-const sampleStateMachine: StateMachine<SampleState, SampleStateAction> = StateMachine.fromNamed<SampleState, SampleStateAction>(
+
+const sampleStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fromType<SlothState, SlothAction>(
     'SampleState',
-    SampleState.Idle,
-    {
-        state: SampleState.Idle,
-        actions: [
-            [SampleStateAction.Start, SampleState.Preparing],
-        ]
-    },
-    {
-        state: SampleState.Preparing,
-        actions: [
-            [SampleStateAction.CompletePreparation, SampleState.Running],
-            [SampleStateAction.Stop, SampleState.Stopping]
-        ]
-    },
-    {
-        state: SampleState.Running,
-        actions: [
-            [SampleStateAction.Stop, SampleState.Stopping]
-        ]
-    },
-    {
-        state: SampleState.Stopping,
-        actions: [
-            [SampleStateAction.CompleteStop, SampleState.Idle]
-        ]
-    },
+    SlothStateType.Idle,
     {
         state: MetaState.Anytime,
         actions: [
-            [SampleStateAction.ForceStop, SampleState.Idle]
+            [SlothAction.Sleep, SlothStateType.Sleeping]
+        ]
+    },
+    {
+        state: SlothStateType.Idle,
+        actions: [
+            [SlothAction.Work, SlothStateType.Working],
+            [SlothAction.Eat, SlothStateType.Eating]
+        ]
+    },
+    {
+        state: SlothStateType.Working,
+        actions: [
+            [SlothAction.Stop, SlothStateType.Idle]
+        ]
+    },
+    {
+        state: SlothStateType.Sleeping,
+        actions: [
+            [SlothAction.Wake, SlothStateType.Idle]
+        ]
+    },
+    {
+        state: SlothStateType.Eating,
+        actions: [
+            [SlothAction.Stop, SlothStateType.Idle]
+        ]
+    },
+    {
+        state: SlothStateType.Sleepy,
+        actions: [
+            [SlothAction.Wake, SlothStateType.Idle]
+        ]
+    },
+    {
+        state: SlothStateType.Sleeping,
+        actions: [
+            [SlothAction.Wake, SlothStateType.Sleepy]
         ]
     }
 );
-
 
 console.log(sampleStateMachine.export(PumlWriter.getWriter({autoNumber: true})));
 
 
 sampleStateMachine.do(MetaStateAction.DoStart); // Don't forget
 
-if (sampleStateMachine.can(SampleStateAction.Start)) {
-    sampleStateMachine.do(SampleStateAction.Start);
+if (sampleStateMachine.can(SlothAction.Sleep)) {
+    sampleStateMachine.do(SlothAction.Sleep);
 }
 
-console.log(`Label: ${sampleStateMachine.current.label}`);
+let energy = 10;
+energy += sampleStateMachine.current.energyIncrease;
 
-if (!sampleStateMachine.current.buttonEnabled) {
-    // Disable button
-}
+sampleStateMachine.current.mainTask();

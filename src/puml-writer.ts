@@ -36,20 +36,36 @@ export class PumlWriter {
     }
 
     private setState(fromState: StateMachineMapItem): void {
-        const fromId: string = idOf(fromState.name);
+        const fromId = idOf(fromState.name);
         this.definitions.push(`state "${fromState.name}" as ${fromId}`);
 
+        const transitions = new Map<string, string>();
         for (const action of fromState.actions) {
             const toId = idOf(action.destination);
+            const path = `${fromId}-${toId}`;
+
+            let act: string;
             if (this.options.autoNumber) {
-                const actI = `(${this.actionI++})`;
-                this.definitions.push(`${fromId}: ${actI} ${action.name}`);
-                this.transitions.push(`${fromId} -${this.options.arrowDirection}-> ${toId}: ${actI}`);
+                act = `(${this.actionI++})`;
+                this.definitions.push(`${fromId}: ${act} ${action.name}`);
             } else {
+                act = action.name;
                 this.definitions.push(`${fromId}: ${action.name}`);
-                this.transitions.push(`${fromId} -${this.options.arrowDirection}-> ${toId}: ${action.name}`);
             }
+
+            let transition = transitions.get(path);
+            if (transition) {
+                transition += `,${act}`; // Append
+            } else {
+                transition = `${fromId} -${this.options.arrowDirection}-> ${toId}: ${act}`; // New
+            }
+
+            transitions.set(path, transition);
         }
+
+        transitions.forEach(transition => {
+            this.transitions.push(transition);
+        });
 
         this.definitions.push('');
         this.transitions.push('');
