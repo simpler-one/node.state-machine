@@ -80,7 +80,7 @@ const sampleStateMachine: StateMachine<SampleState, SampleStateAction> = StateMa
     }
 );
 
-console.log(sampleStateMachine.export(PumlWriter.getWriter()));
+console.log(sampleStateMachine.export(PumlWriter.getWriter({autoNumber: true})));
 
 
 sampleStateMachine.do(MetaStateAction.DoStart); // Don't forget

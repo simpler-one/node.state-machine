@@ -49,10 +49,10 @@ export class PumlWriter {
                 this.definitions.push(`${fromId}: ${action.name}`);
                 this.transitions.push(`${fromId} -${this.options.arrowDirection}-> ${toId}: ${action.name}`);
             }
-
-            this.definitions.push('');
-            this.transitions.push('');
         }
+
+        this.definitions.push('');
+        this.transitions.push('');
     }
 
     private export(): string {
@@ -70,7 +70,7 @@ export class PumlWriter {
 
 
 export interface Options {
-    autoNumber?: number;
+    autoNumber?: boolean;
     arrowDirection?: string;
 }
 namespace Options {
