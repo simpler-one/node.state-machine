@@ -1,5 +1,8 @@
 # State Machine
 
+[![Build Status](https://travis-ci.org/work-work-komei/node.state-machine.svg?branch=develop)](https://travis-ci.org/work-work-komei/node.state-machine)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+
 ![StateMachine](https://github.com/work-work-komei/node.state-machine/blob/develop/samples/SlothState.png)
 
 ## Functions:

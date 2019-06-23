@@ -14,8 +14,10 @@
     "url": "git+https://github.com/work-work-komei/node.state-machine.git"
   },
   "keywords": [
-    "state-machine",
+    "fsm",
+    "finite state machine",
     "state machine",
+    "state-machine",
     "automaton",
     "state"
   ],
