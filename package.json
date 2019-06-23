@@ -4,8 +4,8 @@
   "description": "State Machine for NodeJS",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rimraf dist & tsc -p src",
-    "test": "rimraf spec/built & tsc -p spec & ls -la spec",
+    "build": "rimraf dist & tsc -p src & ls -la .",
+    "test": "rimraf spec/built & tsc -p spec & jasmine",
     "postinstall": "npm run build"
   },
   "repository": {
