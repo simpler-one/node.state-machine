@@ -1,6 +1,6 @@
 # State Machine
 
-![StateMachine](https://github.com/work-work-komei/node.state-machine/blob/develop/samples/SampleState.png) 
+![StateMachine](https://github.com/work-work-komei/node.state-machine/blob/develop/samples/SlothState.png)
 
 ## Functions:
  - Create finite state machine and manage current state and transitions

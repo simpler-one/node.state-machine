@@ -30,8 +30,8 @@ enum SlothAction {
 }
 
 
-const sampleStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fromNamed<SlothState, SlothAction>(
-    'SampleState',
+const slothStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fromNamed<SlothState, SlothAction>(
+    'SlothState',
     SlothState.Idle,
     {
         state: MetaState.Anytime,
@@ -78,18 +78,18 @@ const sampleStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.f
     }
 );
 
-console.log(sampleStateMachine.export(PumlWriter.getWriter({autoNumber: true})));
+console.log(slothStateMachine.export(PumlWriter.getWriter({autoNumber: true})));
 
 
-sampleStateMachine.do(MetaStateAction.DoStart); // Don't forget
+slothStateMachine.do(MetaStateAction.DoStart); // Don't forget
 
-if (sampleStateMachine.can(SlothAction.Sleep)) {
-    sampleStateMachine.do(SlothAction.Sleep);
+if (slothStateMachine.can(SlothAction.Sleep)) {
+    slothStateMachine.do(SlothAction.Sleep);
 }
 
-if (sampleStateMachine.current === SlothState.Sleeping) {
+if (slothStateMachine.current === SlothState.Sleeping) {
     // PiyoPiyo
 }
 
 let energy = 10;
-energy += sampleStateMachine.current.energyIncrease;
+energy += slothStateMachine.current.energyIncrease;

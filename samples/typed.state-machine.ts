@@ -51,8 +51,8 @@ class SlothStateType implements StateType<SlothState> {
 
 
 
-const sampleStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fromType<SlothState, SlothAction>(
-    'SampleState',
+const slothStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fromType<SlothState, SlothAction>(
+    'SlothState',
     SlothStateType.Idle,
     {
         state: MetaState.Anytime,
@@ -99,16 +99,16 @@ const sampleStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.f
     }
 );
 
-console.log(sampleStateMachine.export(PumlWriter.getWriter({autoNumber: true})));
+console.log(slothStateMachine.export(PumlWriter.getWriter({autoNumber: true})));
 
 
-sampleStateMachine.do(MetaStateAction.DoStart); // Don't forget
+slothStateMachine.do(MetaStateAction.DoStart); // Don't forget
 
-if (sampleStateMachine.can(SlothAction.Sleep)) {
-    sampleStateMachine.do(SlothAction.Sleep);
+if (slothStateMachine.can(SlothAction.Sleep)) {
+    slothStateMachine.do(SlothAction.Sleep);
 }
 
 let energy = 10;
-energy += sampleStateMachine.current.energyIncrease;
+energy += slothStateMachine.current.energyIncrease;
 
-sampleStateMachine.current.mainTask();
+slothStateMachine.current.mainTask();
