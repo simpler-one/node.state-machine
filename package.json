@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf dist & tsc -p src",
-    "test": "rimraf spec/built & tsc -p spec & ls spec/built & jasmine",
+    "test": "rimraf spec/built & tsc -p spec & ls spec & jasmine",
     "postinstall": "npm run build"
   },
   "repository": {
