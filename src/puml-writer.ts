@@ -89,6 +89,7 @@ export interface Options {
     autoNumber?: boolean;
     arrowDirection?: string;
 }
+// tslint:disable-next-line:no-namespace
 namespace Options {
     export function fill(options: Options): Options {
         return {

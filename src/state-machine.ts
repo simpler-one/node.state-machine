@@ -186,7 +186,7 @@ export class StateMachine<S, A extends string, P = void> {
     }
 }
 
-
+// tslint:disable-next-line:max-classes-per-file
 class StateWrapper<S, A, P> {
     public get name(): string {
         return this.type.name;
@@ -199,6 +199,7 @@ class StateWrapper<S, A, P> {
     }
 }
 
+// tslint:disable-next-line:max-classes-per-file
 class StringType<S extends string, A> implements StateType<S, A> {
     public get name(): string {
         return this.state;
@@ -214,6 +215,7 @@ class StringType<S extends string, A> implements StateType<S, A> {
     }
 }
 
+// tslint:disable-next-line:max-classes-per-file
 class NamedType<S extends Named, A> implements StateType<S, A> {
     public get name(): string {
         return this.state.name;
