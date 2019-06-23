@@ -1,1 +1,1 @@
-export const DoStart: undefined = undefined;
+export const DoStart: undefined = void 0;

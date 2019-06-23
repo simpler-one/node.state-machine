@@ -9,7 +9,7 @@ export class PumlWriter {
         return (map) => new PumlWriter(map, opt).export();
     }
 
-    private actionI = 1;
+    private actionI: number = 1;
     private definitions: string[] = [];
     private transitions: string[] = [];
 
