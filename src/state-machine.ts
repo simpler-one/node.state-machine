@@ -105,7 +105,7 @@ export class StateMachine<S, A extends string, P = void> {
 
         this.map.set(MetaState.StartName, new Map([[MetaStateAction.DoStart, start]]));
 
-        this._current = new StateWrapper(new StringType(MetaState.StartName as any), MetaState.Start);
+        this._current = new StateWrapper(new StringType(MetaState.StartName as undefined), MetaState.Start);
     }
 
 

@@ -7,12 +7,12 @@ export namespace MetaState {
     export const StartName: string = '[*]';
     export const AnytimeName: string = '*';
 
-    class AnytimeState implements StateType<any, any> {
-        readonly name: string = AnytimeName;
-        getState(): any {
+    class AnytimeState implements StateType<{}, {}> {
+        public readonly name: string = AnytimeName;
+        public getState(): {} {
             throw new Error('AnytimeState');
         }
-        toString(): string {
+        public toString(): string {
             return AnytimeName;
         }
     }    
