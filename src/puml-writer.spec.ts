@@ -1,6 +1,5 @@
-/// <reference path=",,/../../node_modules/@types/jasmine/index.d.ts" />
 import { PumlWriter } from './puml-writer';
-import { StateMachineMap, StateMachineMapItem, StateMachineMapAction } from './interface';
+import { StateMachineMap, StateMachineMapItem } from './interface';
 import { MetaState } from './state-meta';
 
 

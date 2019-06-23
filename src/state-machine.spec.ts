@@ -1,4 +1,4 @@
-/// <reference path=",,/../../node_modules/@types/jasmine/index.d.ts" />
+
 import { StateMachine } from './state-machine'
 import { MetaState, MetaStateAction } from './state-meta'
 
