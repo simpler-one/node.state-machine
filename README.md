@@ -7,9 +7,17 @@
 
 ![StateMachine](https://github.com/work-work-komei/node.state-machine/blob/develop/samples/SlothState.png)
 
-## Functions:
+## Functions
  - Create finite state machine and manage current state and transitions
  - Export state machine as text (ex. PlantUML)
 
-## Usage:
+## Usage
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
+
+## Schedule
+ - Check coverage: someday
+ - Crate docs: someday
+ - Release v1.0: someday
+ - Be truant: everyday
+ - Rest: everyday
+ - Sleep: everyday
