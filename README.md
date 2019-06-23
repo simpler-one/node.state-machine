@@ -7,4 +7,4 @@
  - Export state machine as text (ex. PlantUML)
 
 ## Usage:
- See: samples
+ See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
