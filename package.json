@@ -28,6 +28,7 @@
   "homepage": "https://github.com/work-work-komei/node.state-machine#readme",
   "dependencies": {
     "rimraf": "^2.6.3",
+    "rxjs": "^6.5.2",
     "tsc": "^1.20150623.0",
     "typescript": "^3.5.2"
   },

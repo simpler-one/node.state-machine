@@ -1,10 +1,17 @@
-import { StateType, StateMachineItem, Named, StateMachineWriter, StateMachineMap, StateMachineMapItem, StateMachineMapAction } from './interface';
+import {
+    StateType, StateMachineItem, Named, StateMachineWriter,
+    StateMachineMap, StateMachineMapItem, StateMachineMapAction
+} from './interface';
 import { MetaState, MetaStateAction } from './state-meta';
+import { Subject, Observable } from 'rxjs';
 
 
 type StateMap<S, A, P> = Map<string, Map<string, StateType<S, A, P>>>;
 type Item<S, A, P> = StateMachineItem<string, StateType<S, A, P>, A>;
-type LooseStateType<S, A, P> = StateType<S, A | void, P | void>
+type LooseStateType<S, A, P> = StateType<S, A | void, P | void>;
+
+type StateChangedEventArgs<S, A> = { oldState: S, newState: S, action: A, message: string };
+type StateChangeFailedEventArgs<S, A> = { curState: S, action: A, message: string };
 
 export class StateMachine<S, A extends string, P = void> {
 
@@ -19,19 +26,19 @@ export class StateMachine<S, A extends string, P = void> {
     //
     // Public event
 
-    public set stateChanged(handler: (oldState: S, newState: S, action: A, message: string) => void) {
-        this._stateChanged = handler ? handler : () => undefined;
+    public get stateChanged(): Observable<StateChangedEventArgs<S, A>> {
+        return this._stateChanged.asObservable();
     }
-    public set stateCstateChangeFailedhanged(handler: (curState: S, action: A, message: string) => void) {
-        this._stateChangeFailed = handler ? handler : () => undefined;
+    public get stateCstateChangeFailed(): Observable<StateChangeFailedEventArgs<S, A>> {
+        return this._stateChangeFailed.asObservable();
     }
 
 
     private readonly map: StateMap<S, A, P>;
     private _current: StateWrapper<S, A, P>;
 
-    private _stateChanged: (oldState: S, newState: S, action: A, message: string) => void = () => undefined;
-    private _stateChangeFailed: (curState: S, action: A, message: string) => void = () => undefined;
+    private readonly _stateChanged: Subject<StateChangedEventArgs<S, A>> = new Subject();
+    private readonly _stateChangeFailed: Subject<StateChangeFailedEventArgs<S, A>> = new Subject();
 
 
     //
@@ -117,14 +124,23 @@ export class StateMachine<S, A extends string, P = void> {
     public do(action: A, params?: P): void {
         const type: StateType<S, A, P> = this.getType(action);
         if (type === undefined) {
-            this._stateChangeFailed(this._current.state, action, `[${this.name}] Invalid action. ${this._current.name} -> ? : ${action}`);
+            this._stateChangeFailed.next({
+                curState: this._current.state,
+                action,
+                message: `[${this.name}] Invalid action. ${this._current.name} -> ? : ${action}`
+            });
             return;
         }
 
         const old: StateWrapper<S, A, P> = this._current;
         const next: S = type.getState(params);
         this._current = new StateWrapper(type, next);
-        this._stateChanged(old.state, next, action, `[${this.name}] ${this._current.name} -> ${type.name} : ${action}`);
+        this._stateChanged.next({
+            oldState: old.state,
+            newState: next,
+            action,
+            message: `[${this.name}] ${this._current.name} -> ${type.name} : ${action}`
+        });
         if (old.type.onLeaveState) old.type.onLeaveState(old.state, next, action, params);
         if (type.onEnterState) type.onEnterState(old.state, next, action, params);
     }
