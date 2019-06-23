@@ -4,12 +4,12 @@ import { MetaState } from "./state-meta";
 
 export class PumlWriter {
 
-    static getWriter(options?: Options): (map: StateMachineMap) => string {
+    public static getWriter(options?: Options): (map: StateMachineMap) => string {
         const opt = Options.fill(options);
         return (map) => new PumlWriter(map, opt).export();
     }
 
-    private actionI: number = 1;
+    private actionI = 1;
     private definitions: string[] = [];
     private transitions: string[] = [];
 

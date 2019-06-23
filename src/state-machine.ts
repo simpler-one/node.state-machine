@@ -1,4 +1,7 @@
-import { StateType, StateMachineItem, Named, StateMachineWriter, StateMachineMap, StateMachineMapItem, StateMachineMapAction } from './interface';
+import {
+    StateType, StateMachineItem, Named, StateMachineWriter,
+    StateMachineMap, StateMachineMapItem, StateMachineMapAction
+} from './interface';
 import { MetaState, MetaStateAction } from './state-meta';
 import { Subject, Observable } from 'rxjs';
 
