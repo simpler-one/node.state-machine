@@ -34,6 +34,33 @@ class TypedState {
     }
 }
 
+class FullTypedState {
+    public static readonly State1 = new FullTypedState(StringState.State1);
+    public static readonly State2 = new FullTypedState(StringState.State2);
+    public static readonly State3 = new FullTypedState(StringState.State3);
+
+    public enterCalled: number = 0;
+    public leaveCalled: number = 0;
+
+    get name(): string {
+        return this.state;
+    }
+
+    constructor(public readonly state: StringState) {
+    }
+
+    getState() {
+        return this.state;
+    }
+
+    onEnterState(): void {
+        this.enterCalled++;
+    }
+    onLeaveState(): void {
+        this.leaveCalled++;
+    }
+}
+
 enum Action {
     Action1 = 'Action1',
     Action2 = 'Action2',
@@ -89,13 +116,19 @@ describe('StateMachine', () => {
         describe('do', () => {
             it('should transit to user-defined start state when do start if state is start', () => {
                 // Given
+                let changedEventCalled = false;
+                let failedEventCalled = false;
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1);
+                fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
+                fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
     
                 // When
                 fsm.do(MetaStateAction.DoStart);
     
                 // Then
                 expect(fsm.current).toBe(StringState.State1);
+                expect(changedEventCalled).toBe(true);
+                expect(failedEventCalled).toBe(false);
             });
 
             it('should transit to next state when do action if transition is defined', () => {
@@ -118,6 +151,8 @@ describe('StateMachine', () => {
 
             it('should NOT transit to next state when do action if transition is NOT defined', () => {
                 // Given
+                let changedEventCalled = false;
+                let failedEventCalled = false;
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
                     state: TypedState.State1,
@@ -125,12 +160,16 @@ describe('StateMachine', () => {
                     ]
                 });
                 fsm.do(MetaStateAction.DoStart);
+                fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
+                fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
     
                 // When
                 fsm.do(Action.Action1);
     
                 // Then
                 expect(fsm.current).toBe(StringState.State1);
+                expect(changedEventCalled).toBe(false);
+                expect(failedEventCalled).toBe(true);
             });
 
             it('should transit to next state when do action if anytime transition is defined', () => {
@@ -154,6 +193,35 @@ describe('StateMachine', () => {
     
                 // Then
                 expect(fsm.current).toBe(StringState.State2);
+            });
+
+            it('should call enter/leave event when do action if event hander is defined', () => {
+                // Given
+                const fsm = StateMachine.fromType<StringState, Action>('name', FullTypedState.State1,
+                {
+                    state: MetaState.Anytime,
+                    actions: [
+                        [Action.Action1, FullTypedState.State2]
+                    ]
+                },
+                {
+                    state: FullTypedState.State1,
+                    actions: [
+                    ]
+                });
+                fsm.do(MetaStateAction.DoStart);
+                const calledCount1 = { enter: FullTypedState.State1.enterCalled, leave: FullTypedState.State1.leaveCalled };
+                const calledCount2 = { enter: FullTypedState.State2.enterCalled, leave: FullTypedState.State2.leaveCalled };
+    
+                // When
+                fsm.do(Action.Action1);
+    
+                // Then
+                expect(fsm.current).toBe(StringState.State2);
+                expect(FullTypedState.State1.enterCalled).toBe(calledCount1.enter);
+                expect(FullTypedState.State1.leaveCalled).toBe(calledCount1.leave + 1);
+                expect(FullTypedState.State2.enterCalled).toBe(calledCount2.enter + 1);
+                expect(FullTypedState.State2.leaveCalled).toBe(calledCount2.leave);
             });
         });
 
