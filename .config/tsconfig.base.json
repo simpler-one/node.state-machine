@@ -2,10 +2,7 @@
     "compilerOptions": {
         "target": "es6",
         "module": "commonjs",
-        "sourceMap": true,
-        "declaration": true,
-        "rootDir": "src",
-        "outDir": "build",
+        "rootDir": "../src",
         "skipLibCheck": true,
         "newLine": "lf"
     },
