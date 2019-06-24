@@ -1,6 +1,6 @@
 {
   "name": "@working-sloth/state-machine",
-  "version": "0.1.13",
+  "version": "0.1.14",
   "description": "State Machine for NodeJS",
   "main": "dist/index.js",
   "scripts": {
@@ -27,12 +27,12 @@
   },
   "homepage": "https://github.com/work-work-komei/node.state-machine#readme",
   "dependencies": {
-    "rxjs": "^6.5.2"
+    "rimraf": "^2.6.3",
+    "rxjs": "^6.5.2",
+    "typescript": "^3.5.2"
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
-    "jasmine": "^3.4.0",
-    "rimraf": "^2.6.3",
-    "typescript": "^3.5.2"
+    "jasmine": "^3.4.0"
   }
 }
