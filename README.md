@@ -20,7 +20,7 @@ Note: This version is beta.
  - Check coverage: someday
  - Crate docs: someday
  - Release v1.0: someday
- - Rest: everyday
- - Sleep: everyday
+ - Rest: every day
+ - Sleep: every day
  - Be clever and lazy: soon
  - Be stupid and diligent: never

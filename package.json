@@ -1,12 +1,11 @@
 {
   "name": "@working-sloth/state-machine",
-  "version": "0.1.11",
+  "version": "0.1.12",
   "description": "State Machine for NodeJS",
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf dist && tsc -p src",
-    "test": "rimraf spec/built && tsc -p spec && jasmine",
-    "postinstall": "npm run build"
+    "test": "rimraf spec/built && tsc -p spec && jasmine"
   },
   "repository": {
     "type": "git",
@@ -27,13 +26,12 @@
   },
   "homepage": "https://github.com/work-work-komei/node.state-machine#readme",
   "dependencies": {
-    "rimraf": "^2.6.3",
-    "rxjs": "^6.5.2",
-    "tsc": "^1.20150623.0",
-    "typescript": "^3.5.2"
+    "rxjs": "^6.5.2"
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
-    "jasmine": "^3.4.0"
+    "jasmine": "^3.4.0",
+    "rimraf": "^2.6.3",
+    "typescript": "^3.5.2"
   }
 }
