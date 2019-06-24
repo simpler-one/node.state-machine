@@ -1,11 +1,12 @@
 {
   "name": "@working-sloth/state-machine",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "description": "State Machine for NodeJS",
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf dist && tsc -p src",
-    "test": "rimraf spec/built && tsc -p spec && jasmine"
+    "test": "rimraf spec/built && tsc -p spec && jasmine",
+    "postinstall": "npm run build"
   },
   "repository": {
     "type": "git",
