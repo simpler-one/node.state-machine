@@ -1,4 +1,5 @@
-import { StateMachine } from '@working-sloth/state-machine';
+import { StateMachine, MetaStateAction } from "@working-sloth/state-machine";
+
 
 enum SlothState {
     Idle = 'Idle',
@@ -35,6 +36,9 @@ const fsm = StateMachine.fromString<SlothState, SlothAction>(
         ]
     }
 );
+
+
+fsm.do(MetaStateAction.DoStart); // Don't forget
 
 if (fsm.can(SlothAction.Sleep)) {
     fsm.do(SlothAction.Sleep);
