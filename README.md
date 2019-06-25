@@ -35,26 +35,22 @@ const fsm = StateMachine.fromString<SlothState, SlothAction>(
     {
         state: SlothState.Idle,
         actions: [
-            [SlothAction.Sleep, SlothState.Sleep],
+            [SlothAction.Sleep, SlothState.Sleeping],
             [SlothAction.Eat, SlothState.Eating],
         ]
     }, {
         state: SlothState.Sleeping,
         actions: [
-            [SloshAction.Wake, SlothState.Idle],
+            [SlothAction.Wake, SlothState.Idle],
         ]
     }, {
         state: SlothState.Eating,
         actions: [
-            [SlothAction.Sleep, SlothState.Sleep],
+            [SlothAction.Sleep, SlothState.Sleeping],
             [SlothAction.Stop, SlothState.Idle],
         ]
     }
 );
-
-if (fsm.can(SlothAction.Sleep)) {
-    fsm.do(SlothAction.Sleep);
-}
 ```
 
 ### case: Named static state (rich state)

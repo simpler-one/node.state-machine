@@ -1,5 +1,4 @@
-import { StateMachine, MetaState, MetaStateAction, StateType } from "../src";
-import { PumlWriter } from "../src/puml-writer";
+import { StateMachine, MetaState, MetaStateAction, PumlWriter } from "@working-sloth/state-machine";
 
 
 class SlothState {
