@@ -29,7 +29,7 @@ enum SlothAction {
     ...
 }
 
-const fsm = StateMachine.fromString(
+const fsm = StateMachine.fromString<SlothState, SlothAction>(
     'Sloth State', // state machine name
     SlothState.Idle, // start state
     {
