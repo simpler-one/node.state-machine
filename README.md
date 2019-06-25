@@ -22,22 +22,21 @@ import { StateMachine } from '@working-sloth/state-machine';
 
 enum SlothState {
     Idle = 'Idle',
-    Sleeping = 'Sleeping ',
-    Eating = 'Eating',
+    ...
 }
 
 enum SlothAction {
     Sleep = 'Sleep',
-    Eat = 'Eat',
-    Stop = 'Stop',
-    Wake = 'Wake',
+    ...
 }
 
 const fsm = StateMachine.fromString(
     'Sloth State', // state machine name
     SlothState.Idle, // start state
     {
-        state: 
+        state: SlothState.Idle,
+        actions: [
+        ]
     }, {
         
     }
