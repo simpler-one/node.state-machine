@@ -6,7 +6,8 @@
   "scripts": {
     "build": "rimraf dist && tsc -p src",
     "test": "rimraf spec/built && tsc -p spec && jasmine",
-    "postinstall": "npm run build"
+    "postinstall": "npm run build",
+    "exec": "ts-node -P .config/tsconfig.base.json --files"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
-    "jasmine": "^3.4.0"
+    "jasmine": "^3.4.0",
+    "ts-node": "^8.3.0"
   }
 }
