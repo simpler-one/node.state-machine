@@ -1,5 +1,5 @@
 import {
-    StateType, StateMachineItem, Named, StateMachineWriter,
+    StateType, StateMachineItem, NamedState, StateMachineWriter,
     StateMachineMap, StateMachineMapItem, StateMachineMapAction
 } from './interface';
 import { MetaState, MetaStateAction } from './state-meta';
@@ -63,17 +63,17 @@ export class StateMachine<S, A extends string, P = void> {
         );
     }
 
-    public static fromNamed<S extends Named, A extends string>(
+    public static fromNamed<S extends NamedState<S, A, P>, A extends string, P = void>(
         name: string,
         start: S,
         ...items: StateMachineItem<S, S, A>[]
-    ): StateMachine<S, A> {
-        return new StateMachine<S, A>(
+    ): StateMachine<S, A, P> {
+        return new StateMachine<S, A, P>(
             name,
             new NamedType(start),
             items.map(item => ({
                 state: item.state.name,
-                actions: item.actions.map(action => [action[0], new NamedType(action[1])] as [A, StateType<S, A>])
+                actions: item.actions.map(action => [action[0], new NamedType(action[1])] as [A, StateType<S, A, P>])
             }))
         );
     }
@@ -216,14 +216,19 @@ class StringType<S extends string, A> implements StateType<S, A> {
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class NamedType<S extends Named, A> implements StateType<S, A> {
+class NamedType<S extends NamedState<S, A, P>, A, P> implements StateType<S, A, P> {
     public get name(): string {
         return this.state.name;
     }
 
+    public readonly onEnterState: (oldState: S, newState: S, action: A, params: P) => void;
+    public readonly onLeaveState: (oldState: S, newState: S, action: A, params: P) => void;
+
     constructor(
-        private readonly state: S
+        private readonly state: S,
     ) {
+        this.onEnterState = state.onEnterState;
+        this.onLeaveState = state.onLeaveState;
     }
 
     public getState(): S {
