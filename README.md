@@ -21,7 +21,16 @@ Note: This version is beta.
 import { StateMachine } from '@working-sloth/state-machine';
 
 enum SlothState {
-    
+    Idle = 'Idle',
+    Sleeping = 'Sleeping ',
+    Eating = 'Eating',
+}
+
+enum SlothAction {
+    Sleep = 'Sleep',
+    Eat = 'Eat',
+    Stop = 'Stop',
+    Wake = 'Wake',
 }
 
 const fsm = StateMachine.fromString(
@@ -35,7 +44,7 @@ const fsm = StateMachine.fromString(
 );
 ```
 
-### case: Named static state (rich long-lived state)
+### case: Named static state (rich singleton state)
  See sample: 
 
 ### case: Typed dynamic state (rich short-lived state)
