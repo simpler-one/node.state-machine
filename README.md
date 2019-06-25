@@ -10,11 +10,22 @@
 Note: This version is beta.
 
 ## Functions
- - Create finite state machine and manage current state and transitions
+ - Provide rich state machine
  - Export state machine as text (ex. PlantUML)
 
-## Usage
+## Quick start
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
+```js
+import { StateMachine } from '@working-sloth/state-machine';
+
+
+const fsm = StateMachine.fromString(
+    'Sloth State', // state machine name
+    SlothState.Idle, // start state
+    {
+    }
+);
+```
 
 ## Schedule
  - State nesting: someday
