@@ -29,15 +29,17 @@ const fsm = StateMachine.fromString(
     SlothState.Idle, // start state
     {
         state: 
+    }, {
+        
     }
 );
 ```
 
-### case: Named static state (rich state)
+### case: Named static state (rich long-lived state)
+ See sample: 
 
-
-### case: 
-
+### case: Typed dynamic state (rich short-lived state)
+ See sample: 
 
 ## Schedule
  - State nesting: someday
