@@ -37,6 +37,7 @@ const fsm = StateMachine.fromString<SlothState, SlothAction>(
     }
 );
 
+console.log(fsm.current);
 
 fsm.do(MetaStateAction.DoStart); // Don't forget
 
