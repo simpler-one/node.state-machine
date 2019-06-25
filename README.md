@@ -15,17 +15,29 @@ Note: This version is beta.
 
 ## Quick start
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
+
+### case: String state (most simple)
 ```js
 import { StateMachine } from '@working-sloth/state-machine';
 
+enum SlothState {
+    
+}
 
 const fsm = StateMachine.fromString(
     'Sloth State', // state machine name
     SlothState.Idle, // start state
     {
+        state: 
     }
 );
 ```
+
+### case: Named static state (rich state)
+
+
+### case: 
+
 
 ## Schedule
  - State nesting: someday
