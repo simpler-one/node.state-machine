@@ -17,6 +17,7 @@ Note: This version is beta.
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
 
 ## Schedule
+ - State nesting: someday
  - Check coverage: someday
  - Crate docs: someday
  - Release v1.0: someday
