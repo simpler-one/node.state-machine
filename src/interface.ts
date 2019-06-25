@@ -1,5 +1,7 @@
-export interface Named {
+export interface NamedState<S, A = void, P = void> {
     readonly name: string;
+    onEnterState?(oldState: S, newState: S, action: A, params: P): void;
+    onLeaveState?(oldState: S, newState: S, action: A, params: P): void;
 }
 
 export interface StateType<S, A = void, P = void> {
