@@ -7,10 +7,10 @@
 
 ![StateMachine](https://github.com/work-work-komei/node.state-machine/blob/develop/samples/SlothState.png)
 
-Note: This version is beta.
+Note: Current version is beta.
 
 ## Functions
- - Provide rich state machine
+ - Provide rich and typed state machine
  - Export state machine as text (ex. PlantUML)
 
 ## Quick start
