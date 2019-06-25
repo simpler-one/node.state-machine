@@ -36,17 +36,32 @@ const fsm = StateMachine.fromString(
     {
         state: SlothState.Idle,
         actions: [
+            [SlothAction.Sleep, SlothState.Sleep],
+            [SlothAction.Eat, SlothState.Eating],
         ]
     }, {
-        
+        state: SlothState.Sleeping,
+        actions: [
+            [SloshAction.Wake, SlothState.Idle],
+        ]
+    }, {
+        state: SlothState.Eating,
+        actions: [
+            [SlothAction.Sleep, SlothState.Sleep],
+            [SlothAction.Stop, SlothState.Idle],
+        ]
     }
 );
+
+if (fsm.can(SlothAction.Sleep)) {
+    fsm.do(SlothAction.Sleep);
+}
 ```
 
-### case: Named static state (rich singleton state)
+### case: Named static state (rich state)
  See sample: 
 
-### case: Typed dynamic state (rich short-lived state)
+### case: Typed dynamic state (rich state)
  See sample: 
 
 ## Schedule
