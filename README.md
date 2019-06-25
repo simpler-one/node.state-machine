@@ -14,8 +14,7 @@ Note: This version is beta.
  - Export state machine as text (ex. PlantUML)
 
 ## Quick start
- See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
-
+ 
 ### case: String state (most simple)
 ```js
 import { StateMachine } from '@working-sloth/state-machine';
@@ -59,12 +58,15 @@ if (fsm.can(SlothAction.Sleep)) {
 ```
 
 ### case: Named static state (rich state)
- See sample: 
+ See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
 
-### case: Typed dynamic state (rich state)
- See sample: 
+
+### case: Typed dynamic state (rich state with life cycle)
+ See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
+
 
 ## Schedule
+ - Create string-based fsm from PlantUML: someday
  - State nesting: someday
  - Check coverage: someday
  - Crate docs: someday
