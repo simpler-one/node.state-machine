@@ -20,11 +20,11 @@ Let's be lazy.
     </tr>
     <tr>
         <td>
-            <pre>
+<pre>
 if (fsm.current === 'Doing' || fsm.curent === 'Waiting' || ...) {
     showProgress();
 }
-
+<br>
 if (fsm.current === 'Complete') {
     showResult();
 }
@@ -35,16 +35,16 @@ if (fsm.current === 'Cancel') {
     showCanceled();
 }
 ...
-            </pre>
+</pre>
         </td>
         <td>
-            <pre>
+<pre>
 if (fsm.current.inProgress) {
     showProgress();
 }
-
+<br>
 fsm.current.show();
-            </pre>
+</pre>
         </td>
     </tr>
 </table>
