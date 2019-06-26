@@ -70,11 +70,11 @@ if (fsm.can(SlothAction.Sleep)) {
 ```
 
 ### case: Named static state (rich state)
- I have a good sample which this margin is too narrow to contain.
+ I have a truly marvelous sample of this case which this margin is too narrow to contain.
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
 
 ### case: Typed dynamic state (rich state with life cycle)
- I have a good sample which this margin is too narrow to contain.
+ I have a truly marvelous sample of this case which this margin is too narrow to contain.
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
 
 

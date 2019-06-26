@@ -70,11 +70,11 @@ if (fsm.can(SlothAction.Sleep)) {
 ```
 
 ### case: Named static state (rich state)
- 真に驚くべき良いサンプルがあるが、ここに書くには余白が狭すぎる
+ 真に驚くべきサンプルがあるが、ここに書くには余白が狭すぎる
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
 
 ### case: Typed dynamic state (ライフサイクル付きrich state)
- 真に驚くべき良いサンプルがあるが、ここに書くには余白が狭すぎる
+ 真に驚くべきサンプルがあるが、ここに書くには余白が狭すぎる
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
 
 
