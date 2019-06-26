@@ -12,6 +12,39 @@
 日々怠ける処の開発者、日没する処の社畜開発者に致す。
 ステートマシンを１から作ったり貧弱なステートマシンのお世話があなたの仕事ですか？
 怠けましょう
+<table>
+    <tr>
+        <th>Poor state (Before)</th>
+        <th>Rich State (After)</th>
+    </tr>
+    <tr>
+        <td>
+            <pre>
+if (fsm.current === 'Sending' || fsm.curent === 'Receiving' || ...) {
+    showProgress();
+}
+if (fsm.current === 'Complete') {
+    showResult();
+}
+if (fsm.current === 'Error') {
+    showError();
+}
+if (fsm.current === 'Cancel') {
+    showCanceled();
+}
+...
+            </pre>
+        </td>
+        <td>
+            <pre>
+if (fsm.current.progressVisible) {
+    showProgress();
+}
+fsm.current.show();
+            </pre>
+        </td>
+    </tr>
+</table>
 
 ## 概要
  JavaScriptとTypeScript用のステートマシンです
