@@ -117,6 +117,14 @@ export class StateMachine<S, A extends string, P = void> {
 
 
     /**
+     * Start action
+     * @param params params for getState(*)
+     */
+    public start(params?: P): void {
+        this.do(MetaStateAction.DoStart, params);
+    }
+
+    /**
      * Do the action
      * @param action action
      * @param params params for getState(*)
