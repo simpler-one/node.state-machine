@@ -27,7 +27,7 @@
 
 ### case: String state (最もシンプル)
 ```js
-import { StateMachine, MetaStateAction } from '@working-sloth/state-machine';
+import { StateMachine } from '@working-sloth/state-machine';
 
 enum SlothState {
     Idle = 'Idle',
