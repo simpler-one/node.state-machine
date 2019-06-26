@@ -1,3 +1,12 @@
+# dist/ : necessary
+node_modules/
+samples/
+spec/
+.gitignore
+# .travis.yml : necessary
+
+#---------------
+
 # Logs
 logs
 *.log
@@ -59,9 +68,3 @@ typings/
 
 # next.js build output
 .next
-
-# distribution
-dist/
-
-# build
-spec/built/

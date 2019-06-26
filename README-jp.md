@@ -5,13 +5,12 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/03db41b395194a168573c9b647f9db24)](https://app.codacy.com/app/work-work-komei/node.state-machine?utm_source=github.com&utm_medium=referral&utm_content=work-work-komei/node.state-machine&utm_campaign=Badge_Grade_Dashboard)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-
-![StateMachine](https://github.com/work-work-komei/node.state-machine/blob/develop/samples/1.quick-start/state.png)
-
+![StateMachine](samples/1.quick-start/state.png)
 
 注: まだβ版です
 
-日本の社畜開発者へ、ステートマシンを１から作ったり貧弱なステートマシンのお世話があなたの仕事ですか？
+日々怠ける処の開発者、日没する処の社畜開発者に致す。
+ステートマシンを１から作ったり貧弱なステートマシンのお世話があなたの仕事ですか？
 怠けましょう
 
 ## 概要
@@ -19,11 +18,11 @@
 
 
 ## Why?
- - シンプル: 使い方が簡単で、コードが短くなります
- - ジェネリック型対応: ステート、アクション、オプション引数すべて
- - リッチなステート: ステートオブジェクトにユーザー定義クラスが使えます
- - ライフサイクル: 生成/破棄
- - 状態遷移図のエクスポート: PlantUML
+- シンプル: 使い方が簡単で、コードが短くなります
+- ジェネリック型対応: ステート、アクション、オプション引数すべて
+- リッチなステート: ステートオブジェクトにユーザー定義クラスが使えます
+- ライフサイクル: 生成/破棄
+- 状態遷移図のエクスポート: PlantUML
 
 
 ## Quick start
@@ -70,25 +69,23 @@ if (fsm.can(SlothAction.Sleep)) {
 ```
 
 ### case: Named static state (rich state)
- 真に驚くべき良いサンプルがあるが、ここに書くには余白が狭すぎる
- See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
+ 真に驚くべきサンプルがあるが、ここに書くには余白が狭すぎる
+ [See samples](samples)
 
 ### case: Typed dynamic state (ライフサイクル付きrich state)
- 真に驚くべき良いサンプルがあるが、ここに書くには余白が狭すぎる
- See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
-
+ 真に驚くべきサンプルがあるが、ここに書くには余白が狭すぎる
+ [See samples](samples)
 
 ## 予定
- - PlantUMLからの逆変換: 明日やる
- - ステートのネスト: 明日やる
- - カバレッジチェック: 明日やる
- - ドキュメントの充実: 明日やる
- - リリース v1.0: 明日やる
- - 休憩: 毎日
- - おふとん: 毎日
- - 有能な怠け者になる: もうすぐ
- - 無能な働き者になる: 一昨日
-
+- PlantUMLからの逆変換: 明日やる
+- ステートのネスト: 明日やる
+- カバレッジチェック: 明日やる
+- ドキュメントの充実: 明日やる
+- リリース v1.0: 明日やる
+- 休憩: 毎日
+- おふとん: 毎日
+- 有能な怠け者になる: もうすぐ
+- 無能な働き者になる: 一昨日
 
 ## ご満足いただけなかった場合
  ここに連絡：koba.work.work1127@gmail.com
