@@ -5,7 +5,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/03db41b395194a168573c9b647f9db24)](https://app.codacy.com/app/work-work-komei/node.state-machine?utm_source=github.com&utm_medium=referral&utm_content=work-work-komei/node.state-machine&utm_campaign=Badge_Grade_Dashboard)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-![StateMachine](https://github.com/work-work-komei/node.state-machine/blob/develop/samples/1.quick-start/state.png)
+![StateMachine](samples/1.quick-start/state.png)
 
 [日本語](README-jp.md)
 
@@ -68,11 +68,11 @@ if (fsm.can(SlothAction.Sleep)) {
 
 ### case: Named static state (rich state)
  I have a truly marvelous sample of this case which this margin is too narrow to contain.
- See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
+ [See samples](samples)
 
 ### case: Typed dynamic state (rich state with life cycle)
  I have a truly marvelous sample of this case which this margin is too narrow to contain.
- See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
+ [See samples](samples)
 
 ## Schedule
 - Create string-based fsm from PlantUML: someday

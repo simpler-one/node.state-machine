@@ -5,7 +5,7 @@
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/03db41b395194a168573c9b647f9db24)](https://app.codacy.com/app/work-work-komei/node.state-machine?utm_source=github.com&utm_medium=referral&utm_content=work-work-komei/node.state-machine&utm_campaign=Badge_Grade_Dashboard)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-![StateMachine](https://github.com/work-work-komei/node.state-machine/blob/develop/samples/1.quick-start/state.png)
+![StateMachine](samples/1.quick-start/state.png)
 
 注: まだβ版です
 
@@ -70,11 +70,11 @@ if (fsm.can(SlothAction.Sleep)) {
 
 ### case: Named static state (rich state)
  真に驚くべきサンプルがあるが、ここに書くには余白が狭すぎる
- See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
+ [See samples](samples)
 
 ### case: Typed dynamic state (ライフサイクル付きrich state)
  真に驚くべきサンプルがあるが、ここに書くには余白が狭すぎる
- See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
+ [See samples](samples)
 
 ## 予定
 - PlantUMLからの逆変換: 明日やる
