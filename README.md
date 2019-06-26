@@ -9,9 +9,18 @@
 
 Note: Current version is beta.
 
-## Functions
- - Provide rich and typed state machine
+## Main Functions
+ - Provide rich state machine
  - Export state machine as text (ex. PlantUML)
+
+
+## Why this state-machine?
+ - Simple: 
+ - Generic typing: states, actions and optional params
+ - Rich object state: user defined class can be state
+ - State with life-cycle: 
+ - Export state machine: PlantUML
+
 
 ## Quick start
  
@@ -58,7 +67,6 @@ if (fsm.can(SlothAction.Sleep)) {
 
 ### case: Named static state (rich state)
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
-
 
 ### case: Typed dynamic state (rich state with life cycle)
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
