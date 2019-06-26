@@ -3,7 +3,7 @@ node_modules/
 samples/
 spec/
 .gitignore
-# .travis.yml : necessary
+.travis.yml
 
 #---------------
 
