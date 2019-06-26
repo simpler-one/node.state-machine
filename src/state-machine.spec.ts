@@ -1,6 +1,7 @@
 
 import { StateMachine } from './state-machine'
 import { MetaState, MetaStateAction } from './state-meta'
+import { StateMachineMap } from './interface';
 
 enum StringState {
     State1 = 'State1',
@@ -454,6 +455,36 @@ describe('StateMachine', () => {
                 expect(stringResult).toEqual(namedResult);
                 expect(stringResult).toEqual(typedResult);
                 expect(namedResult).toEqual(typedResult);
+            });
+        });
+
+        describe('export', () => {
+            it('should pass equal map to toMachineMap', () => {
+                // Given
+                const name = 'name';
+                const fsm = StateMachine.fromString<StringState, Action>(
+                    name,
+                    StringState.State1,
+                    {
+                        state: StringState.State1,
+                        actions: [
+                            [Action.Action1, StringState.State2]
+                        ]
+                    }
+                );
+                const result = 'result';
+                let actualMap: StateMachineMap;
+                const writer = (map: StateMachineMap) => {
+                    actualMap = map;
+                    return result;
+                };
+
+                // When
+                const actualResult = fsm.export(writer);
+
+                // Then
+                expect(actualResult).toBe(result);
+                expect(actualMap).toEqual(fsm.toMachineMap());
             });
         });
     });
