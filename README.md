@@ -11,12 +11,15 @@
 
 Note: Current version is beta.
 
+Diligent developer, is it your work to create state machine from scratch or take care of poor state machine?
+Let's be lazy.
+
 ## What?
  Finite state machine for JavaScript and TypeScript.
 
 
 ## Why?
- - Simple: easy to learn usage and provide shorter codes
+ - Simple: easy to understand usage and provide shorter codes
  - Generic typing: states, actions and optional params
  - Rich object state: user defined class can be state
  - State with life-cycle: create/dispose
