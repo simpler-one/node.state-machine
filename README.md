@@ -27,7 +27,7 @@ Note: Current version is beta.
  
 ### case: String state (most simple)
 ```js
-import { StateMachine } from '@working-sloth/state-machine';
+import { StateMachine, MetaStateAction } from '@working-sloth/state-machine';
 
 enum SlothState {
     Idle = 'Idle',
