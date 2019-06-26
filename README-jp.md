@@ -20,9 +20,10 @@
     <tr>
         <td>
             <pre>
-if (fsm.current === 'Sending' || fsm.curent === 'Receiving' || ...) {
+if (fsm.current === 'Doing' || fsm.curent === 'Waiting' || ...) {
     showProgress();
 }
+
 if (fsm.current === 'Complete') {
     showResult();
 }
@@ -37,9 +38,10 @@ if (fsm.current === 'Cancel') {
         </td>
         <td>
             <pre>
-if (fsm.current.progressVisible) {
+if (fsm.current.inProgress) {
     showProgress();
 }
+
 fsm.current.show();
             </pre>
         </td>
