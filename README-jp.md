@@ -9,26 +9,26 @@
 ![StateMachine](https://github.com/work-work-komei/node.state-machine/blob/develop/samples/1.quick-start/state.png)
 
 
-Note: Current version is beta.
+注: まだβ版です
 
-Diligent developer, is it your work to create state machine from scratch or take care of poor state machine?
-Let's be lazy.
+日本の社畜開発者へ、ステートマシンを１から作ったり貧弱なステートマシンのお世話があなたの仕事ですか？
+怠けましょう
 
-## What?
- Finite state machine for JavaScript and TypeScript.
+## 概要
+ JavaScriptとTypeScript用のステートマシンです
 
 
 ## Why?
- - Simple: easy to understand usage and provide shorter codes
- - Generic typing: states, actions and optional params
- - Rich object state: user defined class can be state
- - State with life-cycle: create/dispose
- - Export statecharts: PlantUML
+ - シンプル: 使い方が簡単で、コードが短くなります
+ - ジェネリック型対応: ステート、アクション、オプション引数すべて
+ - リッチなステート: ステートオブジェクトにユーザー定義クラスが使えます
+ - ライフサイクル: 生成/破棄
+ - 状態遷移図のエクスポート: PlantUML
 
 
 ## Quick start
 
-### case: String state (most simple)
+### case: String state (最もシンプル)
 ```js
 import { StateMachine, MetaStateAction } from '@working-sloth/state-machine';
 
@@ -70,25 +70,25 @@ if (fsm.can(SlothAction.Sleep)) {
 ```
 
 ### case: Named static state (rich state)
- I have a good sample which this margin is too narrow to contain.
+ 真に驚くべき良いサンプルがあるが、ここに書くには余白が狭すぎる
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
 
-### case: Typed dynamic state (rich state with life cycle)
- I have a good sample which this margin is too narrow to contain.
+### case: Typed dynamic state (ライフサイクル付きrich state)
+ 真に驚くべき良いサンプルがあるが、ここに書くには余白が狭すぎる
  See samples: https://github.com/work-work-komei/node.state-machine/tree/develop/samples
 
 
-## Schedule
- - Create string-based fsm from PlantUML: someday
- - State nesting: someday
- - Check coverage: someday
- - Crate docs: someday
- - Release v1.0: someday
- - Rest: every day
- - Sleep: every day
- - Be clever and lazy: soon
- - Be stupid and diligent: never
+## 予定
+ - PlantUMLからの逆変換: 明日やる
+ - ステートのネスト: 明日やる
+ - カバレッジチェック: 明日やる
+ - ドキュメントの充実: 明日やる
+ - リリース v1.0: 明日やる
+ - 休憩: 毎日
+ - おふとん: 毎日
+ - 有能な怠け者になる: もうすぐ
+ - 無能な働き者になる: 一昨日
 
 
-## If you aren't be satisfied
- contect: koba.work.work1127@gmail.com
+## ご満足いただけなかった場合
+ ここに連絡：koba.work.work1127@gmail.com
