@@ -14,10 +14,10 @@ Note: Current version is beta.
 Diligent developer, is it your work to create state machine from scratch or take care of poor state machine?
 Let's be lazy.
 
-## What?
+## What? 
  Finite state machine for JavaScript and TypeScript.
 
-## Why\?
+## Why? 
 - Simple: easy to understand usage and provide shorter codes
 - Generic typing: states, actions and optional params
 - Rich object state: user defined class can be state
@@ -86,4 +86,4 @@ if (fsm.can(SlothAction.Sleep)) {
 - Be stupid and diligent: never
 
 ## If you aren't be satisfied
- contect: koba.work.work1127@gmail.com
+ contact: koba.work.work1127@gmail.com
