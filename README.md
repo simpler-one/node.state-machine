@@ -13,6 +13,40 @@ Note: Current version is beta.
 
 Diligent developer, is it your work to create state machine from scratch or take care of poor state machine?
 Let's be lazy.
+<table>
+    <tr>
+        <th>Poor state (Before)</th>
+        <th>Rich State (After)</th>
+    </tr>
+    <tr>
+        <td>
+            <pre>
+if (fsm.current === 'Sending' || fsm.curent === 'Receiving' || ...) {
+    showProgress();
+}
+if (fsm.current === 'Complete') {
+    showResult();
+}
+if (fsm.current === 'Error') {
+    showError();
+}
+if (fsm.current === 'Cancel') {
+    showCanceled();
+}
+...
+            </pre>
+        </td>
+        <td>
+            <pre>
+if (fsm.current.progressVisible) {
+    showProgress();
+}
+fsm.current.show();
+            </pre>
+        </td>
+    </tr>
+</table>
+
 
 ## What? 
  Finite state machine for JavaScript and TypeScript.
