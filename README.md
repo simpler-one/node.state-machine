@@ -19,7 +19,7 @@ Let's be lazy.
         <th>Rich State (After)</th>
     </tr>
     <tr>
-        <td>
+        <td valign="top">
 <pre>
 if (fsm.current === 'Doing' || fsm.curent === 'Waiting' || ...) {
     showProgress();
@@ -37,7 +37,7 @@ if (fsm.current === 'Cancel') {
 ...
 </pre>
         </td>
-        <td>
+        <td valign="top">
 <pre>
 if (fsm.current.inProgress) {
     showProgress();
