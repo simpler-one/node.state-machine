@@ -1,4 +1,4 @@
-import { StateMachine, MetaState, MetaStateAction, PumlWriter } from "@working-sloth/state-machine";
+import { StateMachine, MetaState, PumlWriter } from '@working-sloth/state-machine';
 
 
 class SlothState {
@@ -80,7 +80,7 @@ const slothStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fr
 console.log(slothStateMachine.export(PumlWriter.getWriter({autoNumber: true})));
 
 
-slothStateMachine.do(MetaStateAction.DoStart); // Don't forget
+slothStateMachine.start(); // Don't forget
 
 if (slothStateMachine.can(SlothAction.Sleep)) {
     slothStateMachine.do(SlothAction.Sleep);

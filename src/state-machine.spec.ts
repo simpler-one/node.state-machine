@@ -124,7 +124,7 @@ describe('StateMachine', () => {
                 fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
     
                 // When
-                fsm.do(MetaStateAction.DoStart);
+                fsm.start();
     
                 // Then
                 expect(fsm.current).toBe(StringState.State1);
@@ -141,7 +141,7 @@ describe('StateMachine', () => {
                         [Action.Action1, TypedState.State2]
                     ]
                 });
-                fsm.do(MetaStateAction.DoStart);
+                fsm.start();
     
                 // When
                 fsm.do(Action.Action1);
@@ -160,7 +160,7 @@ describe('StateMachine', () => {
                     actions: [
                     ]
                 });
-                fsm.do(MetaStateAction.DoStart);
+                fsm.start();
                 fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
                 fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
     
@@ -187,7 +187,7 @@ describe('StateMachine', () => {
                     actions: [
                     ]
                 });
-                fsm.do(MetaStateAction.DoStart);
+                fsm.start();
     
                 // When
                 fsm.do(Action.Action1);
@@ -210,7 +210,7 @@ describe('StateMachine', () => {
                     actions: [
                     ]
                 });
-                fsm.do(MetaStateAction.DoStart);
+                fsm.start();
                 const calledCount1 = { enter: FullTypedState.State1.enterCalled, leave: FullTypedState.State1.leaveCalled };
                 const calledCount2 = { enter: FullTypedState.State2.enterCalled, leave: FullTypedState.State2.leaveCalled };
     
@@ -247,7 +247,7 @@ describe('StateMachine', () => {
                         [Action.Action1, TypedState.State2]
                     ]
                 });
-                fsm.do(MetaStateAction.DoStart);
+                fsm.start();
     
                 // When
                 const result = fsm.can(Action.Action1);
@@ -264,7 +264,7 @@ describe('StateMachine', () => {
                     actions: [
                     ]
                 });
-                fsm.do(MetaStateAction.DoStart);
+                fsm.start();
     
                 // When
                 const result = fsm.can(Action.Action1);
@@ -287,7 +287,7 @@ describe('StateMachine', () => {
                     actions: [
                     ]
                 });
-                fsm.do(MetaStateAction.DoStart);
+                fsm.start();
     
                 // When
                 const result = fsm.can(Action.Action1);

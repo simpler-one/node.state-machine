@@ -19,7 +19,7 @@
 ## 特徴
 - シンプル: 使い方が簡単で、コードが短くなります
 - ジェネリック型対応: ステート、アクション、オプション引数すべて
-- リッチなステート: ステートオブジェクトにユーザー定義クラスが使えます
+- Rich state: ステートオブジェクトにユーザー定義クラスが使えます
 - ライフサイクル: 生成/破棄
 - 状態遷移図のエクスポート: PlantUML
 
@@ -59,7 +59,7 @@ const fsm = StateMachine.fromString<SlothState, SlothAction>(
 
 console.log(fsm.current);
 
-fsm.do(MetaStateAction.DoStart); // Don't forget
+fsm.start(); // Don't forget
 
 if (fsm.can(SlothAction.Sleep)) {
     fsm.do(SlothAction.Sleep);

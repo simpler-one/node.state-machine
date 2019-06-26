@@ -1,4 +1,4 @@
-import { StateMachine, MetaStateAction } from "@working-sloth/state-machine";
+import { StateMachine } from '@working-sloth/state-machine';
 
 
 enum SlothState {
@@ -39,7 +39,7 @@ const fsm = StateMachine.fromString<SlothState, SlothAction>(
 
 console.log(fsm.current);
 
-fsm.do(MetaStateAction.DoStart); // Don't forget
+fsm.start(); // Don't forget
 
 if (fsm.can(SlothAction.Sleep)) {
     fsm.do(SlothAction.Sleep);
