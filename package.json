@@ -8,7 +8,7 @@
     "test-pre": "rimraf spec/built && tsc -p spec",
     "test": "rimraf spec/built && tsc -p spec && istanbul cover node_modules/jasmine/bin/jasmine.js",
     "remap-test": "cat coverage/coverage.json | ./node_modules/.bin/remap-istanbul > coverage/coverage-remap.json",
-    "remap-test:win": "type coverage\\coverage.json | .\\node_modules\\.bin\\remap-istanbul > coverage\\coverage-remap.json",
+    "remap-test:win": "type coverage\\coverage.json | .\\node_modules\\.bin\\remap-istanbul > coverage\\coverage-remap.json && del coverage\\coverage.json && ren coverage\\coverage-remap.json coverage.json",
     "exec": "ts-node -P .config/tsconfig.base.json --files"
   },
   "repository": {
