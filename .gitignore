@@ -1,12 +1,20 @@
+# .config/ : necessary
+.local/
+dist/
+# samples : necessary
+spec/built/
+# src/ : necessary
+# .gitignore : necessary
+# .travis.yml : necessary
+
+#---------------
+
 # Logs
 logs
 *.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-
-# Local only
-.local
 
 # Runtime data
 pids
@@ -62,9 +70,3 @@ typings/
 
 # next.js build output
 .next
-
-# distribution
-dist/
-
-# build
-spec/built/
