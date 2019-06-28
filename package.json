@@ -6,7 +6,7 @@
   "scripts": {
     "build": "rimraf dist && tsc -p src",
     "test": "rimraf spec/built && tsc -p spec && istanbul cover node_modules/jasmine/bin/jasmine.js",
-    "remapcov": "cat coverage/coverage.json | ./node_modules/.bin/remap-istanbul > coverage/coverage-remap.json",
+    "remapcov": "cat coverage/coverage.json | ./node_modules/.bin/remap-istanbul > coverage/coverage-remap.json && mv -f coverage/coverage-remap.json coverage/coverage.json",
     "remapcov:win": "type coverage\\coverage.json | .\\node_modules\\.bin\\remap-istanbul > coverage\\coverage-remap.json && del coverage\\coverage.json && ren coverage\\coverage-remap.json coverage.json",
     "codecov": "codecov",
     "exec": "ts-node -P .config/tsconfig.base.json --files"
