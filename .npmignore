@@ -1,7 +1,9 @@
+.config/
+.local/
 # dist/ : necessary
-node_modules/
 samples/
 spec/
+src/
 .gitignore
 .travis.yml
 
