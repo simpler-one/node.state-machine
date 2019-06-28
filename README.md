@@ -114,7 +114,6 @@ if (fsm.can(SlothAction.Sleep)) {
 ## Schedule
 - Create string-based fsm from PlantUML: someday
 - State nesting: someday
-- Check coverage: someday
 - Crate docs: someday
 - Release v1.0: someday
 - Rest: every day

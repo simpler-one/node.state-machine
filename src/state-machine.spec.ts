@@ -115,7 +115,41 @@ describe('StateMachine', () => {
 
     describe('instance', () => {
         describe('do', () => {
-            it('should transit to user-defined start state when do start if state is start', () => {
+            it('should transit to user-defined start state when do start if string state is start', () => {
+                // Given
+                let changedEventCalled = false;
+                let failedEventCalled = false;
+                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1);
+                fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
+                fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
+    
+                // When
+                fsm.start();
+    
+                // Then
+                expect(fsm.current).toBe(StringState.State1);
+                expect(changedEventCalled).toBe(true);
+                expect(failedEventCalled).toBe(false);
+            });
+
+            it('should transit to user-defined start state when do start if named state is start', () => {
+                // Given
+                let changedEventCalled = false;
+                let failedEventCalled = false;
+                const fsm = StateMachine.fromNamed<NamedState, Action>('name', NamedState.State1);
+                fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
+                fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
+    
+                // When
+                fsm.start();
+    
+                // Then
+                expect(fsm.current).toBe(NamedState.State1);
+                expect(changedEventCalled).toBe(true);
+                expect(failedEventCalled).toBe(false);
+            });
+
+            it('should transit to user-defined start state when do start if typed state is start', () => {
                 // Given
                 let changedEventCalled = false;
                 let failedEventCalled = false;
