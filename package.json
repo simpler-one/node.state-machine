@@ -5,10 +5,10 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rimraf dist && tsc -p src",
-    "test-pre": "rimraf spec/built && tsc -p spec",
     "test": "rimraf spec/built && tsc -p spec && istanbul cover node_modules/jasmine/bin/jasmine.js",
-    "remap-test": "cat coverage/coverage.json | ./node_modules/.bin/remap-istanbul > coverage/coverage-remap.json",
-    "remap-test:win": "type coverage\\coverage.json | .\\node_modules\\.bin\\remap-istanbul > coverage\\coverage-remap.json && del coverage\\coverage.json && ren coverage\\coverage-remap.json coverage.json",
+    "remapcov": "cat coverage/coverage.json | ./node_modules/.bin/remap-istanbul > coverage/coverage-remap.json",
+    "remapcov:win": "type coverage\\coverage.json | .\\node_modules\\.bin\\remap-istanbul > coverage\\coverage-remap.json && del coverage\\coverage.json && ren coverage\\coverage-remap.json coverage.json",
+    "codecov": "codecov",
     "exec": "ts-node -P .config/tsconfig.base.json --files"
   },
   "repository": {
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
+    "codecov": "^3.5.0",
     "jasmine": "^3.4.0",
     "remap-istanbul": "^0.13.0",
     "rimraf": "^2.6.3",
