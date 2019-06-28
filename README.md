@@ -113,7 +113,7 @@ if (fsm.can(SlothAction.Sleep)) {
 - Create string-based fsm from PlantUML: someday
 - State nesting: someday
 - Crate docs: someday
-- Release v1.0: someday
+- Export statecharts from CLI: someday
 - Rest: every day
 - Sleep: every day
 - Be clever and lazy: soon
