@@ -8,8 +8,6 @@
 
 ![StateMachine](samples/1.quick-start/state.png)
 
-注: まだβ版です
-
 日々怠ける処の開発者、日没すれども帰れぬ処の社畜開発者に致す。
 ステートマシンを１から作ったり貧弱なステートマシンのお世話があなたの仕事ですか？
 怠けましょう
@@ -93,9 +91,9 @@ const fsm = StateMachine.fromString<SlothState, SlothAction>(
     ...
 );
 
-console.log(fsm.current);
-
 fsm.start(); // Don't forget
+
+console.log(fsm.current); // You can get current state
 
 if (fsm.can(SlothAction.Sleep)) {
     fsm.do(SlothAction.Sleep);
