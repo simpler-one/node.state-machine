@@ -1,21 +1,5 @@
-import { StateMachine, MetaState, PumlWriter } from '@working-sloth/state-machine';
+import { StateMachine, StateType } from '@working-sloth/state-machine';
 
-
-class SlothState {
-    constructor(
-        public readonly energyIncrease: number,
-        public readonly sleepinessIncrease: number
-    ) {
-    }
-
-    mainTask(): void {
-        // Foo bar
-    }
-
-    dispose(): void {
-        // Destroy
-    }
-}
 
 enum SlothAction {
     Work = 'Work',
@@ -25,11 +9,34 @@ enum SlothAction {
     Stop = 'Stop'
 }
 
+// Create state class first
+class SlothState {
+
+    // You can let it having fluid members easily
+    public readonly start: Date;
+    public count: number;
+
+    constructor(
+        public readonly energyIncrease: number,
+        public readonly sleepinessIncrease: number
+    ) {
+        this.start = new Date();
+    }
+
+    mainTask(): void {
+        // Foo bar
+    }
+
+    countUp(): void {
+        this.count++;
+    }
+}
+
+// Create state type class second
 class SlothStateType implements StateType<SlothState> {
     public static readonly Idle = new SlothStateType('Idle', -0.1, 0.1);
     public static readonly Working = new SlothStateType('Working', -1, 100);
     public static readonly Eating = new SlothStateType('Eating', 10, 2);
-    public static readonly Sleepy = new SlothStateType('Sleepy', 0.05, 0);
     public static readonly Sleeping = new SlothStateType('Sleeping', -0.01, -10);
 
     constructor(
@@ -39,29 +46,21 @@ class SlothStateType implements StateType<SlothState> {
     ) {
     }
 
+    // Create state
     getState() {
         return new SlothState(this.energyIncrease, this.sleepinessIncrease);
-    }
-
-    onLeaveState(oldState: SlothState) {
-        oldState.dispose();
     }
 }
 
 
-
-const slothStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fromType<SlothState, SlothAction>(
+// S(Generic type) is a State, not a StateType!
+const fsm = StateMachine.fromType<SlothState, SlothAction>(
     'SlothState',
     SlothStateType.Idle,
     {
-        state: MetaState.Anytime,
-        actions: [
-            [SlothAction.Sleep, SlothStateType.Sleeping]
-        ]
-    },
-    {
         state: SlothStateType.Idle,
         actions: [
+            [SlothAction.Sleep, SlothStateType.Sleeping],
             [SlothAction.Work, SlothStateType.Working],
             [SlothAction.Eat, SlothStateType.Eating]
         ]
@@ -69,6 +68,7 @@ const slothStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fr
     {
         state: SlothStateType.Working,
         actions: [
+            [SlothAction.Sleep, SlothStateType.Sleeping],
             [SlothAction.Stop, SlothStateType.Idle]
         ]
     },
@@ -81,33 +81,16 @@ const slothStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fr
     {
         state: SlothStateType.Eating,
         actions: [
+            [SlothAction.Sleep, SlothStateType.Sleeping],
             [SlothAction.Stop, SlothStateType.Idle]
         ]
     },
-    {
-        state: SlothStateType.Sleepy,
-        actions: [
-            [SlothAction.Wake, SlothStateType.Idle]
-        ]
-    },
-    {
-        state: SlothStateType.Sleeping,
-        actions: [
-            [SlothAction.Wake, SlothStateType.Sleepy]
-        ]
-    }
 );
 
-console.log(slothStateMachine.export(PumlWriter.getWriter({autoNumber: true})));
 
+fsm.start(); // Don't forget
 
-slothStateMachine.start(); // Don't forget
+console.log(fsm.current.start);
 
-if (slothStateMachine.can(SlothAction.Sleep)) {
-    slothStateMachine.do(SlothAction.Sleep);
-}
-
-let energy = 10;
-energy += slothStateMachine.current.energyIncrease;
-
-slothStateMachine.current.mainTask();
+fsm.current.countUp();
+fsm.current.mainTask();

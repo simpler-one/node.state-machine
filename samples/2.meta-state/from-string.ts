@@ -1,24 +1,12 @@
-import { StateMachine, MetaState, PumlWriter } from '@working-sloth/state-machine';
+import { StateMachine, MetaState } from '@working-sloth/state-machine';
 
 
-class SlothState {
-    public static readonly Idle = new SlothState('Idle', -0.1, 0.1);
-    public static readonly Working = new SlothState('Working', -1, 100);
-    public static readonly Eating = new SlothState('Eating', 10, 2);
-    public static readonly Sleepy = new SlothState('Sleepy', 0.05, 0);
-    public static readonly Sleeping = new SlothState('Sleeping', -0.01, -10);
-
-    public readonly start: Date;
-
-    constructor(
-        public readonly name: string,
-        public readonly energyIncrease: number,
-        public readonly sleepinessIncrease: number
-    ) {
-        this.start = new Date();
-    }
+enum SlothState {
+    Idle = 'Idle',
+    Working = 'Working',
+    Eating = 'Eating',
+    Sleeping = 'Sleeping'
 }
-
 
 enum SlothAction {
     Work = 'Work',
@@ -29,12 +17,13 @@ enum SlothAction {
 }
 
 
-const slothStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fromNamed<SlothState, SlothAction>(
+const fsm = StateMachine.fromString<SlothState, SlothAction>(
     'SlothState',
     SlothState.Idle,
     {
-        state: MetaState.Anytime,
+        state: MetaState.Anytime, // import MetaState before declaration
         actions: [
+            // You can allow all states always to do something such as reset
             [SlothAction.Sleep, SlothState.Sleeping]
         ]
     },
@@ -62,33 +51,16 @@ const slothStateMachine: StateMachine<SlothState, SlothAction> = StateMachine.fr
         actions: [
             [SlothAction.Stop, SlothState.Idle]
         ]
-    },
-    {
-        state: SlothState.Sleepy,
-        actions: [
-            [SlothAction.Wake, SlothState.Idle]
-        ]
-    },
-    {
-        state: SlothState.Sleeping,
-        actions: [
-            [SlothAction.Wake, SlothState.Sleepy]
-        ]
     }
 );
 
-console.log(slothStateMachine.export(PumlWriter.getWriter({autoNumber: true})));
 
+fsm.start(); // Don't forget
 
-slothStateMachine.start(); // Don't forget
-
-if (slothStateMachine.can(SlothAction.Sleep)) {
-    slothStateMachine.do(SlothAction.Sleep);
+if (fsm.can(SlothAction.Sleep)) {
+    fsm.do(SlothAction.Sleep);
 }
 
-if (slothStateMachine.current === SlothState.Sleeping) {
+if (fsm.current === SlothState.Sleeping) {
     // PiyoPiyo
 }
-
-let energy = 10;
-energy += slothStateMachine.current.energyIncrease;

@@ -1,4 +1,4 @@
-import { StateMachine } from '@working-sloth/state-machine';
+import { StateMachine, PumlWriter } from '@working-sloth/state-machine';
 
 
 enum SlothState {
@@ -14,6 +14,7 @@ enum SlothAction {
     Stop = 'Stop'
 }
 
+// You can create generic typing state machine
 const fsm = StateMachine.fromString<SlothState, SlothAction>(
     'Sloth State', // state machine name
     SlothState.Idle, // start state
@@ -37,10 +38,14 @@ const fsm = StateMachine.fromString<SlothState, SlothAction>(
     }
 );
 
-console.log(fsm.current);
-
 fsm.start(); // Don't forget
 
+console.log(fsm.current); // You can get current state
+
+// You can check action availability
 if (fsm.can(SlothAction.Sleep)) {
     fsm.do(SlothAction.Sleep);
 }
+
+// export to console
+console.log(fsm.export(PumlWriter.getWriter({autoNumber: true})));
