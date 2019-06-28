@@ -10,8 +10,6 @@
 
 [日本語](README-jp.md)
 
-Note: Current version is beta.
-
 Diligent developer, is it your work to create state machine from scratch or take care of poor state machine?
 Let's be lazy.
 <table>
@@ -94,9 +92,9 @@ const fsm = StateMachine.fromString<SlothState, SlothAction>(
     ...
 );
 
-console.log(fsm.current);
-
 fsm.start(); // Don't forget
+
+console.log(fsm.current); // You can get current state
 
 if (fsm.can(SlothAction.Sleep)) {
     fsm.do(SlothAction.Sleep);
