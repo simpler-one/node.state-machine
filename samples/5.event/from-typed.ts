@@ -1,15 +1,6 @@
 import { StateMachine, StateType } from '@working-sloth/state-machine';
 
 
-class SlothState {
-
-    public readonly resource: any; // Some resource
-
-    dispose(): void {
-        this.resource.close();
-    }
-}
-
 enum SlothAction {
     Work = 'Work',
     Eat = 'Eat',
@@ -17,6 +8,20 @@ enum SlothAction {
     Wake = 'Wake',
     Stop = 'Stop'
 }
+
+class SlothState {
+
+    constructor(
+        private readonly fsm: StateMachine<SlothState, SlothAction>,
+        public readonly resource: any, // Some resource
+    ) {
+    }
+
+    dispose(): void {
+        this.resource.close();
+    }
+}
+
 
 class SlothStateType implements StateType<SlothState, SlothAction> {
     public static readonly Idle = new SlothStateType('Idle', 'data1');
@@ -30,8 +35,8 @@ class SlothStateType implements StateType<SlothState, SlothAction> {
     ) {
     }
 
-    getState() {
-        return new SlothState(getFooBarResource(this.data));
+    getState(fsm: StateMachine<SlothState, SlothAction>) {
+        return new SlothState(fsm, getFooBarResource(this.data));
     }
 
     // State Event handler

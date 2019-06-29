@@ -1,6 +1,6 @@
 {
   "name": "@working-sloth/state-machine",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "State Machine for NodeJS",
   "main": "dist/index.js",
   "scripts": {
@@ -36,6 +36,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
+    "@working-sloth/data-matrix": "^0.1.1",
     "codecov": "^3.5.0",
     "jasmine": "^3.4.0",
     "remap-istanbul": "^0.13.0",

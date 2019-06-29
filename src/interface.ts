@@ -1,12 +1,14 @@
-export interface NamedState<S, A = void, P = void> {
+import { StateMachine } from "./state-machine";
+
+export interface NamedState<S, A extends string, P = void> {
     readonly name: string;
     onEnterState?(oldState: S, newState: S, action: A, params: P): void;
     onLeaveState?(oldState: S, newState: S, action: A, params: P): void;
 }
 
-export interface StateType<S, A = void, P = void> {
+export interface StateType<S, A extends string, P = void> {
     readonly name: string;
-    getState(params: P): S;
+    getState(stateMachine: StateMachine<S, A, P>, params: P): S;
     onEnterState?(oldState: S, newState: S, action: A, params: P): void;
     onLeaveState?(oldState: S, newState: S, action: A, params: P): void;
 }
