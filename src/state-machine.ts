@@ -58,7 +58,7 @@ export class StateMachine<S, A extends string, P = void> {
     private readonly map: StateMap<S, A, P>;
     private _current: StateWrapper<S, A, P>;
     private _histories: StateHistory<A>[] = [];
-    private _historyCapacity = 100;
+    private _historyCapacity: number = 100;
 
     private readonly _stateChanged: Subject<StateChangedEventArgs<S, A>> = new Subject();
     private readonly _stateChangeFailed: Subject<StateChangeFailedEventArgs<S, A>> = new Subject();
