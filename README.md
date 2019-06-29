@@ -53,11 +53,12 @@ fsm.current.show();
  Finite state machine for JavaScript and TypeScript.
 
 ## Why? 
-- Simple: easy to understand usage and provide shorter codes
+- Readable: state machine definition is so readable that you easily understand transitions
 - Generic typing: states, actions and optional params
 - Rich object state: user defined class can be state
 - State with life-cycle: create/dispose
 - Export statecharts: PlantUML
+- Learning cost: basic takes only 1 step, rich state takes only 3 steps, full function takes 6 only steps to learn
 
 ## Quick start
 ### case: String state (most simple)
