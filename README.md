@@ -16,7 +16,7 @@ Let's be lazy.
     <tr>
         <th>Poor state<br>(Before)</th>
         <td>
-<pre>
+<pre style="margin: 0">
 if (fsm.current === 'Doing' || fsm.curent === 'Waiting' || ...) {
     showProgress();
 }
@@ -37,7 +37,7 @@ if (fsm.current === 'Cancel') {
     <tr>
         <th>Rich state<br>(After)</th>
         <td>
-<pre>
+<pre style="margin: 0">
 if (fsm.current.inProgress) {
     showProgress();
 }
