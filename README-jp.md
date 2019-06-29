@@ -13,11 +13,8 @@
 怠けましょう
 <table>
     <tr>
-        <th>Poor state (Before)</th>
-        <th>Rich State (After)</th>
-    </tr>
-    <tr>
-        <td valign="top">
+        <th>Poor state<br>(Before)</th>
+        <td>
 <pre>
 if (fsm.current === 'Doing' || fsm.curent === 'Waiting' || ...) {
     showProgress();
@@ -35,7 +32,10 @@ if (fsm.current === 'Cancel') {
 ...
 </pre>
         </td>
-        <td valign="top">
+    </tr>
+    <tr>
+        <th>Rich state<br>(After)</th>
+        <td>
 <pre>
 if (fsm.current.inProgress) {
     showProgress();
