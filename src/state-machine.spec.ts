@@ -2,6 +2,7 @@
 import { StateMachine } from './state-machine'
 import { MetaState, MetaStateAction } from './state-meta'
 import { StateMachineMap } from './interface';
+import { buildDataMatrix } from '@working-sloth/data-matrix';
 
 enum StringState {
     State1 = 'State1',
@@ -115,56 +116,31 @@ describe('StateMachine', () => {
 
     describe('instance', () => {
         describe('do', () => {
-            it('should transit to user-defined start state when do start if string state is start', () => {
-                // Given
-                let changedEventCalled = false;
-                let failedEventCalled = false;
-                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1);
-                fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
-                fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
-    
-                // When
-                fsm.start();
-    
-                // Then
-                expect(fsm.current).toBe(StringState.State1);
-                expect(changedEventCalled).toBe(true);
-                expect(failedEventCalled).toBe(false);
-            });
-
-            it('should transit to user-defined start state when do start if named state is start', () => {
-                // Given
-                let changedEventCalled = false;
-                let failedEventCalled = false;
-                const fsm = StateMachine.fromNamed<NamedState, Action>('name', NamedState.State1);
-                fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
-                fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
-    
-                // When
-                fsm.start();
-    
-                // Then
-                expect(fsm.current).toBe(NamedState.State1);
-                expect(changedEventCalled).toBe(true);
-                expect(failedEventCalled).toBe(false);
-            });
-
-            it('should transit to user-defined start state when do start if typed state is start', () => {
-                // Given
-                let changedEventCalled = false;
-                let failedEventCalled = false;
-                const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1);
-                fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
-                fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
-    
-                // When
-                fsm.start();
-    
-                // Then
-                expect(fsm.current).toBe(StringState.State1);
-                expect(changedEventCalled).toBe(true);
-                expect(failedEventCalled).toBe(false);
-            });
+            const startTests = buildDataMatrix<{type: string, fsm: StateMachine<{}, Action>, expect: {}}>([
+                ['type',    'fsm',                                                                      'expect']
+            ], [
+                ['string',  StateMachine.fromString<StringState, Action>('name', StringState.State1),   StringState.State1],
+                ['named',   StateMachine.fromNamed<NamedState, Action>('name', NamedState.State1),      NamedState.State1],
+                ['typed',   StateMachine.fromType<StringState, Action>('name', TypedState.State1),      StringState.State1],
+            ]);
+            for (const test of startTests) {
+                it(`should transit to user-defined start state when do start if ${test.type} state is start`, () => {
+                    // Given
+                    let changedEventCalled = false;
+                    let failedEventCalled = false;
+                    const fsm = test.fsm;
+                    fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
+                    fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
+        
+                    // When
+                    fsm.start();
+        
+                    // Then
+                    expect(fsm.current).toBe(test.expect);
+                    expect(changedEventCalled).toBe(true);
+                    expect(failedEventCalled).toBe(false);
+                });
+            }
 
             it('should transit to next state when do action if transition is defined', () => {
                 // Given
