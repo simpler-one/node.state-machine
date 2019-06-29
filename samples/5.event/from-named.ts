@@ -1,6 +1,14 @@
 import { StateMachine, NamedState } from '@working-sloth/state-machine';
 
 
+enum SlothAction {
+    Work = 'Work',
+    Eat = 'Eat',
+    Sleep = 'Sleep',
+    Wake = 'Wake',
+    Stop = 'Stop'
+}
+
 class SlothState implements NamedState<SlothState, SlothAction> {
     public static readonly Idle = new SlothState('Idle', 0, 0);
     public static readonly Working = new SlothState('Working', 1, 2);
@@ -31,14 +39,6 @@ class SlothState implements NamedState<SlothState, SlothAction> {
         this.value1 = this.initialValue1;
         this.value2 = this.initialValue2;
     }
-}
-
-enum SlothAction {
-    Work = 'Work',
-    Eat = 'Eat',
-    Sleep = 'Sleep',
-    Wake = 'Wake',
-    Stop = 'Stop'
 }
 
 

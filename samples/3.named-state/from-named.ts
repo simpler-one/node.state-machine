@@ -1,7 +1,15 @@
 import { StateMachine, NamedState } from '@working-sloth/state-machine';
 
+enum SlothAction {
+    Work = 'Work',
+    Eat = 'Eat',
+    Sleep = 'Sleep',
+    Wake = 'Wake',
+    Stop = 'Stop'
+}
+
 // You can use any class as state if only it has name
-class SlothState implements NamedState<SlothState> {
+class SlothState implements NamedState<SlothState, SlothAction> {
     public static readonly Idle = new SlothState('Idle', -0.1, 0.1);
     public static readonly Working = new SlothState('Working', -1, 100);
     public static readonly Eating = new SlothState('Eating', 10, 2);
@@ -13,15 +21,6 @@ class SlothState implements NamedState<SlothState> {
         public readonly sleepinessIncrease: number
     ) {
     }
-}
-
-
-enum SlothAction {
-    Work = 'Work',
-    Eat = 'Eat',
-    Sleep = 'Sleep',
-    Wake = 'Wake',
-    Stop = 'Stop'
 }
 
 

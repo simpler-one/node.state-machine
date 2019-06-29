@@ -1,19 +1,19 @@
 import { StateMachine, MetaState } from '@working-sloth/state-machine';
 
 
-enum SlothState {
-    Idle = 'Idle',
-    Working = 'Working',
-    Eating = 'Eating',
-    Sleeping = 'Sleeping'
-}
-
 enum SlothAction {
     Work = 'Work',
     Eat = 'Eat',
     Sleep = 'Sleep',
     Wake = 'Wake',
     Stop = 'Stop'
+}
+
+enum SlothState {
+    Idle = 'Idle',
+    Working = 'Working',
+    Eating = 'Eating',
+    Sleeping = 'Sleeping'
 }
 
 
