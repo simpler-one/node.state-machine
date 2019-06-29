@@ -8,15 +8,14 @@
 
 ![StateMachine](samples/1.quick-start/state.png)
 
-[日本語](README-jp.md)
-
-Diligent developer, is it your work to create state machine from scratch or take care of poor state machine?
-Let's be lazy.
+日々怠ける処の開発者、日没すれども帰れぬ処の社畜開発者に致す。
+ステートマシンを１から作ったり貧弱なステートマシンのお世話があなたの仕事ですか？
+怠けましょう
 <table>
     <tr>
         <th>Poor state<br>(Before)</th>
         <td>
-<pre style="margin: 0">
+<pre>
 if (fsm.current === 'Doing' || fsm.curent === 'Waiting' || ...) {
     showProgress();
 }
@@ -37,7 +36,7 @@ if (fsm.current === 'Cancel') {
     <tr>
         <th>Rich state<br>(After)</th>
         <td>
-<pre style="margin: 0">
+<pre>
 if (fsm.current.inProgress) {
     showProgress();
 }
@@ -48,19 +47,19 @@ fsm.current.show();
     </tr>
 </table>
 
+## 概要
+ JavaScriptとTypeScript用のステートマシンです
 
-## What? 
- Finite state machine for JavaScript and TypeScript.
-
-## Why? 
-- Simple: easy to understand usage and provide shorter codes
-- Generic typing: states, actions and optional params
-- Rich object state: user defined class can be state
-- State with life-cycle: create/dispose
-- Export statecharts: PlantUML
+## 特徴
+- シンプル: 使い方が簡単で、コードが短くなります
+- ジェネリック型対応: ステート、アクション、オプション引数すべて
+- Rich state: ステートオブジェクトにユーザー定義クラスが使えます
+- ライフサイクル: 生成/破棄
+- 状態遷移図のエクスポート: PlantUML
 
 ## Quick start
-### case: String state (most simple)
+
+### case: String state (最もシンプル)
 ```js
 import { StateMachine } from '@working-sloth/state-machine';
 
@@ -102,22 +101,22 @@ if (fsm.can(SlothAction.Sleep)) {
 ```
 
 ### case: Named static state (rich state)
- I have a truly marvelous sample of this case which this margin is too narrow to contain.
+ 真に驚くべきサンプルがあるが、ここに書くには余白が狭すぎる
  [See samples](samples)
 
-### case: Typed dynamic state (rich state with life cycle)
- I have a truly marvelous sample of this case which this margin is too narrow to contain.
+### case: Typed dynamic state (ライフサイクル付きrich state)
+ 真に驚くべきサンプルがあるが、ここに書くには余白が狭すぎる
  [See samples](samples)
 
-## Schedule
-- Create string-based fsm from PlantUML: someday
-- State nesting: someday
-- Crate docs: someday
-- Export statecharts from CLI: someday
-- Rest: every day
-- Sleep: every day
-- Be clever and lazy: soon
-- Be stupid and diligent: never
+## 予定
+- PlantUMLからの逆変換: 明日やる
+- ステートのネスト: 明日やる
+- ドキュメントの充実: 明日やる
+- CLIからの遷移図エクスポート: 明日やる
+- 休憩: 毎日
+- おふとん: 毎日
+- 有能な怠け者になる: もうすぐ
+- 無能な働き者になる: 一昨日
 
-## If you aren't satisfied
- contact: koba.work.work1127@gmail.com
+## ご満足いただけなかった場合
+ ここに連絡：koba.work.work1127@gmail.com
