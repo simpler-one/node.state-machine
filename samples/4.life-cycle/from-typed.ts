@@ -17,6 +17,7 @@ class SlothState {
     public count: number;
 
     constructor(
+        private readonly fsm: StateMachine<SlothState, SlothAction>,
         public readonly energyIncrease: number,
         public readonly sleepinessIncrease: number
     ) {
@@ -25,6 +26,7 @@ class SlothState {
 
     mainTask(): void {
         // Foo bar
+        this.fsm.do(SlothAction.Sleep); // Transit
     }
 
     countUp(): void {
@@ -33,7 +35,7 @@ class SlothState {
 }
 
 // Create state type class second
-class SlothStateType implements StateType<SlothState> {
+class SlothStateType implements StateType<SlothState, SlothAction> {
     public static readonly Idle = new SlothStateType('Idle', -0.1, 0.1);
     public static readonly Working = new SlothStateType('Working', -1, 100);
     public static readonly Eating = new SlothStateType('Eating', 10, 2);
@@ -47,8 +49,8 @@ class SlothStateType implements StateType<SlothState> {
     }
 
     // Create state
-    getState() {
-        return new SlothState(this.energyIncrease, this.sleepinessIncrease);
+    getState(fsm: StateMachine<SlothState, SlothAction>) {
+        return new SlothState(fsm, this.energyIncrease, this.sleepinessIncrease);
     }
 }
 

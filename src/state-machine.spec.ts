@@ -3,6 +3,7 @@ import { StateMachine } from './state-machine'
 import { MetaState, MetaStateAction } from './state-meta'
 import { StateMachineMap } from './interface';
 import { buildDataMatrix } from '@working-sloth/data-matrix';
+import { StateHistory } from './state-history';
 
 enum StringState {
     State1 = 'State1',
@@ -495,6 +496,119 @@ describe('StateMachine', () => {
                 // Then
                 expect(actualResult).toBe(result);
                 expect(actualMap).toEqual(fsm.toMachineMap());
+            });
+        });
+
+        describe('historyCapacity', () => {
+            it('should set normally if not negative value was set', () => {
+                // Given
+                const capacity = 10;
+                const fsm = StateMachine.fromString('nane', StringState.State1);
+
+                // When
+                fsm.historyCapacity = capacity;
+
+                // Then
+                expect(fsm.historyCapacity).toBe(capacity);
+            });
+
+            it('should set zero if negative value was set', () => {
+                // Given
+                const capacity = -1;
+                const fsm = StateMachine.fromString('nane', StringState.State1);
+
+                // When
+                fsm.historyCapacity = capacity;
+
+                // Then
+                expect(fsm.historyCapacity).toBe(0);
+            });
+        })
+
+        describe('histories', () => {
+            it('should return histories', () => {
+                // Given
+                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
+                {
+                    state: StringState.State1,
+                    actions: [
+                        [Action.Action1, StringState.State2]
+                    ]
+                }, {
+                    state: StringState.State2,
+                    actions: [
+                        [Action.Action2, StringState.State1]
+                    ]
+                });
+    
+                // When
+                fsm.start();
+                fsm.do(Action.Action1);
+                fsm.do(Action.Action2);
+                fsm.do(Action.Action2);
+                const histories = fsm.histories;
+
+                // Then
+                expect(histories).toEqual([
+                    new StateHistory(MetaState.StartName, StringState.State1, MetaStateAction.DoStart),
+                    new StateHistory(StringState.State1, StringState.State2, Action.Action1),
+                    new StateHistory(StringState.State2, StringState.State1, Action.Action2),
+                    new StateHistory(StringState.State1, undefined, Action.Action2),
+                ]);
+            });
+
+            it('should return limited size histories if history is overflow', () => {
+                // Given
+                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
+                {
+                    state: StringState.State1,
+                    actions: [
+                        [Action.Action1, StringState.State2]
+                    ]
+                }, {
+                    state: StringState.State2,
+                    actions: [
+                        [Action.Action2, StringState.State1]
+                    ]
+                });
+                fsm.historyCapacity = 2;
+    
+                // When
+                fsm.start();
+                fsm.do(Action.Action1);
+                fsm.do(Action.Action2);
+                fsm.do(Action.Action1);
+                const histories = fsm.histories;
+
+                // Then
+                expect(histories.length).toEqual(fsm.historyCapacity);
+            });
+
+            it('should return limited size histories if history capacity is reduced', () => {
+                // Given
+                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
+                {
+                    state: StringState.State1,
+                    actions: [
+                        [Action.Action1, StringState.State2]
+                    ]
+                }, {
+                    state: StringState.State2,
+                    actions: [
+                        [Action.Action2, StringState.State1]
+                    ]
+                });
+                fsm.start();
+                fsm.do(Action.Action1);
+                fsm.do(Action.Action2);
+                fsm.do(Action.Action1);
+
+                // When
+                fsm.historyCapacity = 2;
+                const histories = fsm.histories;
+
+                // Then
+                expect(histories.length).toEqual(fsm.historyCapacity);
             });
         });
     });

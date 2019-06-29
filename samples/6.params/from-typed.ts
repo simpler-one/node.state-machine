@@ -2,14 +2,6 @@ import { StateMachine, StateType } from '@working-sloth/state-machine';
 
 type SlothParams = { sleepiness: number, sleepingTime: string };
 
-class SlothState {
-
-    public readonly resource: any;
-
-    dispose(params: SlothParams): void {
-        this.resource.close();
-    }
-}
 
 enum SlothAction {
     Work = 'Work',
@@ -17,6 +9,20 @@ enum SlothAction {
     Sleep = 'Sleep',
     Wake = 'Wake',
     Stop = 'Stop'
+}
+
+class SlothState {
+
+
+    constructor(
+        private readonly fsm: StateMachine<SlothState, SlothAction>,
+        public readonly resource: any,
+    ) {
+    }
+
+    dispose(params: SlothParams): void {
+        this.resource.close();
+    }
 }
 
 class SlothStateType implements StateType<SlothState, SlothAction, SlothParams> {
@@ -32,8 +38,8 @@ class SlothStateType implements StateType<SlothState, SlothAction, SlothParams> 
     }
 
     // You can receive optional params
-    getState(params: SlothParams) {
-        return new SlothState(getFooBarResource(this.data, params.sleepiness, params.sleepingTime));
+    getState(fsm: StateMachine<SlothState, SlothAction>, params: SlothParams) {
+        return new SlothState(fsm, getFooBarResource(this.data, params.sleepiness, params.sleepingTime));
     }
 
     // You can receive optional params

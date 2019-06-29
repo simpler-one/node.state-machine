@@ -4,7 +4,7 @@ import { StateType } from '../interface'
 export const StartName = '[*]';
 export const AnytimeName = '*';
 
-class AnytimeState implements StateType<void> {
+class AnytimeState implements StateType<void, string> {
     public readonly name: string = AnytimeName;
     public getState(): void {
         throw new Error('AnytimeState');
