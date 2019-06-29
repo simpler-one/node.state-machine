@@ -225,7 +225,7 @@ export class StateMachine<S, A extends string, P = void> {
     private addHistory(history: StateHistory<A>): void {
         this._histories.push(history);
         if (this._histories.length > this._historyCapacity) {
-            this.histories.shift();
+            this._histories.shift();
         }
     }
 }
