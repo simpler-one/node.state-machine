@@ -30,7 +30,7 @@ export namespace Options {
             autoNumber: false,
             arrowDirection: 'down',
             ...options
-        } as Options;
+        };
     }
 }
 
