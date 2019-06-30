@@ -18,6 +18,23 @@ export interface StateMachineItem<S, T, A> {
     actions: [A, T][];
 }
 
+
+export interface Options {
+    autoNumber?: boolean;
+    arrowDirection?: string;
+}
+// tslint:disable-next-line:no-namespace
+export namespace Options {
+    export function fill(options: Options): Options {
+        return {
+            autoNumber: false,
+            arrowDirection: 'down',
+            ...options
+        } as Options;
+    }
+}
+
+
 export interface StateMachineMap {
     name: string;
     states: StateMachineMapItem[];
