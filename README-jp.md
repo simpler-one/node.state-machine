@@ -120,4 +120,5 @@ if (fsm.can(SlothAction.Sleep)) {
 - 無能な働き者になる: 一昨日
 
 ## ご満足いただけなかった場合
- ここに連絡：koba.work.work1127@gmail.com
+- 「question」または「enhancement」として[Issueを作成](https://github.com/work-work-komei/node.data-matrix/issues)
+- e-mail：koba.work.work1127@gmail.com
