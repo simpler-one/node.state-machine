@@ -1,4 +1,4 @@
-import { StateMachineMap, StateMachineMapItem } from "./interface";
+import { StateMachineMap, StateMachineMapItem, Options } from "./interface";
 import { MetaState } from "./state-meta";
 
 
@@ -15,7 +15,7 @@ export class PumlWriter {
 
     private constructor(
         private readonly map: StateMachineMap,
-        private readonly options: Options
+        private readonly options: Options,
     ) {
     }
 
@@ -84,21 +84,6 @@ export class PumlWriter {
     }
 }
 
-
-export interface Options {
-    autoNumber?: boolean;
-    arrowDirection?: string;
-}
-// tslint:disable-next-line:no-namespace
-namespace Options {
-    export function fill(options: Options): Options {
-        return {
-            autoNumber: false,
-            arrowDirection: 'down',
-            ...options
-        } as Options;
-    }
-}
 
 
 function idOf(name: string): string {
