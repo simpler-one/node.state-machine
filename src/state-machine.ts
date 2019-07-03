@@ -20,7 +20,7 @@ export class StateMachine<S, A extends string, P = void> {
     // Public var
 
     /** Current status */
-    public get current(): S {
+    public get current(): S | undefined {
         return this._current.state;
     }
     /** Histories */
