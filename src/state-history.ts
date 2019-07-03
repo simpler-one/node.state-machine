@@ -4,6 +4,7 @@ export class StateHistory<A extends string> {
     }
     
     constructor(
+        public readonly data: Date,
         public readonly oldState: string,
         public readonly newState: string,
         public readonly action: A,

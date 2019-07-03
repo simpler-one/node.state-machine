@@ -155,7 +155,7 @@ export class StateMachine<S, A extends string, P = void> {
     public do(action: A, params?: P): void {
         const type: StateType<S, A, P> = this.getType(action);
         if (type === undefined) {
-            this.addHistory(new StateHistory(this._current.name, undefined, action));
+            this.addHistory(new StateHistory(new Date(), this._current.name, undefined, action));
             this._stateChangeFailed.next({
                 curState: this._current.state,
                 action,
@@ -167,7 +167,7 @@ export class StateMachine<S, A extends string, P = void> {
         const old: StateWrapper<S, A, P> = this._current;
         const next: S = type.getState(this, params);
         this._current = new StateWrapper(type, next);
-        this.addHistory(new StateHistory(old.name, type.name, action));
+        this.addHistory(new StateHistory(new Date(), old.name, type.name, action));
         this._stateChanged.next({
             oldState: old.state,
             newState: next,
