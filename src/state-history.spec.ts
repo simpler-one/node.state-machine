@@ -4,7 +4,7 @@ describe('StateHistory', () => {
     describe('isError', () => {
         it('should return false if newState is not undefined', () => {
             // Given
-            const history = new StateHistory<string>('old', 'new', 'action');
+            const history = new StateHistory<string>(new Date(), 'old', 'new', 'action');
 
             // When
             const isErr = history.isError;
@@ -15,7 +15,7 @@ describe('StateHistory', () => {
 
         it('should return true if newState is undefined', () => {
             // Given
-            const history = new StateHistory<string>('old', undefined, 'action');
+            const history = new StateHistory<string>(new Date(), 'old', undefined, 'action');
 
             // When
             const isErr = history.isError;
