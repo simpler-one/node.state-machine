@@ -549,12 +549,18 @@ describe('StateMachine', () => {
                 const histories = fsm.histories;
 
                 // Then
-                expect(histories).toEqual([
-                    new StateHistory(MetaState.StartName, StringState.State1, MetaStateAction.DoStart),
-                    new StateHistory(StringState.State1, StringState.State2, Action.Action1),
-                    new StateHistory(StringState.State2, StringState.State1, Action.Action2),
-                    new StateHistory(StringState.State1, undefined, Action.Action2),
-                ]);
+                const expected = [
+                    new StateHistory(undefined, MetaState.StartName, StringState.State1, MetaStateAction.DoStart),
+                    new StateHistory(undefined, StringState.State1, StringState.State2, Action.Action1),
+                    new StateHistory(undefined, StringState.State2, StringState.State1, Action.Action2),
+                    new StateHistory(undefined, StringState.State1, undefined, Action.Action2),
+                ];
+                expect(histories.length).toBe(expected.length);
+                for (let i = 0; i < expected.length; i++) {
+                    expect(histories[i].oldState).toBe(expected[i].oldState);
+                    expect(histories[i].newState).toBe(expected[i].newState);
+                    expect(histories[i].action).toBe(expected[i].action);
+                }
             });
 
             it('should return limited size histories if history is overflow', () => {
