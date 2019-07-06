@@ -2,7 +2,7 @@ import {
     StateType, StateMachineItem, NamedState, StateMachineWriter,
     StateMachineMap, StateMachineMapItem, StateMachineMapAction
 } from './interface';
-import { MetaState, MetaStateAction } from './state-meta';
+import { MetaState, MetaStateAction as MetaAction } from './state-meta';
 import { Subject, Observable } from 'rxjs';
 import { StateHistory } from './state-history';
 
@@ -63,9 +63,27 @@ export class StateMachine<S, A extends string, P = void> {
     private readonly _stateChanged: Subject<StateChangedEventArgs<S, A>> = new Subject();
     private readonly _stateChangeFailed: Subject<StateChangeFailedEventArgs<S, A>> = new Subject();
 
+    protected constructor(
+        public readonly name: string,
+        start: StateType<S, A, P>,
+        items: Item<S, A, P>[]
+    ) {
+        const anytimeI: number = items.findIndex(item => `${item.state}` === MetaState.AnytimeName);
+        let anytimeActions: [A, StateType<S, A, P>][] = [];
+        if (anytimeI >= 0) {
+            anytimeActions = items.splice(anytimeI, 1)[0].actions;
+        }
 
-    //
-    // Public static method
+        this.map = new Map(items.map(item => [
+            item.state,
+            new Map(item.actions.concat(anytimeActions))
+        ] as [string, Map<string, StateType<S, A, P>>]));
+
+        this.map.set(MetaState.StartName, new Map([[MetaAction.DoStart, start]]));
+
+        this._current = new StateWrapper(new StringType(MetaState.StartName as undefined), MetaState.Start);
+    }
+
 
     public static fromString<S extends string, A extends string>(
         name: string,
@@ -116,35 +134,12 @@ export class StateMachine<S, A extends string, P = void> {
         );
     }
 
-
-    protected constructor(
-        public readonly name: string,
-        start: StateType<S, A, P>,
-        items: Item<S, A, P>[]
-    ) {
-        const anytimeI: number = items.findIndex(item => `${item.state}` === MetaState.AnytimeName);
-        let anytimeActions: [A, StateType<S, A, P>][] = [];
-        if (anytimeI >= 0) {
-            anytimeActions = items.splice(anytimeI, 1)[0].actions;
-        }
-
-        this.map = new Map(items.map(item => [
-            item.state,
-            new Map(item.actions.concat(anytimeActions))
-        ] as [string, Map<string, StateType<S, A, P>>]));
-
-        this.map.set(MetaState.StartName, new Map([[MetaStateAction.DoStart, start]]));
-
-        this._current = new StateWrapper(new StringType(MetaState.StartName as undefined), MetaState.Start);
-    }
-
-
     /**
      * Start action
      * @param params params for getState(*)
      */
     public start(params?: P): void {
-        this.do(MetaStateAction.DoStart, params);
+        this.do(MetaAction.DoStart, params);
     }
 
     /**
@@ -176,6 +171,30 @@ export class StateMachine<S, A extends string, P = void> {
         });
         if (old.type.onLeaveState) old.type.onLeaveState(old.state, next, action, params);
         if (type.onEnterState) type.onEnterState(old.state, next, action, params);
+    }
+
+    /**
+     * Reset state
+     */
+    public reset(): void {
+        const old = this._current;
+        this.addHistory(new StateHistory(new Date(), old.name, MetaState.StartName, MetaAction.ResetName));
+        this._stateChanged.next({
+            oldState: old.state,
+            newState: MetaState.Start,
+            action: MetaAction.Reset,
+            message: `[${this.name}] ${this._current.name} -> ${MetaState.StartName} : ${MetaAction.ResetName}`
+        });
+        this._current = new StateWrapper(new StringType(MetaState.StartName as undefined), MetaState.Start);
+        if (old.type.onLeaveState) old.type.onLeaveState(old.state, MetaState.Start, MetaAction.Reset, undefined);
+    }
+    /**
+     * Restart state
+     * @param params params for getState(*)
+     */
+    public restart(params?: P): void {
+        this.reset();
+        this.start(params);
     }
 
     /**

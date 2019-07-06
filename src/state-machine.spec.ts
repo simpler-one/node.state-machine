@@ -118,7 +118,7 @@ describe('StateMachine', () => {
     describe('instance', () => {
         describe('do', () => {
             const startTests = buildDataMatrix<{type: string, fsm: StateMachine<{}, Action>, expect: {}}>([
-                ['type',    'fsm',                                                                      'expect']
+                'type       fsm                                                                         expect',
             ], [
                 ['string',  StateMachine.fromString<StringState, Action>('name', StringState.State1),   StringState.State1],
                 ['named',   StateMachine.fromNamed<NamedState, Action>('name', NamedState.State1),      NamedState.State1],
@@ -234,6 +234,59 @@ describe('StateMachine', () => {
                 expect(FullTypedState.State1.leaveCalled).toBe(calledCount1.leave + 1);
                 expect(FullTypedState.State2.enterCalled).toBe(calledCount2.enter + 1);
                 expect(FullTypedState.State2.leaveCalled).toBe(calledCount2.leave);
+            });
+        });
+
+        describe('reset', () => {
+            it('should become meta start state when reset', () => {
+                // Given
+                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1);
+                fsm.start();
+    
+                // When
+                fsm.reset();
+    
+                // Then
+                expect(fsm.current).toBe(MetaState.Start);
+            });
+
+            it('should called "onLeave" event callback when reset if callback is defined', () => {
+                // Given
+                const fsm = StateMachine.fromType<StringState, Action>('name', FullTypedState.State1);
+                fsm.start();
+                const enterCalled = FullTypedState.State1.enterCalled;
+                const leaveCalled = FullTypedState.State1.leaveCalled;
+
+                // When
+                fsm.reset();
+    
+                // Then
+                expect(fsm.current).toBe(MetaState.Start);
+                expect(FullTypedState.State1.enterCalled).toBe(enterCalled);
+                expect(FullTypedState.State1.leaveCalled).toBe(leaveCalled + 1);
+            });
+        });
+
+        describe('restart', () => {
+            it('should become user-defined start state when restart if current is NOT user-defined start', () => {
+                // Given
+                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1);
+                fsm.start();
+    
+                // When
+                fsm.restart();
+    
+                // Then
+                expect(fsm.current).toBe(StringState.State1);
+            });
+
+            it('should become user-defined start state when restart', () => {
+                // Given
+                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1);
+                // When
+                fsm.restart();
+                // Then
+                expect(fsm.current).toBe(StringState.State1);
             });
         });
 

@@ -36,7 +36,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
-    "@working-sloth/data-matrix": "^1.0.0",
+    "@working-sloth/data-matrix": "^2.0.0",
     "codecov": "^3.5.0",
     "jasmine": "^3.4.0",
     "remap-istanbul": "^0.13.0",
