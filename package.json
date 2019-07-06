@@ -4,6 +4,7 @@
   "description": "State Machine for NodeJS",
   "main": "dist/index.js",
   "scripts": {
+    "prepublishOnly": "npm run build",
     "build": "rimraf dist && tsc -p src",
     "test": "rimraf spec/built && tsc -p spec && istanbul cover node_modules/jasmine/bin/jasmine.js",
     "remapcov": "cat coverage/coverage.json | ./node_modules/.bin/remap-istanbul > coverage/coverage-remap.json && mv -f coverage/coverage-remap.json coverage/coverage.json",
@@ -36,7 +37,7 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
-    "@working-sloth/data-matrix": "^1.0.0",
+    "@working-sloth/data-matrix": "^2.0.0",
     "codecov": "^3.5.0",
     "jasmine": "^3.4.0",
     "remap-istanbul": "^0.13.0",
