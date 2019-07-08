@@ -1,6 +1,6 @@
 {
   "name": "@working-sloth/state-machine-ts2.5",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "State Machine for NodeJS (Typescript 2.5)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
