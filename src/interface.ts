@@ -18,17 +18,42 @@ export interface StateMachineItem<S, T, A> {
     actions: [A, T][];
 }
 
+export type StateChangedEventArgs<S, A> = { oldState: S | undefined, newState: S | undefined, action: A, message: string };
+export type StateChangeFailedEventArgs<S, A> = { curState: S | undefined, action: A, message: string };
 
-export interface Options {
-    autoNumber?: boolean;
-    arrowDirection?: string;
+
+/**
+ * @param indices 0-based index array
+ * @param count 1-based count
+ */
+export type AutoIndex = (indices: number[], count: number) => string;
+
+export interface PumlWriterOptions {
+    autoIndex?: AutoIndex;
+    arrowDirections?: {
+        from?: string;
+        to?: string;
+        direction: PumlWriterOptions.ArrowDirection | 'up' | 'down' | 'left' | 'right';
+    }[]
 }
 // tslint:disable-next-line:no-namespace
-export namespace Options {
-    export function fill(options: Options): Options {
+export namespace PumlWriterOptions {
+    export const AutoNumber: AutoIndex = (indices, count) => `(${count})`;
+    export const AutoNumberDot: AutoIndex = (indices, count) => `${count}.`;
+    export const AutoNumberColon: AutoIndex = (indices, count) => `${count}:`;
+    export const AutoIndex: AutoIndex = (indices, count) => `(${indices.map(index => index + 1).join('.')})`;
+
+    export enum ArrowDirection {
+        Up = 'up',
+        Down = 'down',
+        Left = 'left',
+        Right = 'right',
+    }
+
+    export function fill(options: PumlWriterOptions): PumlWriterOptions {
         return {
-            autoNumber: false,
-            arrowDirection: 'down',
+            autoIndex: undefined,
+            arrowDirections: [ { direction: ArrowDirection.Down } ],
             ...options
         };
     }

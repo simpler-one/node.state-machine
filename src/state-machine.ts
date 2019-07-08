@@ -1,6 +1,6 @@
 import {
     StateType, StateMachineItem, NamedState, StateMachineWriter,
-    StateMachineMap, StateMachineMapItem, StateMachineMapAction
+    StateMachineMap, StateMachineMapItem, StateMachineMapAction, StateChangedEventArgs, StateChangeFailedEventArgs
 } from './interface';
 import { MetaState, MetaStateAction as MetaAction } from './state-meta';
 import { Subject, Observable } from 'rxjs';
@@ -10,9 +10,6 @@ import { StateHistory } from './state-history';
 type StateMap<S, A extends string, P> = Map<string, Map<string, StateType<S, A, P>>>;
 type Item<S, A extends string, P> = StateMachineItem<string, StateType<S, A, P>, A>;
 type LooseStateType<S, A extends string, P> = StateType<S, A | undefined, P | void>;
-
-type StateChangedEventArgs<S, A> = { oldState: S, newState: S, action: A, message: string };
-type StateChangeFailedEventArgs<S, A> = { curState: S, action: A, message: string };
 
 export class StateMachine<S, A extends string, P = void> {
 
