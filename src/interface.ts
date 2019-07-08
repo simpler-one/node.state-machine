@@ -18,8 +18,8 @@ export interface StateMachineItem<S, T, A> {
     actions: [A, T][];
 }
 
-export type StateChangedEventArgs<S, A> = { oldState: S | undefined, newState: S | undefined, action: A, message: string };
-export type StateChangeFailedEventArgs<S, A> = { curState: S | undefined, action: A, message: string };
+export type StateChangedArgs<S, A> = { oldState: S | undefined, newState: S | undefined, action: A, message: string };
+export type StateChangeFailedArgs<S, A> = { curState: S | undefined, action: A, message: string };
 
 
 /**
