@@ -1,6 +1,6 @@
 import {
     StateType, StateMachineItem, NamedState, StateMachineWriter,
-    StateMachineMap, StateMachineMapItem, StateMachineMapAction
+    StateMachineMap, StateMachineMapItem, StateMachineMapAction, StateChangedArgs, StateChangeFailedArgs
 } from './interface';
 import { MetaState, MetaStateAction as MetaAction } from './state-meta';
 import { Subject, Observable } from 'rxjs';
@@ -10,9 +10,6 @@ import { StateHistory } from './state-history';
 type StateMap<S, A extends string, P> = Map<string, Map<string, StateType<S, A, P>>>;
 type Item<S, A extends string, P> = StateMachineItem<string, StateType<S, A, P>, A>;
 type LooseStateType<S, A extends string, P> = StateType<S, A | undefined, P | void>;
-
-type StateChangedEventArgs<S, A> = { oldState: S, newState: S, action: A, message: string };
-type StateChangeFailedEventArgs<S, A> = { curState: S, action: A, message: string };
 
 export class StateMachine<S, A extends string, P = void> {
 
@@ -47,10 +44,10 @@ export class StateMachine<S, A extends string, P = void> {
     //
     // Public event
 
-    public get stateChanged(): Observable<StateChangedEventArgs<S, A>> {
+    public get stateChanged(): Observable<StateChangedArgs<S, A>> {
         return this._stateChanged.asObservable();
     }
-    public get stateCstateChangeFailed(): Observable<StateChangeFailedEventArgs<S, A>> {
+    public get stateCstateChangeFailed(): Observable<StateChangeFailedArgs<S, A>> {
         return this._stateChangeFailed.asObservable();
     }
 
@@ -60,8 +57,8 @@ export class StateMachine<S, A extends string, P = void> {
     private _histories: StateHistory<A>[] = [];
     private _historyCapacity: number = 100;
 
-    private readonly _stateChanged: Subject<StateChangedEventArgs<S, A>> = new Subject();
-    private readonly _stateChangeFailed: Subject<StateChangeFailedEventArgs<S, A>> = new Subject();
+    private readonly _stateChanged: Subject<StateChangedArgs<S, A>> = new Subject();
+    private readonly _stateChangeFailed: Subject<StateChangeFailedArgs<S, A>> = new Subject();
 
     protected constructor(
         public readonly name: string,
