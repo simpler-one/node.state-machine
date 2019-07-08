@@ -1,7 +1,7 @@
 {
-  "name": "@working-sloth/state-machine",
+  "name": "@working-sloth/state-machine-ts2.5",
   "version": "1.4.0",
-  "description": "State Machine for NodeJS",
+  "description": "State Machine for NodeJS (Typescript 2.5)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -34,7 +34,7 @@
   },
   "homepage": "https://github.com/work-work-komei/node.state-machine#readme",
   "dependencies": {
-    "rxjs": "^6.5.2"
+    "rxjs": "^5.5.12"
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
