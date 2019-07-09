@@ -2,6 +2,9 @@ import { StateMachineMap, StateMachineMapItem, PumlWriterOptions } from "./inter
 import { MetaState } from "./state-meta";
 
 
+const StateIndex = 0;
+const ActionIdex = 1;
+
 export class PumlWriter {
 
     public static getWriter(options?: PumlWriterOptions): (map: StateMachineMap) => string {
@@ -19,20 +22,29 @@ export class PumlWriter {
         private readonly map: StateMachineMap,
         private readonly options: PumlWriterOptions,
     ) {
+        this.directionMap = PumlWriter.getDirectionMap(options.arrows);
+    }
+
+    private static getDirectionMap(arrows: typeof PumlWriterOptions.Model.arrows): Map<string, string> {
+        const map = new Map();
+        for (const arrow of arrows) {
+            const from = arrow.from ? idOf(arrow.from) : '';
+            const to = arrow.to ? idOf(arrow.to) : '';
+            map.set(`${from}-path-${to}`, arrow.direction);
+            if (arrow.bothWay && (arrow.from || arrow.to)) {
+                map.set(`${to}-path-${from}`, PumlWriterOptions.ArrowDirection.reverse(arrow.direction));
+            }
+        }
+
+        return map;
     }
 
     private setStates(): void {
-        this.indices = new Array(2);
+        this.indices = [0, 0];
         this.count = 0;
         this.definitions = [];
         this.transitions = [];
-        this.directionMap = new Map(
-            this.options.arrowDirections.map(direction => {
-                const from = direction.from ? idOf(direction.from) : '';
-                const to = direction.to ? idOf(direction.to) : '';
-                return [`${from}-path-${to}`, direction.direction];
-            })
-        );
+
 
         const start = this.map.states.find(state => state.name === MetaState.StartName);
         const states = this.map.states.filter(state => state.name !== MetaState.StartName);
@@ -47,6 +59,7 @@ export class PumlWriter {
     }
 
     private setState(fromState: StateMachineMapItem): void {
+        this.indices[ActionIdex] = 0;
         const from = idOf(fromState.name);
         this.definitions.push(`state "${fromState.name}" as ${from}`);
 
@@ -57,8 +70,8 @@ export class PumlWriter {
 
             let act: string;
             if (this.options.autoIndex) {
-                this.indices[1]++;
                 act = this.options.autoIndex(this.indices, ++this.count);
+                this.indices[ActionIdex]++;
                 this.definitions.push(`${from}: ${act} ${action.name}`);
             } else {
                 act = action.name;
@@ -82,6 +95,7 @@ export class PumlWriter {
 
         this.definitions.push('');
         this.transitions.push('');
+        this.indices[StateIndex]++;
     }
 
     private getDirection(from: string, to: string): string {

@@ -1,4 +1,4 @@
-import { StateMachine, PumlWriter, PumlWriterOptions } from '@working-sloth/state-machine';
+import { StateMachine, PumlWriter, AutoIndex } from '@working-sloth/state-machine';
 
 
 enum SlothAction {
@@ -48,4 +48,4 @@ if (fsm.can(SlothAction.Sleep)) {
 }
 
 // export to console
-console.log(fsm.export(PumlWriter.getWriter({autoIndex: PumlWriterOptions.AutoNumber})));
+console.log(fsm.export(PumlWriter.getWriter({autoIndex: AutoIndex.LargeAlphaNumIndex})));
