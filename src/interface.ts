@@ -1,3 +1,4 @@
+// tslint:disable:no-namespace
 import { StateMachine } from "./state-machine";
 
 export interface NamedState<S, A extends string, P = void> {
@@ -27,33 +28,69 @@ export type StateChangeFailedArgs<S, A> = { curState: S | undefined, action: A, 
  * @param count 1-based count
  */
 export type AutoIndex = (indices: number[], count: number) => string;
+export namespace AutoIndex {
+    const SmallA: number = 'a'.charCodeAt(0);
+    const LargeA: number = 'A'.charCodeAt(0);
+    const AlphaSpan: number = 'Z'.charCodeAt(0) - LargeA + 1;
+
+    export const Number: AutoIndex = (indices, count) => `(${count})`;
+    export const NumberDot: AutoIndex = (indices, count) => `${count}.`;
+    export const NumberColon: AutoIndex = (indices, count) => `${count}:`;
+    export const Alpha: AutoIndex = (indices, count) => alphaOf(count - 1, LargeA);
+    export const NumIndex: AutoIndex = (indices) => `(${indices.map(index => index + 1).join('.')})`;
+    export const AlphaNumIndex: AutoIndex = (indices) => `(${alphaOf(indices[0], SmallA)}${indices[1] + 1})`;
+    export const LargeAlphaNumIndex: AutoIndex = (indices) => `(${alphaOf(indices[0], LargeA)}${indices[1] + 1})`;
+
+    function alphaOf(value: number, charCodeOffset: number): string {
+        let result = '';
+        let val = value;
+
+        do {
+            result = String.fromCharCode(charCodeOffset + val % AlphaSpan) + result;
+            val = Math.floor(val / AlphaSpan);
+        } while (val > 0)
+
+        return result;
+    }
+}
 
 export interface PumlWriterOptions {
     autoIndex?: AutoIndex;
-    arrowDirections?: {
+    arrows?: {
         from?: string;
         to?: string;
-        direction: PumlWriterOptions.ArrowDirection | 'up' | 'down' | 'left' | 'right';
-    }[]
+        direction: PumlWriterOptions.ArrowDirectionType;
+        bothWay?: boolean;
+        /* color?: string; reserved for future */
+    }[];
 }
-// tslint:disable-next-line:no-namespace
 export namespace PumlWriterOptions {
-    export const AutoNumber: AutoIndex = (indices, count) => `(${count})`;
-    export const AutoNumberDot: AutoIndex = (indices, count) => `${count}.`;
-    export const AutoNumberColon: AutoIndex = (indices, count) => `${count}:`;
-    export const AutoIndex: AutoIndex = (indices, count) => `(${indices.map(index => index + 1).join('.')})`;
+    export const Model: PumlWriterOptions = {};
 
+    export type ArrowDirectionType = 'up' | 'down' | 'left' | 'right' | ArrowDirection;
     export enum ArrowDirection {
         Up = 'up',
         Down = 'down',
         Left = 'left',
         Right = 'right',
     }
+    export namespace ArrowDirection {
+        const ReverseMap = new Map<ArrowDirectionType, ArrowDirectionType>([
+            [ArrowDirection.Up, ArrowDirection.Down],
+            [ArrowDirection.Down, ArrowDirection.Up],
+            [ArrowDirection.Left, ArrowDirection.Right],
+            [ArrowDirection.Right, ArrowDirection.Left],
+        ]);
+
+        export function reverse(direction: ArrowDirectionType): ArrowDirectionType {
+            return ReverseMap.get(direction);
+        }
+    }
 
     export function fill(options: PumlWriterOptions): PumlWriterOptions {
         return {
-            autoIndex: undefined,
-            arrowDirections: [ { direction: ArrowDirection.Down } ],
+            autoIndex: AutoIndex.AlphaNumIndex,
+            arrows: [],
             ...options
         };
     }
