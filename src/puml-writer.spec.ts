@@ -124,7 +124,6 @@ describe('PumlWriter', () => {
 
                 // When
                 const result = writer(map);
-                console.log(result);
 
                 // Then
                 expect(result.includes('state1 -up-> state2')).toBeTruthy();
