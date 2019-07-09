@@ -1,5 +1,5 @@
 import { PumlWriter } from './puml-writer';
-import { StateMachineMap, StateMachineMapItem, PumlWriterOptions } from './interface';
+import { StateMachineMap, StateMachineMapItem, PumlWriterOptions, AutoIndex } from './interface';
 import { MetaState } from './state-meta';
 
 
@@ -72,13 +72,12 @@ describe('PumlWriter', () => {
                 expect(result.includes('-up->')).toBeFalsy();
                 expect(result.includes('-left->')).toBeFalsy();
                 expect(result.includes('-right->')).toBeFalsy();
-                expect(result.includes('(1)')).toBeFalsy();
-                expect(result.includes('OK,Next')).toBeTruthy();
+                expect(result.includes('(a1)')).toBeTruthy();
             });
 
             it('shuold return auto-number machine map', () => {
                 // Given
-                const writer = PumlWriter.getWriter({autoIndex: PumlWriterOptions.AutoNumber});
+                const writer = PumlWriter.getWriter({autoIndex: AutoIndex.Number});
 
                 // When
                 const result = writer(map);
@@ -110,7 +109,7 @@ describe('PumlWriter', () => {
             it('shuold return customized arrow machine map', () => {
                 // Given
                 const writer = PumlWriter.getWriter({
-                    arrowDirections: [{
+                    arrows: [{
                         direction: 'up',
                     }, {
                         to: 'State1',
