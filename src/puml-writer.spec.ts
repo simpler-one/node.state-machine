@@ -159,7 +159,7 @@ describe('PumlWriter', () => {
                     arrows: [{
                         to: 'State1',
                         direction: 'right',
-                        bothWay: true,
+                        bothWays: true,
                     }]
                 });
 

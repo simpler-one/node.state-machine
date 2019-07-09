@@ -31,7 +31,7 @@ export class PumlWriter {
             const from = arrow.from ? idOf(arrow.from) : '';
             const to = arrow.to ? idOf(arrow.to) : '';
             map.set(`${from}-path-${to}`, arrow.direction);
-            if (arrow.bothWay && (arrow.from || arrow.to)) {
+            if (arrow.bothWays && (arrow.from || arrow.to)) {
                 map.set(`${to}-path-${from}`, PumlWriterOptions.ArrowDirection.reverse(arrow.direction));
             }
         }
