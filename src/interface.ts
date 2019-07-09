@@ -60,7 +60,7 @@ export interface PumlWriterOptions {
         from?: string;
         to?: string;
         direction: PumlWriterOptions.ArrowDirectionType;
-        bothWay?: boolean;
+        bothWays?: boolean;
         /* color?: string; reserved for future */
     }[];
 }
