@@ -164,7 +164,7 @@ export class StateMachine<S, A extends string, P = void> {
             oldState: old.state,
             newState: next,
             action,
-            message: `[${this.name}] ${this._current.name} -> ${type.name} : ${action}`
+            message: `[${this.name}] ${old.name} -> ${type.name} : ${action}`
         });
         if (old.type.onLeaveState) old.type.onLeaveState(old.state, next, action, params);
         if (type.onEnterState) type.onEnterState(old.state, next, action, params);
@@ -180,7 +180,7 @@ export class StateMachine<S, A extends string, P = void> {
             oldState: old.state,
             newState: MetaState.Start,
             action: MetaAction.Reset,
-            message: `[${this.name}] ${this._current.name} -> ${MetaState.StartName} : ${MetaAction.ResetName}`
+            message: `[${this.name}] ${old.name} -> ${MetaState.StartName} : ${MetaAction.ResetName}`
         });
         this._current = new StateWrapper(new StringType(MetaState.StartName as undefined), MetaState.Start);
         if (old.type.onLeaveState) old.type.onLeaveState(old.state, MetaState.Start, MetaAction.Reset, undefined);
