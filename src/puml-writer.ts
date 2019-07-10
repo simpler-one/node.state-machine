@@ -4,9 +4,9 @@ import { MetaState } from "./state-meta";
 
 const StateIndex = 0;
 const ActionIdex = 1;
-coust NonId = new RegExp([
-    ' ', '-', '/',
-    ...[ '|', '\\' ].map(c => `\\${c}`),
+const NonId = new RegExp([
+    ' ', '-', '/', ',', ';', '#', '@', '%', '&', '<', '>', '~'
+    ...[ '|', '\\', ':', '[', ']', '{', '}', '(', ')', '!', '?', '*', '^', '=' ].map(c => `\\${c}`),
 ].join('|'), 'g');
 
 export class PumlWriter {
