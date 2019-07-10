@@ -4,6 +4,10 @@ import { MetaState } from "./state-meta";
 
 const StateIndex = 0;
 const ActionIdex = 1;
+coust NonId = new RegExp([
+    ' ', '-', '/',
+    ...[ '|', '\\' ].map(c => `\\${c}`),
+].join('|'), 'g');
 
 export class PumlWriter {
 
@@ -128,7 +132,7 @@ export class PumlWriter {
 function idOf(name: string): string {
     const n = name
         .trim()
-        .replace(/ |-/g, '_')
+        .replace(NonId, '_')
     ;
     return n.charAt(0).toLowerCase() + n.substr(1);
 }
