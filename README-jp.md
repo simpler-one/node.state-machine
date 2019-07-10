@@ -1,3 +1,5 @@
+[English](README.md) | 日本語
+
 # State Machine
 
 [![npm version](https://badge.fury.io/js/%40working-sloth%2Fstate-machine.svg)](https://badge.fury.io/js/%40working-sloth%2Fstate-machine)
