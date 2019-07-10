@@ -1,3 +1,5 @@
+English | [日本語](README-jp.md)
+
 # State Machine
 
 [![npm version](https://badge.fury.io/js/%40working-sloth%2Fstate-machine.svg)](https://badge.fury.io/js/%40working-sloth%2Fstate-machine)
@@ -7,8 +9,6 @@
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
 ![StateMachine](samples/1.quick-start/state.png)
-
-[日本語](README-jp.md)
 
 Diligent developer, is it your work to create state machine from scratch or take care of poor state machine?
 Let's be lazy.
