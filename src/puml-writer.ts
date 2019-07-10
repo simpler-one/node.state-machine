@@ -5,8 +5,8 @@ import { MetaState } from "./state-meta";
 const StateIndex = 0;
 const ActionIdex = 1;
 const NonId = new RegExp([
-    ' ', '-', '/', ',', ';', '#', '@', '%', '&', '<', '>', '~'
-    ...[ '|', '\\', ':', '[', ']', '{', '}', '(', ')', '!', '?', '*', '^', '=' ].map(c => `\\${c}`),
+    ...Array.from(' -+=/,:;@%&<>~\'"'),
+    ...Array.from('+|\\[]{}()!?*^').map(c => `\\${c}`),
 ].join('|'), 'g');
 
 export class PumlWriter {
