@@ -94,7 +94,7 @@ fsm.stateChanged.subscribe(param => {
 });
 
 // Machine Event handler (Observable)
-fsm.stateCstateChangeFailed.subscribe(param => {
+fsm.stateChangeFailed.subscribe(param => {
     console.error(param.message);
     if (param.action === SlothAction.Work) {
         alert("You can't work now");
