@@ -1,6 +1,7 @@
 import { PumlWriter } from './puml-writer';
-import { StateMachineMap, StateMachineMapItem, PumlWriterOptions, AutoIndex } from './interface';
-import { MetaState } from './state-meta';
+import { StateMachineMap, StateMachineMapItem } from '../../interface';
+import { AutoIndex } from '../interface';
+import { MetaState } from '../../state-meta';
 
 
 describe('PumlWriter', () => {
@@ -57,7 +58,7 @@ describe('PumlWriter', () => {
                 }] as StateMachineMapItem[]
             };
 
-            it('shuold return default optioned machine map', () => {
+            it('should return default optioned machine map', () => {
                 // Given
                 const writer = PumlWriter.getWriter();
 
@@ -75,7 +76,7 @@ describe('PumlWriter', () => {
                 expect(result.includes('(a1)')).toBeTruthy();
             });
 
-            it('shuold return no-index optioned machine map', () => {
+            it('should return no-index optioned machine map', () => {
                 // Given
                 const writer = PumlWriter.getWriter({autoIndex: undefined});
 
@@ -94,7 +95,7 @@ describe('PumlWriter', () => {
                 expect(result.includes('OK,Next')).toBeTruthy();
             });
 
-            it('shuold return auto-number machine map', () => {
+            it('should return auto-number machine map', () => {
                 // Given
                 const writer = PumlWriter.getWriter({autoIndex: AutoIndex.Number});
 
@@ -110,7 +111,7 @@ describe('PumlWriter', () => {
                 expect(result.includes('(2),(3)')).toBeTruthy();
             });
 
-            it('shuold return default arrow machine map', () => {
+            it('should return default arrow machine map', () => {
                 // Given
                 const writer = PumlWriter.getWriter();
 
@@ -125,7 +126,7 @@ describe('PumlWriter', () => {
                 expect(result.includes('(1)')).toBeFalsy();
             });
 
-            it('shuold return customized arrow machine map', () => {
+            it('should return customized arrow machine map', () => {
                 // Given
                 const writer = PumlWriter.getWriter({
                     arrows: [{
@@ -153,7 +154,7 @@ describe('PumlWriter', () => {
                 expect(result.includes('state3 -up-> state2')).toBeTruthy();
             });
 
-            it('shuold return both way arrow machine map', () => {
+            it('should return both way arrow machine map', () => {
                 // Given
                 const writer = PumlWriter.getWriter({
                     arrows: [{
@@ -170,6 +171,28 @@ describe('PumlWriter', () => {
                 expect(result.includes('-right-> state1')).toBeTruthy();
                 expect(result.includes('state1 -left->')).toBeTruthy();
             });
+
+            it('should return positioned machine map', () => {
+                // Given
+                const writer = PumlWriter.getWriter({
+                    positions: [
+                        { state: 'State1', x: 3 },
+                        { state: 'State2', x: 1, y: 4 },
+                        { state: 'State3', x: -5 },
+                    ]
+                });
+
+                // When
+                const result = writer(map);
+
+                // Then
+                expect(result.includes('state1 -down-> state2')).toBeTruthy();
+                expect(result.includes('state2 -up-> state1')).toBeTruthy();
+                expect(result.includes('state2 -left-> state3')).toBeTruthy();
+                expect(result.includes('state3 -right-> state2')).toBeTruthy();
+                expect(result.includes('state3 -right-> state1')).toBeTruthy();
+            });
         });
     });
+
 });

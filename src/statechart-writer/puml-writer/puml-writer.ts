@@ -1,42 +1,51 @@
-import { StateMachineMap, StateMachineMapItem, PumlWriterOptions } from "./interface";
-import { MetaState } from "./state-meta";
+import { StateMachineMap, StateMachineMapItem } from "../../interface";
+import { PumlWriterOptions, ArrowDirectionType, ArrowDirection } from "./interface";
+import { MetaState } from "../../state-meta";
 
 
+type Position = { x: number, y: number };
 const StateIndex = 0;
-const ActionIdex = 1;
+const ActionIndex = 1;
 const NonId = new RegExp([
     ...Array.from(' -=/,:;@%&<>~`\'"'),
     ...Array.from('+|\\[]{}()!?*^').map(c => `\\${c}`),
 ].join('|'), 'g');
+const ZeroPos = {x: 0, y: 0};
 
 export class PumlWriter {
-
-    public static getWriter(options?: PumlWriterOptions): (map: StateMachineMap) => string {
-        const opt = PumlWriterOptions.fill(options);
-        return (map) => new PumlWriter(map, opt).export();
-    }
 
     private indices: number[];
     private count: number;
     private definitions: string[] = [];
     private transitions: string[] = [];
-    private directionMap: Map<string, string>;
+    private readonly directionMap: Map<string, ArrowDirectionType>;
+    private readonly positionMap: Map<string, Position>;
+    private readonly defaultDirection: ArrowDirectionType;
 
     private constructor(
         private readonly map: StateMachineMap,
         private readonly options: PumlWriterOptions,
     ) {
         this.directionMap = PumlWriter.getDirectionMap(options.arrows);
+        this.positionMap = new Map(
+            options.positions.map(pos => [idOf(pos.state), {x: pos.x || 0, y: pos.y || 0}])
+        );
+        this.defaultDirection = this.directionMap.get(pathOf('', ''));
     }
 
-    private static getDirectionMap(arrows: typeof PumlWriterOptions.Model.arrows): Map<string, string> {
+    public static getWriter(options?: PumlWriterOptions): (map: StateMachineMap) => string {
+        const opt = PumlWriterOptions.fill(options);
+        return (map) => new PumlWriter(map, opt).export();
+    }
+
+    private static getDirectionMap(arrows: typeof PumlWriterOptions.Model.arrows): Map<string, ArrowDirectionType> {
         const map = new Map();
         for (const arrow of arrows) {
             const from = arrow.from ? idOf(arrow.from) : '';
             const to = arrow.to ? idOf(arrow.to) : '';
             map.set(`${from}-path-${to}`, arrow.direction);
             if (arrow.bothWays && (arrow.from || arrow.to)) {
-                map.set(`${to}-path-${from}`, PumlWriterOptions.ArrowDirection.reverse(arrow.direction));
+                map.set(`${to}-path-${from}`, ArrowDirection.reverse(arrow.direction));
             }
         }
 
@@ -48,7 +57,6 @@ export class PumlWriter {
         this.count = 0;
         this.definitions = [];
         this.transitions = [];
-
 
         const start = this.map.states.find(state => state.name === MetaState.StartName);
         const states = this.map.states.filter(state => state.name !== MetaState.StartName);
@@ -63,7 +71,7 @@ export class PumlWriter {
     }
 
     private setState(fromState: StateMachineMapItem): void {
-        this.indices[ActionIdex] = 0;
+        this.indices[ActionIndex] = 0;
         const from = idOf(fromState.name);
         this.definitions.push(`state "${fromState.name}" as ${from}`);
 
@@ -75,7 +83,7 @@ export class PumlWriter {
             let act: string;
             if (this.options.autoIndex) {
                 act = this.options.autoIndex(this.indices, ++this.count);
-                this.indices[ActionIdex]++;
+                this.indices[ActionIndex]++;
                 this.definitions.push(`${from}: ${act} ${action.name}`);
             } else {
                 act = action.name;
@@ -103,12 +111,16 @@ export class PumlWriter {
     }
 
     private getDirection(from: string, to: string): string {
+        const fromP = this.positionMap.get(from) || ZeroPos;
+        const toP = this.positionMap.get(to) || ZeroPos;
+
         const candidates = [
             this.directionMap.get(pathOf(from, to)),
             this.directionMap.get(pathOf(from, '')),
             this.directionMap.get(pathOf('', to)),
-            this.directionMap.get(pathOf('', '')),
-            PumlWriterOptions.ArrowDirection.Down,
+            ArrowDirection.fromPosition(fromP.x, fromP.y, toP.x, toP.y),
+            this.defaultDirection,
+            ArrowDirection.Down,
         ];
 
         return candidates.find(candidate => candidate);
@@ -126,7 +138,6 @@ export class PumlWriter {
         ].join('\n');
     }
 }
-
 
 
 function idOf(name: string): string {
