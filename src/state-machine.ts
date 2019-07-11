@@ -1,5 +1,5 @@
 import {
-    StateType, StateMachineItem, NamedState, StateMachineWriter,
+    StateType, StateMachineItem, NamedState, StatechartWriter,
     StateMachineMap, StateMachineMapItem, StateMachineMapAction, StateChangedArgs, StateChangeFailedArgs
 } from './interface';
 import { MetaState, MetaStateAction as MetaAction } from './state-meta';
@@ -29,12 +29,7 @@ export class StateMachine<S, A extends string, P = void> {
         return this._historyCapacity;
     }
     public set historyCapacity(capacity: number) {
-        if (capacity < 0) {
-            this._historyCapacity = 0;
-        } else {
-            this._historyCapacity = capacity;
-        }
-
+        this._historyCapacity = capacity < 0 ? 0 : capacity;
         const over = this._histories.length - this._historyCapacity;
         if (over > 0) {
             this._histories.splice(0, over);
@@ -47,7 +42,7 @@ export class StateMachine<S, A extends string, P = void> {
     public get stateChanged(): Observable<StateChangedArgs<S, A>> {
         return this._stateChanged.asObservable();
     }
-    public get stateCstateChangeFailed(): Observable<StateChangeFailedArgs<S, A>> {
+    public get stateChangeFailed(): Observable<StateChangeFailedArgs<S, A>> {
         return this._stateChangeFailed.asObservable();
     }
 
@@ -206,7 +201,7 @@ export class StateMachine<S, A extends string, P = void> {
      * Export state machine
      * @param writer writer
      */
-    public export(writer: StateMachineWriter): string {
+    public export(writer: StatechartWriter): string {
         return writer(this.toMachineMap());
     }
 
