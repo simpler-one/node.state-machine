@@ -1,5 +1,5 @@
 import {
-    StateType, StateMachineItem, NamedState, StateMachineWriter,
+    StateType, StateMachineItem, NamedState, StatechartWriter,
     StateMachineMap, StateMachineMapItem, StateMachineMapAction, StateChangedArgs, StateChangeFailedArgs
 } from './interface';
 import { MetaState, MetaStateAction as MetaAction } from './state-meta';
@@ -201,7 +201,7 @@ export class StateMachine<S, A extends string, P = void> {
      * Export state machine
      * @param writer writer
      */
-    public export(writer: StateMachineWriter): string {
+    public export(writer: StatechartWriter): string {
         return writer(this.toMachineMap());
     }
 

@@ -38,4 +38,4 @@ export interface StateMachineMapAction {
     destination: string;
 }
 
-export type StateMachineWriter = (map: StateMachineMap) => string;
+export type StatechartWriter = (map: StateMachineMap) => string;
