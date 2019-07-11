@@ -3,6 +3,7 @@ import { PumlWriterOptions, ArrowDirectionType, ArrowDirection } from "./interfa
 import { MetaState } from "../../state-meta";
 
 
+type Position = { x: number, y: number };
 const StateIndex = 0;
 const ActionIndex = 1;
 const NonId = new RegExp([
@@ -18,7 +19,7 @@ export class PumlWriter {
     private definitions: string[] = [];
     private transitions: string[] = [];
     private readonly directionMap: Map<string, ArrowDirectionType>;
-    private readonly positionMap: Map<string, {x:number, y: number}>;
+    private readonly positionMap: Map<string, Position>;
     private readonly defaultDirection: ArrowDirectionType;
 
     private constructor(

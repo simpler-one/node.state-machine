@@ -25,7 +25,7 @@ export namespace AutoIndex {
         do {
             result = String.fromCharCode(charCodeOffset + val % AlphaSpan) + result;
             val = Math.floor(val / AlphaSpan);
-        } while (val > 0)
+        } while (val > 0);
 
         return result;
     }
