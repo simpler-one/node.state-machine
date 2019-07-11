@@ -131,7 +131,7 @@ describe('StateMachine', () => {
                     let failedEventCalled = false;
                     const fsm = test.fsm;
                     fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
-                    fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
+                    fsm.stateChangeFailed.subscribe(() => { failedEventCalled = true; });
         
                     // When
                     fsm.start();
@@ -173,7 +173,7 @@ describe('StateMachine', () => {
                 });
                 fsm.start();
                 fsm.stateChanged.subscribe(() => { changedEventCalled = true; });
-                fsm.stateCstateChangeFailed.subscribe(() => { failedEventCalled = true; });
+                fsm.stateChangeFailed.subscribe(() => { failedEventCalled = true; });
     
                 // When
                 fsm.do(Action.Action1);

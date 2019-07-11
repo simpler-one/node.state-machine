@@ -84,7 +84,7 @@ fsm.stateChanged.subscribe(param => {
 });
 
 // Machine Event handler (Observable)
-fsm.stateCstateChangeFailed.subscribe(param => {
+fsm.stateChangeFailed.subscribe(param => {
     console.error(param.message);
     console.error(fsm.histories); // histories
     if (param.action === SlothAction.Work) {

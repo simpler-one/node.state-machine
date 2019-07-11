@@ -47,7 +47,7 @@ export class StateMachine<S, A extends string, P = void> {
     public get stateChanged(): Observable<StateChangedArgs<S, A>> {
         return this._stateChanged.asObservable();
     }
-    public get stateCstateChangeFailed(): Observable<StateChangeFailedArgs<S, A>> {
+    public get stateChangeFailed(): Observable<StateChangeFailedArgs<S, A>> {
         return this._stateChangeFailed.asObservable();
     }
 
