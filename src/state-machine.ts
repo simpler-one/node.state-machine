@@ -29,12 +29,7 @@ export class StateMachine<S, A extends string, P = void> {
         return this._historyCapacity;
     }
     public set historyCapacity(capacity: number) {
-        if (capacity < 0) {
-            this._historyCapacity = 0;
-        } else {
-            this._historyCapacity = capacity;
-        }
-
+        this._historyCapacity = capacity < 0 ? 0 : capacity;
         const over = this._histories.length - this._historyCapacity;
         if (over > 0) {
             this._histories.splice(0, over);
