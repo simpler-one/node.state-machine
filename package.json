@@ -1,11 +1,11 @@
 {
   "name": "@working-sloth/state-machine-ts2.5",
-  "version": "1.5.3",
+  "version": "1.6.0",
   "description": "State Machine for NodeJS (Typescript 2.5)",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepublishOnly": "npm run build",
+    "prepublishOnly": "npm uninstall && npm install && npm run build",
     "build": "rimraf dist && tsc -p src",
     "test": "rimraf spec/built && tsc -p spec && istanbul cover node_modules/jasmine/bin/jasmine.js",
     "remapcov": "cat coverage/coverage.json | ./node_modules/.bin/remap-istanbul > coverage/coverage-remap.json && mv -f coverage/coverage-remap.json coverage/coverage.json",
@@ -23,6 +23,7 @@
     "automaton",
     "puml",
     "PlantUML",
+    "statechart",
     "sloth",
     "lazy",
     "diligent"
