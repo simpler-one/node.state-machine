@@ -17,6 +17,8 @@ export interface StateType<S, A extends string, P = void> {
 export interface StateMachineItem<S, T, A> {
     state: S;
     actions: [A, T][];
+    startChild?: T;
+    children?: StateMachineItem<S, T, A>[];
 }
 
 export type StateChangedArgs<S, A> = { oldState: S | undefined, newState: S | undefined, action: A, message: string };
