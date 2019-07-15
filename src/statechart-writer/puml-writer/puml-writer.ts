@@ -1,5 +1,5 @@
-import { StateMachineMap, StateMachineMapItem } from "../../interface";
-import { PumlWriterOptions, ArrowDirectionType, ArrowDirection } from "./interface";
+import { Statechart, StatechartItem } from "../../interface";
+import { PumlWriterOptions, ArrowDirection } from "./interface";
 import { MetaState } from "../../state-meta";
 
 
@@ -18,12 +18,12 @@ export class PumlWriter {
     private count: number;
     private definitions: string[] = [];
     private transitions: string[] = [];
-    private readonly directionMap: Map<string, ArrowDirectionType>;
+    private readonly directionMap: Map<string, ArrowDirection>;
     private readonly positionMap: Map<string, Position>;
-    private readonly defaultDirection: ArrowDirectionType;
+    private readonly defaultDirection: ArrowDirection;
 
     private constructor(
-        private readonly map: StateMachineMap,
+        private readonly map: Statechart,
         private readonly options: PumlWriterOptions,
     ) {
         this.directionMap = PumlWriter.getDirectionMap(options.arrows);
@@ -33,12 +33,12 @@ export class PumlWriter {
         this.defaultDirection = this.directionMap.get(pathOf('', ''));
     }
 
-    public static getWriter(options?: PumlWriterOptions): (map: StateMachineMap) => string {
+    public static getWriter(options?: PumlWriterOptions): (map: Statechart) => string {
         const opt = PumlWriterOptions.fill(options);
         return (map) => new PumlWriter(map, opt).export();
     }
 
-    private static getDirectionMap(arrows: typeof PumlWriterOptions.Model.arrows): Map<string, ArrowDirectionType> {
+    private static getDirectionMap(arrows: typeof PumlWriterOptions.Model.arrows): Map<string, ArrowDirection> {
         const map = new Map();
         for (const arrow of arrows) {
             const from = arrow.from ? idOf(arrow.from) : '';
@@ -66,11 +66,11 @@ export class PumlWriter {
         }
     }
 
-    private setStart(start: StateMachineMapItem): void {
+    private setStart(start: StatechartItem): void {
         this.transitions.push(`${start.name} --> ${idOf(start.actions[0].destination)}`);
     }
 
-    private setState(fromState: StateMachineMapItem): void {
+    private setState(fromState: StatechartItem): void {
         this.indices[ActionIndex] = 0;
         const from = idOf(fromState.name);
         this.definitions.push(`state "${fromState.name}" as ${from}`);
@@ -84,10 +84,10 @@ export class PumlWriter {
             if (this.options.autoIndex) {
                 act = this.options.autoIndex(this.indices, ++this.count);
                 this.indices[ActionIndex]++;
-                this.definitions.push(`${from}: ${act} ${action.name}`);
+                this.definitions.push(`${from}: ${act} ${action.action}`);
             } else {
-                act = action.name;
-                this.definitions.push(`${from}: ${action.name}`);
+                act = action.action;
+                this.definitions.push(`${from}: ${action.action}`);
             }
 
             let transition = transitions.get(path);
@@ -141,11 +141,10 @@ export class PumlWriter {
 
 
 function idOf(name: string): string {
-    const n = name
+    return name
         .trim()
         .replace(NonId, '_')
     ;
-    return n.charAt(0).toLowerCase() + n.substr(1);
 }
 
 function pathOf(from: string, to: string): string {

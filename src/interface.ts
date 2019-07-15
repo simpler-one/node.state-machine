@@ -1,43 +1,41 @@
 // tslint:disable:no-namespace
 import { StateMachine } from "./state-machine";
+import { StateChangedEvent } from "./event-args";
 
 export interface NamedState<S, A extends string, P = void> {
     readonly name: string;
-    onEnterState?(oldState: S | undefined, newState: S, action: A, params: P): void;
-    onLeaveState?(oldState: S, newState: S | undefined, action: A, params: P): void;
+    onEnterState?(event: StateChangedEvent<S, A, P>): void;
+    onLeaveState?(event: StateChangedEvent<S, A, P>): void;
 }
 
 export interface StateType<S, A extends string, P = void> {
     readonly name: string;
     getState(stateMachine: StateMachine<S, A, P>, params: P): S;
-    onEnterState?(oldState: S | undefined, newState: S, action: A, params: P): void;
-    onLeaveState?(oldState: S, newState: S | undefined, action: A, params: P): void;
+    onEnterState?(event: StateChangedEvent<S, A, P>): void;
+    onLeaveState?(event: StateChangedEvent<S, A, P>): void;
 }
 
-export interface StateMachineItem<S, T, A> {
-    state: S;
-    actions: [A, T][];
+export interface StateMachineItem<N, T, A> {
+    state: N;
+    transitions: [A, T][];
     startChild?: T;
-    children?: StateMachineItem<S, T, A>[];
+    children?: StateMachineItem<N, T, A>[];
 }
 
-export type StateChangedArgs<S, A> = { oldState: S | undefined, newState: S | undefined, action: A, message: string };
-export type StateChangeFailedArgs<S, A> = { curState: S | undefined, action: A, message: string };
 
-
-export interface StateMachineMap {
+export interface Statechart {
     name: string;
-    states: StateMachineMapItem[];
+    states: StatechartItem[];
 }
 
-export interface StateMachineMapItem {
+export interface StatechartItem {
     name: string;
-    actions: StateMachineMapAction[];
+    actions: StatechartTransition[];
 }
 
-export interface StateMachineMapAction {
-    name: string;
+export interface StatechartTransition {
+    action: string;
     destination: string;
 }
 
-export type StatechartWriter = (map: StateMachineMap) => string;
+export type StatechartWriter = (map: Statechart) => string;

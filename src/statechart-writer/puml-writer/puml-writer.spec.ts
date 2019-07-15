@@ -64,10 +64,11 @@ describe('PumlWriter', () => {
 
                 // When
                 const result = writer(map);
+                console.log(result);
 
                 // Then
-                expect(result.includes('state "State1" as state1')).toBeTruthy();
-                expect(result.includes('state "State2" as state2')).toBeTruthy();
+                expect(result.includes('state "State1" as State1')).toBeTruthy();
+                expect(result.includes('state "State2" as State2')).toBeTruthy();
                 expect(result.includes('[*] -->')).toBeTruthy();
                 expect(result.includes('-down->')).toBeTruthy();
                 expect(result.includes('-up->')).toBeFalsy();
@@ -84,8 +85,8 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('state "State1" as state1')).toBeTruthy();
-                expect(result.includes('state "State2" as state2')).toBeTruthy();
+                expect(result.includes('state "State1" as State1')).toBeTruthy();
+                expect(result.includes('state "State2" as State2')).toBeTruthy();
                 expect(result.includes('[*] -->')).toBeTruthy();
                 expect(result.includes('-down->')).toBeTruthy();
                 expect(result.includes('-up->')).toBeFalsy();
@@ -103,8 +104,8 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('state "State1" as state1')).toBeTruthy();
-                expect(result.includes('state "State2" as state2')).toBeTruthy();
+                expect(result.includes('state "State1" as State1')).toBeTruthy();
+                expect(result.includes('state "State2" as State2')).toBeTruthy();
                 expect(result.includes('[*] -->')).toBeTruthy();
                 expect(result.includes('-down->')).toBeTruthy();
                 expect(result.includes('(1)')).toBeTruthy();
@@ -119,8 +120,8 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('state "State1" as state1')).toBeTruthy();
-                expect(result.includes('state "State2" as state2')).toBeTruthy();
+                expect(result.includes('state "State1" as State1')).toBeTruthy();
+                expect(result.includes('state "State2" as State2')).toBeTruthy();
                 expect(result.includes('[*] -->')).toBeTruthy();
                 expect(result.includes('-down->')).toBeTruthy();
                 expect(result.includes('(1)')).toBeFalsy();
@@ -145,13 +146,13 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('state1 -up-> state2')).toBeTruthy();
+                expect(result.includes('State1 -up-> State2')).toBeTruthy();
 
-                expect(result.includes('state2 -right-> state1')).toBeTruthy();
-                expect(result.includes('state2 -up-> state3')).toBeTruthy();
+                expect(result.includes('State2 -right-> State1')).toBeTruthy();
+                expect(result.includes('State2 -up-> State3')).toBeTruthy();
 
-                expect(result.includes('state3 -down-> state1')).toBeTruthy();
-                expect(result.includes('state3 -up-> state2')).toBeTruthy();
+                expect(result.includes('State3 -down-> State1')).toBeTruthy();
+                expect(result.includes('State3 -up-> State2')).toBeTruthy();
             });
 
             it('should return both way arrow machine map', () => {
@@ -168,8 +169,8 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('-right-> state1')).toBeTruthy();
-                expect(result.includes('state1 -left->')).toBeTruthy();
+                expect(result.includes('-right-> State1')).toBeTruthy();
+                expect(result.includes('State1 -left->')).toBeTruthy();
             });
 
             it('should return positioned machine map', () => {
@@ -186,11 +187,11 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('state1 -down-> state2')).toBeTruthy();
-                expect(result.includes('state2 -up-> state1')).toBeTruthy();
-                expect(result.includes('state2 -left-> state3')).toBeTruthy();
-                expect(result.includes('state3 -right-> state2')).toBeTruthy();
-                expect(result.includes('state3 -right-> state1')).toBeTruthy();
+                expect(result.includes('State1 -down-> State2')).toBeTruthy();
+                expect(result.includes('State2 -up-> State1')).toBeTruthy();
+                expect(result.includes('State2 -left-> State3')).toBeTruthy();
+                expect(result.includes('State3 -right-> State2')).toBeTruthy();
+                expect(result.includes('State3 -right-> State1')).toBeTruthy();
             });
         });
     });

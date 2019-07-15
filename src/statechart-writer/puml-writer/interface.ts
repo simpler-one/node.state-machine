@@ -2,24 +2,31 @@
 import { AutoIndex } from "../interface";
 
 
-export type ArrowDirectionType = 'up' | 'down' | 'left' | 'right' | ArrowDirection;
-export enum ArrowDirection {
-    Up = 'up',
-    Down = 'down',
-    Left = 'left',
-    Right = 'right',
-}
+export type ArrowDirection = 'up' | 'down' | 'left' | 'right' | 'do' | 'le' | 'ri';
 export namespace ArrowDirection {
-    const ReverseMap = new Map<ArrowDirectionType, ArrowDirection>([
-        [ArrowDirection.Up, ArrowDirection.Down],
-        [ArrowDirection.Down, ArrowDirection.Up],
-        [ArrowDirection.Left, ArrowDirection.Right],
-        [ArrowDirection.Right, ArrowDirection.Left],
+    export const
+        Up = 'up',
+        Down = 'down',
+        Left = 'left',
+        Right = 'right',
+        Do = 'do',
+        Le = 'le',
+        Ri = 'ri'
+    ;
+
+    const ReverseMap = new Map<ArrowDirection, ArrowDirection>([
+        [Up, Down],
+        [Down, Up],
+        [Left, Right],
+        [Right, Left],
+        [Do, Up],
+        [Le, Ri],
+        [Ri, Le],
     ]);
 
     export function fromPosition(
         fromX: number, fromY: number, toX: number, toY: number
-    ): ArrowDirectionType | undefined {
+    ): ArrowDirection | undefined {
         const x = toX - fromX;
         const y = toY - fromY;
         const absX = Math.abs(x);
@@ -34,7 +41,7 @@ export namespace ArrowDirection {
         }
     }
 
-    export function reverse(direction: ArrowDirectionType): ArrowDirection {
+    export function reverse(direction: ArrowDirection): ArrowDirection {
         return ReverseMap.get(direction);
     }
 }
@@ -49,7 +56,7 @@ export interface PumlWriterOptions {
         /** state name */
         to?: string;
         /** Arrow direction. This is more prior than positions */
-        direction: ArrowDirectionType;
+        direction: ArrowDirection;
         bothWays?: boolean;
         /* color?: string; reserved for future */
     }[];

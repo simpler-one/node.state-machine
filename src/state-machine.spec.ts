@@ -207,7 +207,7 @@ describe('StateMachine', () => {
                 expect(fsm.current).toBe(StringState.State2);
             });
 
-            it('should call enter/leave event when do action if event hander is defined', () => {
+            it('should call enter/leave event when do action if event handler is defined', () => {
                 // Given
                 const fsm = StateMachine.fromType<StringState, Action>('name', FullTypedState.State1,
                 {
@@ -603,15 +603,15 @@ describe('StateMachine', () => {
 
                 // Then
                 const expected = [
-                    new StateHistory(undefined, MetaState.StartName, StringState.State1, MetaStateAction.DoStart),
-                    new StateHistory(undefined, StringState.State1, StringState.State2, Action.Action1),
-                    new StateHistory(undefined, StringState.State2, StringState.State1, Action.Action2),
-                    new StateHistory(undefined, StringState.State1, undefined, Action.Action2),
+                    new StateHistory(undefined, [], [MetaState.StartName], [StringState.State1], MetaStateAction.DoStart),
+                    new StateHistory(undefined, [], [StringState.State1], [StringState.State2], Action.Action1),
+                    new StateHistory(undefined, [], [StringState.State2], [StringState.State1], Action.Action2),
+                    new StateHistory(undefined, [], [StringState.State1], undefined, Action.Action2),
                 ];
                 expect(histories.length).toBe(expected.length);
                 for (let i = 0; i < expected.length; i++) {
-                    expect(histories[i].oldState).toBe(expected[i].oldState);
-                    expect(histories[i].newState).toBe(expected[i].newState);
+                    expect(histories[i].oldState).toEqual(expected[i].oldState);
+                    expect(histories[i].newState).toEqual(expected[i].newState);
                     expect(histories[i].action).toBe(expected[i].action);
                 }
             });

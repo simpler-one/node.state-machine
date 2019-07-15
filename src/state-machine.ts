@@ -1,13 +1,15 @@
 import {
     StateType, StateMachineItem, NamedState, StatechartWriter,
-    StateMachineMap, StateMachineMapItem, StateMachineMapAction, StateChangedArgs, StateChangeFailedArgs
+    Statechart, StatechartItem, StatechartTransition
 } from './interface';
-import { MetaState, MetaStateAction as MetaAction } from './state-meta';
+import { StateChangedEvent, StateChangeFailedEvent } from './event-args';
+import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from './state-meta';
 import { Subject, Observable } from 'rxjs';
 import { StateHistory } from './state-history';
+import { StartType, StartName } from './state-meta/meta-state';
+import { StateMapItem } from './state-map-item';
 
 
-type StateMap<S, A extends string, P> = Map<string, Map<string, StateType<S, A, P>>>;
 type Item<S, A extends string, P> = StateMachineItem<string, StateType<S, A, P>, A>;
 type LooseStateType<S, A extends string, P> = StateType<S, A | undefined, P | void>;
 
@@ -16,10 +18,19 @@ export class StateMachine<S, A extends string, P = void> {
     //
     // Public var
 
-    /** Current status */
+    /** Current leaf state */
     public get current(): S | undefined {
-        return this._current.state;
+        return this.curLeaf.instance;
     }
+    /** Current top state */
+    public get currentTop(): S | undefined {
+        return this._current[0].instance;
+    }
+    /** Current states */
+    public get currentStates(): S[] | [undefined] {
+        return this._current.map(state => state.instance);
+    }
+    
     /** Histories */
     public get histories(): StateHistory<A>[] {
         return [...this._histories];
@@ -39,21 +50,26 @@ export class StateMachine<S, A extends string, P = void> {
     //
     // Public event
 
-    public get stateChanged(): Observable<StateChangedArgs<S, A>> {
+    public get stateChanged(): Observable<StateChangedEvent<S, A, P>> {
         return this._stateChanged.asObservable();
     }
-    public get stateChangeFailed(): Observable<StateChangeFailedArgs<S, A>> {
+    public get stateChangeFailed(): Observable<StateChangeFailedEvent<S, A, P>> {
         return this._stateChangeFailed.asObservable();
     }
 
 
-    private readonly map: StateMap<S, A, P>;
-    private _current: StateWrapper<S, A, P>;
+    private readonly map: Map<string, StateMapItem<S, A, P>>;
+    // private readonly parentMap: Map<string, StateType<S, A, P>> = new Map();
+
+    private _current: ActiveState<S, A, P>[];
     private _histories: StateHistory<A>[] = [];
     private _historyCapacity: number = 100;
+    private get curLeaf(): ActiveState<S, A, P> {
+        return this._current[this._current.length - 1];
+    }
 
-    private readonly _stateChanged: Subject<StateChangedArgs<S, A>> = new Subject();
-    private readonly _stateChangeFailed: Subject<StateChangeFailedArgs<S, A>> = new Subject();
+    private readonly _stateChanged: Subject<StateChangedEvent<S, A, P>> = new Subject();
+    private readonly _stateChangeFailed: Subject<StateChangeFailedEvent<S, A, P>> = new Subject();
 
     protected constructor(
         public readonly name: string,
@@ -63,17 +79,22 @@ export class StateMachine<S, A extends string, P = void> {
         const anytimeI: number = items.findIndex(item => `${item.state}` === MetaState.AnytimeName);
         let anytimeActions: [A, StateType<S, A, P>][] = [];
         if (anytimeI >= 0) {
-            anytimeActions = items.splice(anytimeI, 1)[0].actions;
+            anytimeActions = items.splice(anytimeI, 1)[0].transitions;
         }
 
-        this.map = new Map(items.map(item => [
-            item.state,
-            new Map(item.actions.concat(anytimeActions))
-        ] as [string, Map<string, StateType<S, A, P>>]));
+        this.map = StateMachine.createMap(items, anytimeActions);
 
-        this.map.set(MetaState.StartName, new Map([[MetaAction.DoStart, start]]));
+        const metaStart = new StateMapItem<S, A, P>(StartType, undefined);
+        this.map.set(MetaState.StartName, metaStart);
+        let startNode = this.map.get(start.name);
+        if (!startNode) {
+            startNode = new StateMapItem(start, undefined);
+            this.map.set(start.name, startNode);
+        }
 
-        this._current = new StateWrapper(new StringType(MetaState.StartName as undefined), MetaState.Start);
+        metaStart.setTransition(MetaAction.DoStart, startNode);
+
+        this._current = [new ActiveState(metaStart, MetaState.Start)];
     }
 
 
@@ -84,14 +105,14 @@ export class StateMachine<S, A extends string, P = void> {
     ): StateMachine<S, A> {
         const i = items.map(item => ({
             state: item.state,
-            actions: item.actions.map(action => [action[0], new StringType(action[1])] as [A, StateType<S, A>])
+            transitions: item.transitions.map(act => [act[0], new StringType(act[1])] as [A, StateType<S, A>])
         }));
         return new StateMachine<S, A>(
             name,
             new StringType(start),
             items.map(item => ({
                 state: item.state,
-                actions: item.actions.map(action => [action[0], new StringType(action[1])] as [A, StateType<S, A>])
+                transitions: item.transitions.map(act => [act[0], new StringType(act[1])] as [A, StateType<S, A>])
             }))
         );
     }
@@ -106,7 +127,7 @@ export class StateMachine<S, A extends string, P = void> {
             new NamedType(start),
             items.map(item => ({
                 state: item.state.name,
-                actions: item.actions.map(action => [action[0], new NamedType(action[1])] as [A, StateType<S, A, P>])
+                transitions: item.transitions.map(act => [act[0], new NamedType(act[1])] as [A, StateType<S, A, P>])
             }))
         );
     }
@@ -121,10 +142,71 @@ export class StateMachine<S, A extends string, P = void> {
             start,
             items.map((item) => ({
                 state: item.state.name,
-                actions: item.actions
+                transitions: item.transitions
             } as Item<S, A, P>))
         );
     }
+
+
+    private static createMap<S, A extends string, P>(
+        items: Item<S, A, P>[],
+        anytimeActions: [A, StateType<S, A, P>][],
+    ): Map<string, StateMapItem<S, A, P>> {
+        const nameToType = new Map<string, StateType<S, A, P>>();
+        for (const item of items) {
+            for (const action of item.transitions) {
+                nameToType.set(item.state, action[1]);
+            }
+        }
+
+        const nameToParent = new Map<string, StateType<S, A, P>>();
+        items
+        .filter(item => item.children)
+        .forEach(item => {
+            const type = nameToType.get(item.state);
+            item.children.forEach(child => {
+                nameToParent.set(child.state, type);
+            })
+        });
+
+        const map = new Map<string, StateMapItem<S, A, P>>();
+        for (const item of items) {
+            this.setMap(map, item.state, nameToType, nameToParent);
+        }
+
+        for (const item of items) {
+            const node = map.get(item.state);
+            for (const act of [...item.transitions, ...anytimeActions]) {
+                node.setTransition(act[0], map.get(act[1].name));
+            }
+        }
+
+        return map;
+    }
+
+    private static setMap<S, A extends string, P>(
+        map: Map<string, StateMapItem<S, A, P>>,
+        name: string,
+        nameToType: Map<string, StateType<S, A, P>>,
+        nameToParent: Map<string, StateType<S, A, P>>,
+    ): StateMapItem<S, A, P> {
+        let node = map.get(name);
+        if (node) {
+            return node;
+        }
+
+        const parentType = nameToParent.get(name);
+        let parent = map.get(parentType.name);
+        if (!parent && parentType) {
+            this.setMap(map, parentType.name, nameToType, nameToParent)
+            parent = map.get(parentType.name); // Recursive
+        }
+
+        node = new StateMapItem(nameToType.get(name), parent);
+        map.set(name, node);
+        return node;
+    }
+
 
     /**
      * Start action
@@ -140,29 +222,25 @@ export class StateMachine<S, A extends string, P = void> {
      * @param params params for getState(*)
      */
     public do(action: A, params?: P): void {
-        const type: StateType<S, A, P> = this.getType(action);
-        if (type === undefined) {
-            this.addHistory(new StateHistory(new Date(), this._current.name, undefined, action));
-            this._stateChangeFailed.next({
-                curState: this._current.state,
-                action,
-                message: `[${this.name}] Invalid action. ${this._current.name} -> ? : ${action}`
-            });
+        let newItems = this.getTypes(action);
+        if (newItems.length === 0) {
+            this.addHistory(new StateHistory(new Date(), [], this._current.map(s => s.name), undefined, action));
+            this._stateChangeFailed.next(new StateChangeFailedEvent(
+                this.currentStates, action, params,
+                `[${this.name}] Invalid action. ${joinName(this._current)} -> ? : ${action}`
+            ));
             return;
         }
 
-        const old: StateWrapper<S, A, P> = this._current;
-        const next: S = type.getState(this, params);
-        this._current = new StateWrapper(type, next);
-        this.addHistory(new StateHistory(new Date(), old.name, type.name, action));
-        this._stateChanged.next({
-            oldState: old.state,
-            newState: next,
-            action,
-            message: `[${this.name}] ${old.name} -> ${type.name} : ${action}`
-        });
-        if (old.type.onLeaveState) old.type.onLeaveState(old.state, next, action, params);
-        if (type.onEnterState) type.onEnterState(old.state, next, action, params);
+        const commonDepth = this.getCommonDepth(newItems);
+        const common = this._current.slice(0, commonDepth);
+        const old = this._current.slice(commonDepth);
+        newItems = newItems.slice(commonDepth);
+
+        const newWrappers = newItems.map(it => new ActiveState(it, it.type.getState(this, params)));
+
+        this._current = [...common, ...newWrappers];
+        this.onStateChanged(common, old, newWrappers, action, action, params);
     }
 
     /**
@@ -170,15 +248,9 @@ export class StateMachine<S, A extends string, P = void> {
      */
     public reset(): void {
         const old = this._current;
-        this.addHistory(new StateHistory(new Date(), old.name, MetaState.StartName, MetaAction.ResetName));
-        this._stateChanged.next({
-            oldState: old.state,
-            newState: MetaState.Start,
-            action: MetaAction.Reset,
-            message: `[${this.name}] ${old.name} -> ${MetaState.StartName} : ${MetaAction.ResetName}`
-        });
-        this._current = new StateWrapper(new StringType(MetaState.StartName as undefined), MetaState.Start);
-        if (old.type.onLeaveState) old.type.onLeaveState(old.state, MetaState.Start, MetaAction.Reset, undefined);
+        const metaStart = this.map.get(StartName);
+        this._current = [new ActiveState(metaStart, MetaState.Start)];
+        this.onStateChanged([], old, this._current, undefined, MetaStateAction.ResetName, undefined);
     }
     /**
      * Restart state
@@ -194,7 +266,7 @@ export class StateMachine<S, A extends string, P = void> {
      * @param action action
      */
     public can(action: A): boolean {
-        return this.getType(action) !== undefined;
+        return this.getDestination(action) !== undefined;
     }
 
     /**
@@ -202,31 +274,60 @@ export class StateMachine<S, A extends string, P = void> {
      * @param writer writer
      */
     public export(writer: StatechartWriter): string {
-        return writer(this.toMachineMap());
+        return writer(this.toChart());
     }
 
     /**
-     * To machine map
+     * To statechart
      */
-    public toMachineMap(): StateMachineMap {
+    public toChart(): Statechart {
         return {
             name: this.name,
             states: Array.from(this.map.entries()).map(state => ({
                 name: state[0],
-                actions: Array.from(state[1].entries()).map(action => ({
-                    name: action[0],
+                actions: Array.from(state[1].mapEntries()).map(action => ({
+                    action: action[0],
                     destination: action[1].name
-                } as StateMachineMapAction))
-            } as StateMachineMapItem))
+                } as StatechartTransition))
+            } as StatechartItem))
         };
     }
 
     /**
-     * Get state type by action
+     * Get state types by action
      * @param action action
      */
-    protected getType(action: A): StateType<S, A, P> {
-        return this.map.get(this._current.name).get(action);
+    protected getTypes(action: A): StateMapItem<S, A, P>[] {
+        const destination = this.getDestination(action);
+
+        const newItems: StateMapItem<S, A, P>[] = [];
+        let item = destination;
+        while (item) {
+            newItems.push(item);
+            item = item.parent;
+        }
+
+        return newItems.reverse();
+    }
+
+    private getDestination(action: A): StateMapItem<S, A, P> {
+        let item: StateMapItem<S, A, P>;
+        for (let i = this._current.length; i-- > 0 && !item; ) {
+            item = this._current[i].map.when(action);
+        }
+
+        return item;
+    }
+
+    private getCommonDepth(newItems: StateMapItem<S, A, P>[]): number {
+        const maxDepth = Math.max(this._current.length, newItems.length);
+
+        let depth = 0;
+        while (depth < maxDepth && this._current[depth].name === newItems[depth].name) {
+            depth++;
+        }
+
+        return depth;
     }
 
     /**
@@ -239,17 +340,51 @@ export class StateMachine<S, A extends string, P = void> {
             this._histories.shift();
         }
     }
+
+
+    private onStateChanged(
+        common: ActiveState<S, A, P>[],
+        old: ActiveState<S, A, P>[],
+        newWrappers: ActiveState<S, A, P>[],
+        action: A,
+        actionName: A,
+        params: P,
+    ): void {
+        this.addHistory(new StateHistory(
+            new Date(), common.map(w => w.name), old.map(w => w.name), newWrappers.map(t => t.name), actionName)
+        );
+
+        const transitionMsg = common.length > 0 ?
+            `${joinName(common)} {${joinName(old)} -> ${joinName(newWrappers)}}` :
+            `${joinName(old)} -> ${joinName(newWrappers)}`
+        ;
+        const event = new StateChangedEvent(
+            common.map(wrapper => wrapper.instance),
+            old.map(wrapper => wrapper.instance),
+            newWrappers.map(wrapper => wrapper.instance),
+            action, params,
+            `[${this.name}] ${transitionMsg} : ${actionName}`
+        );
+
+        this._stateChanged.next(event);
+        
+        old.filter(w => w.map.type.onLeaveState)
+            .forEach(w => w.map.type.onLeaveState(event));
+        newWrappers.filter(w => w.map.type.onEnterState)
+            .forEach(w => w.map.type.onEnterState(event));
+    }
 }
 
+
 // tslint:disable-next-line:max-classes-per-file
-class StateWrapper<S, A extends string, P> {
+class ActiveState<S, A extends string, P> {
     public get name(): string {
-        return this.type.name;
+        return this.map.type.name;
     } 
 
     constructor(
-        public readonly type: StateType<S, A, P>,
-        public readonly state: S
+        public readonly map: StateMapItem<S, A, P>,
+        public readonly instance: S
     ) {
     }
 }
@@ -276,8 +411,8 @@ class NamedType<S extends NamedState<S, A, P>, A extends string, P> implements S
         return this.state.name;
     }
 
-    public readonly onEnterState: (oldState: S, newState: S, action: A, params: P) => void;
-    public readonly onLeaveState: (oldState: S, newState: S, action: A, params: P) => void;
+    public readonly onEnterState: (event: StateChangedEvent<S, A, P>) => void;
+    public readonly onLeaveState: (event: StateChangedEvent<S, A, P>) => void;
 
     constructor(
         private readonly state: S,
@@ -289,4 +424,10 @@ class NamedType<S extends NamedState<S, A, P>, A extends string, P> implements S
     public getState(): S {
         return this.state;
     }
+}
+
+
+
+function joinName(named: ActiveState<{}, string, {}>[]): string {
+    return named.map(s => s.name).join('/');
 }
