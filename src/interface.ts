@@ -3,19 +3,22 @@ import { StateMachine } from "./state-machine";
 import { StateChangedEvent } from "./event-args";
 
 
-export interface NamedState<S, Ac extends string, P = void, At = void> {
+export interface NamedState {
     readonly name: string;
-    has?(attribute: At): boolean;
-    onEnterState?(event: StateChangedEvent<S, Ac, P>): void;
-    onLeaveState?(event: StateChangedEvent<S, Ac, P>): void;
 }
 
 export interface StateType<S, Ac extends string, P = void, At = void> {
     readonly name: string;
     getState(stateMachine: StateMachine<S, Ac, P>, params: P): S;
     has?(attribute: At): boolean;
-    onEnterState?(event: StateChangedEvent<S, Ac, P>): void;
-    onLeaveState?(event: StateChangedEvent<S, Ac, P>): void;
+}
+
+export interface OnEnterState<S, A, P = void> {
+    onEnterState(event: StateChangedEvent<S, A, P>): void;
+}
+
+export interface OnLeaveState<S, A, P = void> {
+    onLeaveState?(event: StateChangedEvent<S, A, P>): void;
 }
 
 export interface StateMachineItem<S, T, A> {
