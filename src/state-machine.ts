@@ -10,10 +10,10 @@ import { StartType, StartName } from './state-meta/meta-state';
 import { StateMapItem } from './state-map-item';
 
 
-type Item<S, A extends string, P> = StateMachineItem<string, StateType<S, A, P>, A>;
-type LooseStateType<S, A extends string, P> = StateType<S, A | undefined, P | void>;
+type Item<S, Ac extends string, P, At> = StateMachineItem<string, StateType<S, Ac, P, At>, Ac>;
+type LooseStateType<S, Ac extends string, P> = StateType<S, Ac | undefined, P | void, At>;
 
-export class StateMachine<S, A extends string, P = void> {
+export class StateMachine<S, Ac extends string, P = void, At = void> {
 
     //
     // Public var
@@ -32,7 +32,7 @@ export class StateMachine<S, A extends string, P = void> {
     }
     
     /** Histories */
-    public get histories(): StateHistory<A>[] {
+    public get histories(): StateHistory<Ac>[] {
         return [...this._histories];
     }
     /** History capacity */
@@ -50,10 +50,10 @@ export class StateMachine<S, A extends string, P = void> {
     //
     // Public event
 
-    public get stateChanged(): Observable<StateChangedEvent<S, A, P>> {
+    public get stateChanged(): Observable<StateChangedEvent<S, Ac, P>> {
         return this._stateChanged.asObservable();
     }
-    public get stateChangeFailed(): Observable<StateChangeFailedEvent<S, A, P>> {
+    public get stateChangeFailed(): Observable<StateChangeFailedEvent<S, Ac, P>> {
         return this._stateChangeFailed.asObservable();
     }
 
