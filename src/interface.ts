@@ -17,7 +17,7 @@ export interface OnEnterState<S, A, P = void> {
 }
 
 export interface OnLeaveState<S, A, P = void> {
-    onLeaveState?(event: StateChangedEvent<S, A, P>): void;
+    onLeaveState(event: StateChangedEvent<S, A, P>): void;
 }
 
 export interface Attributed {
