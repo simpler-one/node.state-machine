@@ -9,7 +9,7 @@ export interface NamedState {
 
 export interface StateType<S, A extends string, P = void> {
     readonly name: string;
-    getState(stateMachine: M, params?: P): S;
+    getState(stateMachine: StateMachine<S, A, P>, params?: P): S;
 }
 
 export interface OnEnterState<S, A, P = void> {
