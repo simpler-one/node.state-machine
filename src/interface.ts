@@ -7,9 +7,9 @@ export interface NamedState {
     readonly name: string;
 }
 
-export interface StateType<S, M extends StateMachine<S, string, {}>> {
+export interface StateType<S, A extends string, P = void> {
     readonly name: string;
-    getState(stateMachine: M, params: P): S;
+    getState(stateMachine: M, params?: P): S;
 }
 
 export interface OnEnterState<S, A, P = void> {
@@ -20,8 +20,8 @@ export interface OnLeaveState<S, A, P = void> {
     onLeaveState(event: StateChangedEvent<S, A, P>): void;
 }
 
-export interface Attributed {
-    has(attribute: number | string): boolean;
+export interface Attributed<A extends number | string> {
+    has(attribute: A): boolean;
 }
 
 export interface StateMachineItem<S, T, A> {
