@@ -1,6 +1,6 @@
 import {
     StateType, StateMachineItem, NamedState, StatechartWriter,
-    Statechart, StatechartItem, StatechartTransition
+    Statechart, StatechartItem, StatechartTransition, OnLeaveState, OnEnterState
 } from './interface';
 import { StateChangedEvent, StateChangeFailedEvent } from './event-args';
 import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from './state-meta';
@@ -32,7 +32,7 @@ export class StateMachine<S, A extends string, P = void> {
     }
     
     /** Histories */
-    public get histories(): StateHistory<Ac>[] {
+    public get histories(): StateHistory<A>[] {
         return [...this._histories];
     }
     /** History capacity */
@@ -50,10 +50,10 @@ export class StateMachine<S, A extends string, P = void> {
     //
     // Public event
 
-    public get stateChanged(): Observable<StateChangedEvent<S, Ac, P>> {
+    public get stateChanged(): Observable<StateChangedEvent<S, A, P>> {
         return this._stateChanged.asObservable();
     }
-    public get stateChangeFailed(): Observable<StateChangeFailedEvent<S, Ac, P>> {
+    public get stateChangeFailed(): Observable<StateChangeFailedEvent<S, A, P>> {
         return this._stateChangeFailed.asObservable();
     }
 
@@ -117,7 +117,7 @@ export class StateMachine<S, A extends string, P = void> {
         );
     }
 
-    public static fromNamed<S extends NamedState<S, A, P>, A extends string, P = void>(
+    public static fromNamed<S extends NamedState, A extends string, P = void>(
         name: string,
         start: S,
         ...items: StateMachineItem<S, S, A>[]
@@ -368,10 +368,8 @@ export class StateMachine<S, A extends string, P = void> {
 
         this._stateChanged.next(event);
         
-        old.filter(w => w.map.type.onLeaveState)
-            .forEach(w => w.map.type.onLeaveState(event));
-        newWrappers.filter(w => w.map.type.onEnterState)
-            .forEach(w => w.map.type.onEnterState(event));
+        old.forEach(w => OnLeaveState.tryCall(w.map.type, event));
+        newWrappers.forEach(w => OnEnterState.tryCall(w.map.type, event));
     }
 }
 
@@ -406,7 +404,7 @@ class StringType<S extends string, A extends string> implements StateType<S, A> 
 }
 
 // tslint:disable-next-line:max-classes-per-file
-class NamedType<S extends NamedState<S, A, P>, A extends string, P> implements StateType<S, A, P> {
+class NamedType<S extends NamedState, A extends string, P> implements StateType<S, A, P>, OnEnterState.Any, OnLeaveState.Any {
     public get name(): string {
         return this.state.name;
     }
@@ -417,8 +415,8 @@ class NamedType<S extends NamedState<S, A, P>, A extends string, P> implements S
     constructor(
         private readonly state: S,
     ) {
-        this.onEnterState = state.onEnterState;
-        this.onLeaveState = state.onLeaveState;
+        this.onEnterState = (event) => state.onEnterState(event);
+        this.onLeaveState = (event) => state.onLeaveState(event);
     }
 
     public getState(): S {

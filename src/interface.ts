@@ -15,9 +15,31 @@ export interface StateType<S, A extends string, P = void> {
 export interface OnEnterState<S, A, P = void> {
     onEnterState(event: StateChangedEvent<S, A, P>): void;
 }
+export namespace OnEnterState {
+    export type Any = OnEnterState<{}, {}, {}>;
+
+    export function tryCall<S, A, P>(obj: {}, event: StateChangedEvent<S, A, P>): void {
+        if ((<Any>obj).onEnterState) {
+            (<Any>obj).onEnterState(event);
+        }
+    }
+
+    export function get<S, A, P>(obj: {}): (event: StateChangedEvent<S, A, P>) => void {
+        
+    }
+}
 
 export interface OnLeaveState<S, A, P = void> {
     onLeaveState(event: StateChangedEvent<S, A, P>): void;
+}
+export namespace OnLeaveState {
+    export type Any = OnLeaveState<{}, {}, {}>;
+
+    export function tryCall<S, A, P>(obj: {}, event: StateChangedEvent<S, A, P>): void {
+        if ((<Any>obj).onLeaveState) {
+            (<Any>obj).onLeaveState(event);
+        }
+    }
 }
 
 export interface Attributed<A extends number | string> {
