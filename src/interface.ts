@@ -25,7 +25,7 @@ export namespace OnEnterState {
     }
 
     export function get<S, A, P>(obj: {}): (event: StateChangedEvent<S, A, P>) => void {
-        
+        return (<Any>obj).onEnterState ? 
     }
 }
 
