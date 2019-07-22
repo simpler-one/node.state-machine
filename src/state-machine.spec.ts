@@ -1,7 +1,7 @@
 
 import { StateMachine } from './state-machine'
 import { MetaState, MetaStateAction } from './state-meta'
-import { StateMachineMap } from './interface';
+import { Statechart } from './interface';
 import { buildDataMatrix } from '@working-sloth/data-matrix';
 import { StateHistory } from './state-history';
 
@@ -148,7 +148,7 @@ describe('StateMachine', () => {
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
                     state: TypedState.State1,
-                    actions: [
+                    transitions: [
                         [Action.Action1, TypedState.State2]
                     ]
                 });
@@ -168,7 +168,7 @@ describe('StateMachine', () => {
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
                     state: TypedState.State1,
-                    actions: [
+                    transitions: [
                     ]
                 });
                 fsm.start();
@@ -189,13 +189,12 @@ describe('StateMachine', () => {
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
                     state: MetaState.Anytime,
-                    actions: [
+                    transitions: [
                         [Action.Action1, TypedState.State2]
                     ]
-                },
-                {
+                }, {
                     state: TypedState.State1,
-                    actions: [
+                    transitions: [
                     ]
                 });
                 fsm.start();
@@ -212,13 +211,13 @@ describe('StateMachine', () => {
                 const fsm = StateMachine.fromType<StringState, Action>('name', FullTypedState.State1,
                 {
                     state: MetaState.Anytime,
-                    actions: [
+                    transitions: [
                         [Action.Action1, FullTypedState.State2]
                     ]
                 },
                 {
                     state: FullTypedState.State1,
-                    actions: [
+                    transitions: [
                     ]
                 });
                 fsm.start();
@@ -307,7 +306,7 @@ describe('StateMachine', () => {
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
                     state: TypedState.State1,
-                    actions: [
+                    transitions: [
                         [Action.Action1, TypedState.State2]
                     ]
                 });
@@ -325,7 +324,7 @@ describe('StateMachine', () => {
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
                     state: TypedState.State1,
-                    actions: [
+                    transitions: [
                     ]
                 });
                 fsm.start();
@@ -342,13 +341,13 @@ describe('StateMachine', () => {
                 const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
                 {
                     state: MetaState.Anytime,
-                    actions: [
+                    transitions: [
                         [Action.Action1, TypedState.State2]
                     ]
                 },
                 {
                     state: TypedState.State1,
-                    actions: [
+                    transitions: [
                     ]
                 });
                 fsm.start();
@@ -361,22 +360,22 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('toMachineMap', () => {
+        describe('toChart', () => {
             it('should return only meta start map if state is empty', () => {
                 // Given
                 const name = 'name';
                 const fsm = StateMachine.fromString<StringState, Action>(name, StringState.State1);
 
                 // When
-                const result = fsm.toMachineMap();
+                const result = fsm.toChart();
 
                 // Then
                 expect(result).toEqual({
                     name,
                     states: [{
                         name: MetaState.StartName,
-                        actions: [{
-                            name: MetaStateAction.DoStart,
+                        transitions: [{
+                            action: MetaStateAction.DoStart,
                             destination: StringState.State1
                         }]
                     }]
@@ -391,28 +390,28 @@ describe('StateMachine', () => {
                     StringState.State1,
                     {
                         state: StringState.State1,
-                        actions: [
+                        transitions: [
                             [Action.Action1, StringState.State2]
                         ]
                     }
                 );
 
                 // When
-                const result = fsm.toMachineMap();
+                const result = fsm.toChart();
 
                 // Then
                 expect(result).toEqual({
                     name,
                     states: [{
                         name: StringState.State1,
-                        actions: [{
-                            name: Action.Action1,
+                        transitions: [{
+                            action: Action.Action1,
                             destination: StringState.State2
                         }]
                     }, {
                         name: MetaState.StartName,
-                        actions: [{
-                            name: MetaStateAction.DoStart,
+                        transitions: [{
+                            action: MetaStateAction.DoStart,
                             destination: StringState.State1
                         }]
                     }]
@@ -427,25 +426,25 @@ describe('StateMachine', () => {
                     StringState.State1,
                     {
                         state: MetaState.Anytime,
-                        actions: [
+                        transitions: [
                             [Action.Action3, StringState.State1]
                         ]
                     },
                     {
                         state: StringState.State1,
-                        actions: [
+                        transitions: [
                             [Action.Action1, StringState.State2]
                         ]
                     },
                     {
                         state: StringState.State2,
-                        actions: [
+                        transitions: [
                             [Action.Action2, StringState.State3]
                         ]
                     },
                     {
                         state: StringState.State3,
-                        actions: [
+                        transitions: [
                             [Action.Action1, StringState.State2],
                             [Action.Action3, StringState.State1]
                         ]
@@ -456,25 +455,25 @@ describe('StateMachine', () => {
                     NamedState.State1,
                     {
                         state: MetaState.Anytime,
-                        actions: [
+                        transitions: [
                             [Action.Action3, NamedState.State1]
                         ]
                     },
                     {
                         state: NamedState.State1,
-                        actions: [
+                        transitions: [
                             [Action.Action1, NamedState.State2]
                         ]
                     },
                     {
                         state: NamedState.State2,
-                        actions: [
+                        transitions: [
                             [Action.Action2, NamedState.State3]
                         ]
                     },
                     {
                         state: NamedState.State3,
-                        actions: [
+                        transitions: [
                             [Action.Action1, NamedState.State2],
                             [Action.Action3, NamedState.State1]
                         ]
@@ -485,25 +484,25 @@ describe('StateMachine', () => {
                     TypedState.State1,
                     {
                         state: MetaState.Anytime,
-                        actions: [
+                        transitions: [
                             [Action.Action3, TypedState.State1]
                         ]
                     },
                     {
                         state: TypedState.State1,
-                        actions: [
+                        transitions: [
                             [Action.Action1, TypedState.State2]
                         ]
                     },
                     {
                         state: TypedState.State2,
-                        actions: [
+                        transitions: [
                             [Action.Action2, TypedState.State3]
                         ]
                     },
                     {
                         state: TypedState.State3,
-                        actions: [
+                        transitions: [
                             [Action.Action1, TypedState.State2],
                             [Action.Action3, TypedState.State1]
                         ]
@@ -511,9 +510,9 @@ describe('StateMachine', () => {
                 );
 
                 // When
-                const stringResult = stringFsm.toMachineMap();
-                const namedResult = namedFsm.toMachineMap();
-                const typedResult = typedFsm.toMachineMap();
+                const stringResult = stringFsm.toChart();
+                const namedResult = namedFsm.toChart();
+                const typedResult = typedFsm.toChart();
 
                 // Then
                 expect(stringResult).toEqual(namedResult);
@@ -523,7 +522,7 @@ describe('StateMachine', () => {
         });
 
         describe('export', () => {
-            it('should pass equal map to toMachineMap', () => {
+            it('should give equal map to toChart', () => {
                 // Given
                 const name = 'name';
                 const fsm = StateMachine.fromString<StringState, Action>(
@@ -531,14 +530,14 @@ describe('StateMachine', () => {
                     StringState.State1,
                     {
                         state: StringState.State1,
-                        actions: [
+                        transitions: [
                             [Action.Action1, StringState.State2]
                         ]
                     }
                 );
                 const result = 'result';
-                let actualMap: StateMachineMap;
-                const writer = (map: StateMachineMap) => {
+                let actualMap: Statechart;
+                const writer = (map: Statechart) => {
                     actualMap = map;
                     return result;
                 };
@@ -548,7 +547,7 @@ describe('StateMachine', () => {
 
                 // Then
                 expect(actualResult).toBe(result);
-                expect(actualMap).toEqual(fsm.toMachineMap());
+                expect(actualMap).toEqual(fsm.toChart());
             });
         });
 
@@ -556,7 +555,7 @@ describe('StateMachine', () => {
             it('should set normally if not negative value was set', () => {
                 // Given
                 const capacity = 10;
-                const fsm = StateMachine.fromString('nane', StringState.State1);
+                const fsm = StateMachine.fromString('name', StringState.State1);
 
                 // When
                 fsm.historyCapacity = capacity;
@@ -568,7 +567,7 @@ describe('StateMachine', () => {
             it('should set zero if negative value was set', () => {
                 // Given
                 const capacity = -1;
-                const fsm = StateMachine.fromString('nane', StringState.State1);
+                const fsm = StateMachine.fromString('name', StringState.State1);
 
                 // When
                 fsm.historyCapacity = capacity;
@@ -584,12 +583,12 @@ describe('StateMachine', () => {
                 const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
                 {
                     state: StringState.State1,
-                    actions: [
+                    transitions: [
                         [Action.Action1, StringState.State2]
                     ]
                 }, {
                     state: StringState.State2,
-                    actions: [
+                    transitions: [
                         [Action.Action2, StringState.State1]
                     ]
                 });
@@ -621,12 +620,12 @@ describe('StateMachine', () => {
                 const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
                 {
                     state: StringState.State1,
-                    actions: [
+                    transitions: [
                         [Action.Action1, StringState.State2]
                     ]
                 }, {
                     state: StringState.State2,
-                    actions: [
+                    transitions: [
                         [Action.Action2, StringState.State1]
                     ]
                 });
@@ -648,12 +647,12 @@ describe('StateMachine', () => {
                 const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
                 {
                     state: StringState.State1,
-                    actions: [
+                    transitions: [
                         [Action.Action1, StringState.State2]
                     ]
                 }, {
                     state: StringState.State2,
-                    actions: [
+                    transitions: [
                         [Action.Action2, StringState.State1]
                     ]
                 });

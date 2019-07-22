@@ -67,7 +67,7 @@ export class PumlWriter {
     }
 
     private setStart(start: StatechartItem): void {
-        this.transitions.push(`${start.name} --> ${idOf(start.actions[0].destination)}`);
+        this.transitions.push(`${start.name} --> ${idOf(start.transitions[0].destination)}`);
     }
 
     private setState(fromState: StatechartItem): void {
@@ -76,7 +76,7 @@ export class PumlWriter {
         this.definitions.push(`state "${fromState.name}" as ${from}`);
 
         const transitions = new Map<string, string>();
-        for (const action of fromState.actions) {
+        for (const action of fromState.transitions) {
             const to = idOf(action.destination);
             const path = `${from}-path-${to}`;
 

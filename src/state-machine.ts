@@ -10,7 +10,7 @@ import { StartType, StartName } from './state-meta/meta-state';
 import { StateMapItem } from './state-map-item';
 
 
-type Item<S, A extends string, P> = StateMachineItem<string, StateType<S, A, P>, A>;
+type Item<S, A extends string, P> = StateMachineItem<StateType<S, A, P>, StateType<S, A, P>, A>;
 type LooseStateType<S, A extends string, P> = StateType<S, A | undefined, P | void>;
 
 export class StateMachine<S, A extends string, P = void> {
@@ -59,7 +59,6 @@ export class StateMachine<S, A extends string, P = void> {
 
 
     private readonly map: Map<string, StateMapItem<S, A, P>>;
-    // private readonly parentMap: Map<string, StateType<S, A, P>> = new Map();
 
     private _current: ActiveState<S, A, P>[];
     private _histories: StateHistory<A>[] = [];
@@ -103,31 +102,29 @@ export class StateMachine<S, A extends string, P = void> {
         start: S,
         ...items: StateMachineItem<S, S, A>[]
     ): StateMachine<S, A> {
-        const i = items.map(item => ({
-            state: item.state,
-            transitions: item.transitions.map(act => [act[0], new StringType(act[1])] as [A, StateType<S, A>])
-        }));
+        const getter = new StringTypeGetter<S, A>();
         return new StateMachine<S, A>(
             name,
-            new StringType(start),
+            getter.get(start),
             items.map(item => ({
-                state: item.state,
+                state: getter.get(item.state),
                 transitions: item.transitions.map(act => [act[0], new StringType(act[1])] as [A, StateType<S, A>])
             }))
         );
     }
 
-    public static fromNamed<S extends NamedState, A extends string, P = void>(
+    public static fromNamed<S extends NamedState, A extends string>(
         name: string,
         start: S,
         ...items: StateMachineItem<S, S, A>[]
-    ): StateMachine<S, A, P> {
-        return new StateMachine<S, A, P>(
+    ): StateMachine<S, A> {
+        const getter = new NamedTypeGetter<S, A>();
+        return new StateMachine<S, A>(
             name,
-            new NamedType(start),
+            getter.get(start),
             items.map(item => ({
-                state: item.state.name,
-                transitions: item.transitions.map(act => [act[0], new NamedType(act[1])] as [A, StateType<S, A, P>])
+                state: getter.get(item.state),
+                transitions: item.transitions.map(act => [act[0], new NamedType(act[1])] as [A, StateType<S, A>])
             }))
         );
     }
@@ -137,14 +134,7 @@ export class StateMachine<S, A extends string, P = void> {
         start: LooseStateType<S, A, P>,
         ...items: StateMachineItem<LooseStateType<S, A, P>, LooseStateType<S, A, P>, A>[]
     ): StateMachine<S, A, P> {
-        return new StateMachine<S, A, P>(
-            name,
-            start,
-            items.map((item) => ({
-                state: item.state.name,
-                transitions: item.transitions
-            } as Item<S, A, P>))
-        );
+        return new StateMachine<S, A, P>(name, start, [...items]);
     }
 
 
@@ -154,8 +144,10 @@ export class StateMachine<S, A extends string, P = void> {
     ): Map<string, StateMapItem<S, A, P>> {
         const nameToType = new Map<string, StateType<S, A, P>>();
         for (const item of items) {
-            for (const action of item.transitions) {
-                nameToType.set(item.state, action[1]);
+            nameToType.set(item.state.name, item.state);
+            for (const transition of item.transitions) {
+                const destination = transition[1];
+                nameToType.set(destination.name, destination);
             }
         }
 
@@ -163,19 +155,19 @@ export class StateMachine<S, A extends string, P = void> {
         items
         .filter(item => item.children)
         .forEach(item => {
-            const type = nameToType.get(item.state);
+            const type = nameToType.get(item.state.name);
             item.children.forEach(child => {
-                nameToParent.set(child.state, type);
+                nameToParent.set(child.state.name, type);
             })
         });
 
         const map = new Map<string, StateMapItem<S, A, P>>();
         for (const item of items) {
-            this.setMap(map, item.state, nameToType, nameToParent);
+            this.setMap(map, item.state.name, nameToType, nameToParent);
         }
 
         for (const item of items) {
-            const node = map.get(item.state);
+            const node = map.get(item.state.name);
             for (const act of [...item.transitions, ...anytimeActions]) {
                 node.setTransition(act[0], map.get(act[1].name));
             }
@@ -195,11 +187,13 @@ export class StateMachine<S, A extends string, P = void> {
             return node;
         }
 
+        let parent: StateMapItem<S, A, P> = undefined;
         const parentType = nameToParent.get(name);
-        let parent = map.get(parentType.name);
-        if (!parent && parentType) {
-            this.setMap(map, parentType.name, nameToType, nameToParent)
-            parent = map.get(parentType.name); // Recursive
+        if (parentType) {
+            parent = map.get(parentType.name);
+            if (!parent) {
+                parent = this.setMap(map, parentType.name, nameToType, nameToParent); // Recursive
+            }
         }
 
         node = new StateMapItem(nameToType.get(name), parent);
@@ -285,9 +279,9 @@ export class StateMachine<S, A extends string, P = void> {
             name: this.name,
             states: Array.from(this.map.entries()).map(state => ({
                 name: state[0],
-                actions: Array.from(state[1].mapEntries()).map(action => ({
-                    action: action[0],
-                    destination: action[1].name
+                transitions: Array.from(state[1].mapEntries()).map(transition => ({
+                    action: transition[0],
+                    destination: (() => { console.log('>>> ', transition); return transition[1].name })()
                 } as StatechartTransition))
             } as StatechartItem))
         };
@@ -415,12 +409,42 @@ class NamedType<S extends NamedState, A extends string, P> implements StateType<
     constructor(
         private readonly state: S,
     ) {
-        this.onEnterState = (event) => state.onEnterState(event);
-        this.onLeaveState = (event) => state.onLeaveState(event);
+        this.onEnterState = OnEnterState.get(state);
+        this.onLeaveState = OnLeaveState.get(state);
     }
 
     public getState(): S {
         return this.state;
+    }
+}
+
+// tslint:disable-next-line:max-classes-per-file
+class StringTypeGetter<S extends string, A extends string> {
+    private map: Map<string, StateType<S, A>> = new Map();
+
+    public get(state: S): StateType<S, A> {
+        let type = this.map.get(state);
+        if (!type) {
+            type = new StringType(state);
+            this.map.set(state, type);
+        }
+
+        return type;
+    }
+}
+
+// tslint:disable-next-line:max-classes-per-file
+class NamedTypeGetter<S extends NamedState, A extends string> {
+    private map: Map<string, StateType<S, A>> = new Map();
+
+    public get(state: S): StateType<S, A> {
+        let type = this.map.get(state.name);
+        if (!type) {
+            type = new NamedType(state);
+            this.map.set(state.name, type);
+        }
+
+        return type;
     }
 }
 

@@ -6,7 +6,7 @@ export class StateMapItem<S, A extends string, P> {
         return this.type.name;
     }
 
-    private readonly transitionMap: Map<A, StateMapItem<S, A, P>> = new Map();
+    private readonly transitions: Map<A, StateMapItem<S, A, P>> = new Map();
 
     constructor(
         public readonly type: StateType<S, A, P>,
@@ -15,14 +15,14 @@ export class StateMapItem<S, A extends string, P> {
     }
 
     public when(action: A): StateMapItem<S, A, P> {
-        return this.transitionMap.get(action);
+        return this.transitions.get(action);
     }
 
     public setTransition(action: A, destination: StateMapItem<S, A, P>): void {
-        this.transitionMap.set(action, destination);
+        this.transitions.set(action, destination);
     }
 
     public mapEntries(): IterableIterator<[A, StateMapItem<S, A, P>]> {
-        return this.transitionMap.entries();
+        return this.transitions.entries();
     }
 }

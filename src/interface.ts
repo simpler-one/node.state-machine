@@ -24,8 +24,8 @@ export namespace OnEnterState {
         }
     }
 
-    export function get<S, A, P>(obj: {}): (event: StateChangedEvent<S, A, P>) => void {
-        return (<Any>obj).onEnterState ? 
+    export function get<S, A, P>(obj: {}): ((event: StateChangedEvent<S, A, P>) => void) | undefined {
+        return (<Any>obj).onEnterState ? (event) => (<Any>obj).onEnterState(event) : undefined;
     }
 }
 
@@ -40,11 +40,12 @@ export namespace OnLeaveState {
             (<Any>obj).onLeaveState(event);
         }
     }
+
+    export function get<S, A, P>(obj: {}): ((event: StateChangedEvent<S, A, P>) => void) | undefined {
+        return (<Any>obj).onLeaveState ? (event) => (<Any>obj).onLeaveState(event) : undefined;
+    }
 }
 
-export interface Attributed<A extends number | string> {
-    has(attribute: A): boolean;
-}
 
 export interface StateMachineItem<S, T, A> {
     state: S;
@@ -61,7 +62,7 @@ export interface Statechart {
 
 export interface StatechartItem {
     name: string;
-    actions: StatechartTransition[];
+    transitions: StatechartTransition[];
 }
 
 export interface StatechartTransition {

@@ -1,5 +1,5 @@
 import { PumlWriter } from './puml-writer';
-import { StateMachineMap, StateMachineMapItem } from '../../interface';
+import { Statechart, StatechartItem } from '../../interface';
 import { AutoIndex } from '../interface';
 import { MetaState } from '../../state-meta';
 
@@ -20,42 +20,42 @@ describe('PumlWriter', () => {
         });
 
         describe('export()', () => {
-            const map: StateMachineMap = {
+            const map: Statechart = {
                 name: 'SampleState',
                 states: [{
                     name: MetaState.StartName,
-                    actions: [{
-                        name: '',
+                    transitions: [{
+                        action: '',
                         destination: 'State1'
                     }]
                 }, {
                     name: 'State1',
-                    actions: [{
-                        name: 'Next',
+                    transitions: [{
+                        action: 'Next',
                         destination: 'State2'
                     }]
                 }, {
                     name: 'State2',
-                    actions: [{
-                        name: 'OK',
+                    transitions: [{
+                        action: 'OK',
                         destination: 'State3'
                     }, {
-                        name: 'Next',
+                        action: 'Next',
                         destination: 'State3'
                     }, {
-                        name: 'Prev',
+                        action: 'Prev',
                         destination: 'State1'
                     }]
                 }, {
                     name: 'State3',
-                    actions: [{
-                        name: 'Next',
+                    transitions: [{
+                        action: 'Next',
                         destination: 'State1'
                     }, {
-                        name: 'Prev',
+                        action: 'Prev',
                         destination: 'State2'
                     }]
-                }] as StateMachineMapItem[]
+                }] as StatechartItem[]
             };
 
             it('should return default optioned machine map', () => {
@@ -64,7 +64,6 @@ describe('PumlWriter', () => {
 
                 // When
                 const result = writer(map);
-                console.log(result);
 
                 // Then
                 expect(result.includes('state "State1" as State1')).toBeTruthy();
