@@ -378,6 +378,9 @@ describe('StateMachine', () => {
                             action: MetaStateAction.DoStart,
                             destination: StringState.State1
                         }]
+                    }, {
+                        name: StringState.State1,
+                        transitions: []
                     }]
                 });
             });
@@ -408,6 +411,9 @@ describe('StateMachine', () => {
                             action: Action.Action1,
                             destination: StringState.State2
                         }]
+                    }, {
+                        name: StringState.State2,
+                        transitions: []
                     }, {
                         name: MetaState.StartName,
                         transitions: [{

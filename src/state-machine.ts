@@ -140,15 +140,18 @@ export class StateMachine<S, A extends string, P = void> {
 
     private static createMap<S, A extends string, P>(
         items: Item<S, A, P>[],
-        anytimeActions: [A, StateType<S, A, P>][],
+        anytimeTransitions: [A, StateType<S, A, P>][],
     ): Map<string, StateMapItem<S, A, P>> {
         const nameToType = new Map<string, StateType<S, A, P>>();
         for (const item of items) {
             nameToType.set(item.state.name, item.state);
             for (const transition of item.transitions) {
-                const destination = transition[1];
-                nameToType.set(destination.name, destination);
+                nameToType.set(transition[1].name, transition[1]);
             }
+        }
+
+        for (const transition of anytimeTransitions) {
+            nameToType.set(transition[1].name, transition[1]);
         }
 
         const nameToParent = new Map<string, StateType<S, A, P>>();
@@ -162,14 +165,14 @@ export class StateMachine<S, A extends string, P = void> {
         });
 
         const map = new Map<string, StateMapItem<S, A, P>>();
-        for (const item of items) {
-            this.setMap(map, item.state.name, nameToType, nameToParent);
+        for (const name of nameToType.keys()) {
+            this.setMap(map, name, nameToType, nameToParent);
         }
 
         for (const item of items) {
             const node = map.get(item.state.name);
-            for (const act of [...item.transitions, ...anytimeActions]) {
-                node.setTransition(act[0], map.get(act[1].name));
+            for (const tr of [...item.transitions, ...anytimeTransitions]) {
+                node.setTransition(tr[0], map.get(tr[1].name));
             }
         }
 
@@ -281,7 +284,7 @@ export class StateMachine<S, A extends string, P = void> {
                 name: state[0],
                 transitions: Array.from(state[1].mapEntries()).map(transition => ({
                     action: transition[0],
-                    destination: (() => { console.log('>>> ', transition); return transition[1].name })()
+                    destination: transition[1].name
                 } as StatechartTransition))
             } as StatechartItem))
         };
@@ -423,6 +426,10 @@ class StringTypeGetter<S extends string, A extends string> {
     private map: Map<string, StateType<S, A>> = new Map();
 
     public get(state: S): StateType<S, A> {
+        if (state === MetaState.Anytime) {
+            return MetaState.Anytime;
+        }
+
         let type = this.map.get(state);
         if (!type) {
             type = new StringType(state);
@@ -438,6 +445,10 @@ class NamedTypeGetter<S extends NamedState, A extends string> {
     private map: Map<string, StateType<S, A>> = new Map();
 
     public get(state: S): StateType<S, A> {
+        if (state === MetaState.Anytime) {
+            return MetaState.Anytime;
+        }
+
         let type = this.map.get(state.name);
         if (!type) {
             type = new NamedType(state);
