@@ -284,8 +284,9 @@ export class StateMachine<S, A extends string, P = void> {
                 name: state[0],
                 transitions: Array.from(state[1].mapEntries()).map(transition => ({
                     action: transition[0],
-                    destination: transition[1].name
-                } as StatechartTransition))
+                    destination: transition[1].name,
+                } as StatechartTransition)),
+                children: state[1].children.map(child => child.name),
             } as StatechartItem))
         };
     }

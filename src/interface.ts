@@ -63,6 +63,7 @@ export interface Statechart {
 export interface StatechartItem {
     name: string;
     transitions: StatechartTransition[];
+    children: string[];
 }
 
 export interface StatechartTransition {
