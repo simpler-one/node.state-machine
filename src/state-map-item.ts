@@ -7,7 +7,7 @@ export class StateMapItem<S, A extends string, P> {
     }
 
     public get children(): StateMapItem<S, A, P>[] {
-        return [...this.children];
+        return [...this._children];
     }
 
     private readonly transitions: Map<A, StateMapItem<S, A, P>> = new Map();

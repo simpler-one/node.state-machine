@@ -377,10 +377,12 @@ describe('StateMachine', () => {
                         transitions: [{
                             action: MetaStateAction.DoStart,
                             destination: StringState.State1
-                        }]
+                        }],
+                        children: [],
                     }, {
                         name: StringState.State1,
-                        transitions: []
+                        transitions: [],
+                        children: [],
                     }]
                 });
             });
@@ -410,16 +412,19 @@ describe('StateMachine', () => {
                         transitions: [{
                             action: Action.Action1,
                             destination: StringState.State2
-                        }]
+                        }],
+                        children: [],
                     }, {
                         name: StringState.State2,
-                        transitions: []
+                        transitions: [],
+                        children: [],
                     }, {
                         name: MetaState.StartName,
                         transitions: [{
                             action: MetaStateAction.DoStart,
                             destination: StringState.State1
-                        }]
+                        }],
+                        children: [],
                     }]
                 });
             });
