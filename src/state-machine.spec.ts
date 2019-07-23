@@ -613,10 +613,10 @@ describe('StateMachine', () => {
 
                 // Then
                 const expected = [
-                    new StateHistory(undefined, [], [MetaState.StartName], [StringState.State1], MetaStateAction.DoStart),
-                    new StateHistory(undefined, [], [StringState.State1], [StringState.State2], Action.Action1),
-                    new StateHistory(undefined, [], [StringState.State2], [StringState.State1], Action.Action2),
-                    new StateHistory(undefined, [], [StringState.State1], undefined, Action.Action2),
+                    new StateHistory(undefined, [], [MetaState.StartName], [StringState.State1], MetaStateAction.DoStart, false),
+                    new StateHistory(undefined, [], [StringState.State1], [StringState.State2], Action.Action1, false),
+                    new StateHistory(undefined, [], [StringState.State2], [StringState.State1], Action.Action2, false),
+                    new StateHistory(undefined, [], [StringState.State1], undefined, Action.Action2, false),
                 ];
                 expect(histories.length).toBe(expected.length);
                 for (let i = 0; i < expected.length; i++) {

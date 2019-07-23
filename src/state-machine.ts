@@ -7,7 +7,7 @@ import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from './sta
 import { Subject, Observable } from 'rxjs';
 import { StateHistory } from './state-history';
 import { StartType, StartName } from './state-meta/meta-state';
-import { StateMapItem } from './state-map-item';
+import { LinkedStateType } from './linked-state-type';
 
 
 type Item<S, A extends string, P> = StateMachineItem<StateType<S, A, P>, StateType<S, A, P>, A>;
@@ -58,7 +58,7 @@ export class StateMachine<S, A extends string, P = void> {
     }
 
 
-    private readonly map: Map<string, StateMapItem<S, A, P>>;
+    private readonly map: Map<string, LinkedStateType<S, A, P>>;
 
     private _current: ActiveState<S, A, P>[];
     private _histories: StateHistory<A>[] = [];
@@ -83,11 +83,11 @@ export class StateMachine<S, A extends string, P = void> {
 
         this.map = StateMachine.createMap(items, anytimeActions);
 
-        const metaStart = new StateMapItem<S, A, P>(StartType, undefined);
+        const metaStart = new LinkedStateType<S, A, P>(StartType, undefined);
         this.map.set(MetaState.StartName, metaStart);
         let startNode = this.map.get(start.name);
         if (!startNode) {
-            startNode = new StateMapItem(start, undefined);
+            startNode = new LinkedStateType(start, undefined);
             this.map.set(start.name, startNode);
         }
 
@@ -141,7 +141,7 @@ export class StateMachine<S, A extends string, P = void> {
     private static createMap<S, A extends string, P>(
         items: Item<S, A, P>[],
         anytimeTransitions: [A, StateType<S, A, P>][],
-    ): Map<string, StateMapItem<S, A, P>> {
+    ): Map<string, LinkedStateType<S, A, P>> {
         const nameToType = new Map<string, StateType<S, A, P>>();
         for (const item of items) {
             nameToType.set(item.state.name, item.state);
@@ -164,7 +164,7 @@ export class StateMachine<S, A extends string, P = void> {
             })
         });
 
-        const map = new Map<string, StateMapItem<S, A, P>>();
+        const map = new Map<string, LinkedStateType<S, A, P>>();
         for (const name of nameToType.keys()) {
             this.setMap(map, name, nameToType, nameToParent);
         }
@@ -180,17 +180,17 @@ export class StateMachine<S, A extends string, P = void> {
     }
 
     private static setMap<S, A extends string, P>(
-        map: Map<string, StateMapItem<S, A, P>>,
+        map: Map<string, LinkedStateType<S, A, P>>,
         name: string,
         nameToType: Map<string, StateType<S, A, P>>,
         nameToParent: Map<string, StateType<S, A, P>>,
-    ): StateMapItem<S, A, P> {
+    ): LinkedStateType<S, A, P> {
         let node = map.get(name);
         if (node) {
             return node;
         }
 
-        let parent: StateMapItem<S, A, P> = undefined;
+        let parent: LinkedStateType<S, A, P> = undefined;
         const parentType = nameToParent.get(name);
         if (parentType) {
             parent = map.get(parentType.name);
@@ -199,7 +199,7 @@ export class StateMachine<S, A extends string, P = void> {
             }
         }
 
-        node = new StateMapItem(nameToType.get(name), parent);
+        node = new LinkedStateType(nameToType.get(name), parent);
         map.set(name, node);
         return node;
     }
@@ -217,27 +217,37 @@ export class StateMachine<S, A extends string, P = void> {
      * Do the action
      * @param action action
      * @param params params for getState(*)
+     * @returns success
      */
-    public do(action: A, params?: P): void {
-        let newItems = this.getTypes(action);
-        if (newItems.length === 0) {
-            this.addHistory(new StateHistory(new Date(), [], this._current.map(s => s.name), undefined, action));
+    public do(action: A, params?: P): boolean {
+        const newType = this.getDestination(action);
+        if (!newType) {
+            this.addHistory(StateHistory.error([], this._current.map(s => s.name), action));
             this._stateChangeFailed.next(new StateChangeFailedEvent(
                 this.currentStates, action, params,
                 `[${this.name}] Invalid action. ${joinName(this._current)} -> ? : ${action}`
             ));
-            return;
+            return false;
         }
 
-        const commonDepth = this.getCommonDepth(newItems);
-        const common = this._current.slice(0, commonDepth);
-        const old = this._current.slice(commonDepth);
-        newItems = newItems.slice(commonDepth);
+        this.setState(newType, action, params, false);
+        return true;
+    }
 
-        const newWrappers = newItems.map(it => new ActiveState(it, it.type.getState(this, params)));
+    /**
+     * Try the action and set current state if transition failed
+     * @param action action
+     * @param state state on failed
+     * @param params params for getState(*)
+     * @returns success
+     */
+    public tryCatchForceSet(action: A, stateName: string, params?: P): boolean {
+        const success = this.do(action, params);
+        if (!success) {
+            this.forceSet(stateName, action, params);
+        }
 
-        this._current = [...common, ...newWrappers];
-        this.onStateChanged(common, old, newWrappers, action, action, params);
+        return success;
     }
 
     /**
@@ -247,7 +257,7 @@ export class StateMachine<S, A extends string, P = void> {
         const old = this._current;
         const metaStart = this.map.get(StartName);
         this._current = [new ActiveState(metaStart, MetaState.Start)];
-        this.onStateChanged([], old, this._current, undefined, MetaStateAction.ResetName, undefined);
+        this.onStateChanged([], old, this._current, undefined, MetaStateAction.ResetName, undefined, true);
     }
     /**
      * Restart state
@@ -264,6 +274,22 @@ export class StateMachine<S, A extends string, P = void> {
      */
     public can(action: A): boolean {
         return this.getDestination(action) !== undefined;
+    }
+
+    /**
+     * Set current state forcibly
+     * @param stateName state name
+     * @param action action
+     * @param params params
+     * @throws RangeError
+     */
+    public forceSet(stateName: string, action: A, params?: P): void {
+        const newType = this.map.get(stateName);
+        if (!newType) {
+            throw new RangeError(`[${this.name}] forceSet failed. Unknown state name. ${stateName}`);
+        }
+
+        this.setState(newType, action, params, true);
     }
 
     /**
@@ -291,37 +317,34 @@ export class StateMachine<S, A extends string, P = void> {
         };
     }
 
-    /**
-     * Get state types by action
-     * @param action action
-     */
-    protected getTypes(action: A): StateMapItem<S, A, P>[] {
-        const destination = this.getDestination(action);
+    private setState(newType: LinkedStateType<S, A, P>, action: A, params: P, forced: boolean): void {
+        let newTypes = newType.inheritanceChain;
 
-        const newItems: StateMapItem<S, A, P>[] = [];
-        let item = destination;
-        while (item) {
-            newItems.push(item);
-            item = item.parent;
-        }
+        const commonDepth = this.getCommonDepth(newTypes);
+        const common = this._current.slice(0, commonDepth);
+        const old = this._current.slice(commonDepth);
+        newTypes = newTypes.slice(commonDepth);
 
-        return newItems.reverse();
+        const newWrappers = newTypes.map(it => new ActiveState(it, it.type.getState(this, params)));
+
+        this._current = [...common, ...newWrappers];
+        this.onStateChanged(common, old, newWrappers, action, action, params, forced);
     }
 
-    private getDestination(action: A): StateMapItem<S, A, P> {
-        let item: StateMapItem<S, A, P>;
-        for (let i = this._current.length; i-- > 0 && !item; ) {
-            item = this._current[i].map.when(action);
+    private getDestination(action: A): LinkedStateType<S, A, P> {
+        let type: LinkedStateType<S, A, P>;
+        for (let i = this._current.length; i-- > 0 && !type; ) {
+            type = this._current[i].map.when(action);
         }
 
-        return item;
+        return type;
     }
 
-    private getCommonDepth(newItems: StateMapItem<S, A, P>[]): number {
-        const maxDepth = Math.max(this._current.length, newItems.length);
+    private getCommonDepth(newTypes: LinkedStateType<S, A, P>[]): number {
+        const maxDepth = Math.max(this._current.length, newTypes.length);
 
         let depth = 0;
-        while (depth < maxDepth && this._current[depth].name === newItems[depth].name) {
+        while (depth < maxDepth && this._current[depth].name === newTypes[depth].name) {
             depth++;
         }
 
@@ -347,10 +370,9 @@ export class StateMachine<S, A extends string, P = void> {
         action: A,
         actionName: A,
         params: P,
+        forced: boolean
     ): void {
-        this.addHistory(new StateHistory(
-            new Date(), common.map(w => w.name), old.map(w => w.name), newWrappers.map(t => t.name), actionName)
-        );
+        this.addHistory(StateHistory.ok([], old.map(s => s.name), newWrappers.map(s => s.name), action, forced));
 
         const transitionMsg = common.length > 0 ?
             `${joinName(common)} {${joinName(old)} -> ${joinName(newWrappers)}}` :
@@ -379,7 +401,7 @@ class ActiveState<S, A extends string, P> {
     } 
 
     constructor(
-        public readonly map: StateMapItem<S, A, P>,
+        public readonly map: LinkedStateType<S, A, P>,
         public readonly instance: S
     ) {
     }
