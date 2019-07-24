@@ -10,7 +10,7 @@ import { StartType, StartName } from './state-meta/meta-state';
 import { LinkedStateType } from './linked-state-type';
 
 
-type Item<S, A extends string, P> = StateMachineItem<StateType<S, A, P>, StateType<S, A, P>, A>;
+type Item<S, A extends string, P = void> = StateMachineItem<StateType<S, A, P>, A>;
 type LooseStateType<S, A extends string, P> = StateType<S, A | undefined, P | void>;
 
 export class StateMachine<S, A extends string, P = void> {
@@ -100,39 +100,25 @@ export class StateMachine<S, A extends string, P = void> {
     public static fromString<S extends string, A extends string>(
         name: string,
         start: S,
-        ...items: StateMachineItem<S, S, A>[]
+        ...items: StateMachineItem<S, A>[]
     ): StateMachine<S, A> {
         const getter = new StringTypeGetter<S, A>();
-        return new StateMachine<S, A>(
-            name,
-            getter.get(start),
-            items.map(item => ({
-                state: getter.get(item.state),
-                transitions: item.transitions.map(act => [act[0], new StringType(act[1])] as [A, StateType<S, A>])
-            }))
-        );
+        return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
     }
 
     public static fromNamed<S extends NamedState, A extends string>(
         name: string,
         start: S,
-        ...items: StateMachineItem<S, S, A>[]
+        ...items: StateMachineItem<S, A>[]
     ): StateMachine<S, A> {
         const getter = new NamedTypeGetter<S, A>();
-        return new StateMachine<S, A>(
-            name,
-            getter.get(start),
-            items.map(item => ({
-                state: getter.get(item.state),
-                transitions: item.transitions.map(act => [act[0], new NamedType(act[1])] as [A, StateType<S, A>])
-            }))
-        );
+        return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
     }
 
     public static fromType<S, A extends string, P = void>(
         name: string,
         start: LooseStateType<S, A, P>,
-        ...items: StateMachineItem<LooseStateType<S, A, P>, LooseStateType<S, A, P>, A>[]
+        ...items: StateMachineItem<LooseStateType<S, A, P>, A>[]
     ): StateMachine<S, A, P> {
         return new StateMachine<S, A, P>(name, start, [...items]);
     }
@@ -170,9 +156,13 @@ export class StateMachine<S, A extends string, P = void> {
         }
 
         for (const item of items) {
-            const node = map.get(item.state.name);
+            const type = map.get(item.state.name);
             for (const tr of [...item.transitions, ...anytimeTransitions]) {
-                node.setTransition(tr[0], map.get(tr[1].name));
+                type.setTransition(tr[0], map.get(tr[1].name));
+            }
+
+            if (item.startChild) {
+                type.setStartChild(item.startChild.name);
             }
         }
 
@@ -318,7 +308,7 @@ export class StateMachine<S, A extends string, P = void> {
     }
 
     private setState(newType: LinkedStateType<S, A, P>, action: A, params: P, forced: boolean): void {
-        let newTypes = newType.inheritanceChain;
+        let newTypes = newType.findLeaf().inheritanceChain;
 
         const commonDepth = this.getCommonDepth(newTypes);
         const common = this._current.slice(0, commonDepth);
@@ -423,7 +413,6 @@ class StringType<S extends string, A extends string> implements StateType<S, A> 
         return this.state;
     }
 }
-
 // tslint:disable-next-line:max-classes-per-file
 class NamedType<S extends NamedState, A extends string, P> implements StateType<S, A, P>, OnEnterState.Any, OnLeaveState.Any {
     public get name(): string {
@@ -445,44 +434,68 @@ class NamedType<S extends NamedState, A extends string, P> implements StateType<
     }
 }
 
-// tslint:disable-next-line:max-classes-per-file
-class StringTypeGetter<S extends string, A extends string> {
-    private map: Map<string, StateType<S, A>> = new Map();
 
+// tslint:disable-next-line:max-classes-per-file
+abstract class TypeGetter<S, A extends string> {
+    private map: Map<string, StateType<S, A>> = new Map();
+    
     public get(state: S): StateType<S, A> {
+        if (state === undefined) {
+            return undefined;
+        }
+
         if (state === MetaState.Anytime) {
             return MetaState.Anytime;
         }
 
-        let type = this.map.get(state);
+        const name = this.nameOf(state);
+        let type = this.map.get(name);
         if (!type) {
-            type = new StringType(state);
-            this.map.set(state, type);
+            type = this.wrap(state);
+            this.map.set(name, type);
         }
 
         return type;
     }
-}
 
+    public convert(items: StateMachineItem<S, A>[]): Item<S, A>[] {
+        if (!items) {
+            return undefined;
+        }
+
+        return items.map(item => this.convertOne(item));
+    }
+
+    private convertOne(item: StateMachineItem<S, A>): Item<S, A> {
+        return {
+            state: this.get(item.state),
+            transitions: item.transitions.map(tr => [tr[0], this.get(tr[1])] as [A, StateType<S, A>]),
+            children: this.convert(item.children),
+            startChild: this.get(item.startChild),
+        };
+    }
+
+    protected abstract nameOf(state: S): string;
+    protected abstract wrap(state: S): StateType<S, A>;
+}
 // tslint:disable-next-line:max-classes-per-file
-class NamedTypeGetter<S extends NamedState, A extends string> {
-    private map: Map<string, StateType<S, A>> = new Map();
-
-    public get(state: S): StateType<S, A> {
-        if (state === MetaState.Anytime) {
-            return MetaState.Anytime;
-        }
-
-        let type = this.map.get(state.name);
-        if (!type) {
-            type = new NamedType(state);
-            this.map.set(state.name, type);
-        }
-
-        return type;
+class StringTypeGetter<S extends string, A extends string> extends TypeGetter<S, A> {
+    protected nameOf(state: S): string {
+        return state;
+    }
+    protected wrap(state: S): StateType<S, A> {
+        return new StringType(state);
     }
 }
-
+// tslint:disable-next-line:max-classes-per-file
+class NamedTypeGetter<S extends NamedState, A extends string> extends TypeGetter<S, A> {
+    protected nameOf(state: S): string {
+        return state.name;
+    }
+    protected wrap(state: S): StateType<S, A> {
+        return new NamedType(state);
+    }
+}
 
 
 function joinName(named: ActiveState<{}, string, {}>[]): string {

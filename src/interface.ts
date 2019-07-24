@@ -47,11 +47,11 @@ export namespace OnLeaveState {
 }
 
 
-export interface StateMachineItem<S, T, A> {
+export interface StateMachineItem<S, A> {
     state: S;
-    transitions: [A, T][];
-    startChild?: T;
-    children?: StateMachineItem<S, T, A>[];
+    transitions: [A, S][];
+    startChild?: S;
+    children?: StateMachineItem<S, A>[];
 }
 
 
