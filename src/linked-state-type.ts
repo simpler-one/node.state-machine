@@ -10,6 +10,10 @@ export class LinkedStateType<S, A extends string, P> {
         return [...this._children];
     }
 
+    public get startChild(): LinkedStateType<S, A, P> | undefined {
+        return 
+    }
+
     public get parents(): LinkedStateType<S, A, P>[] {
         const parents: LinkedStateType<S, A, P>[] = [];
         let parent: LinkedStateType<S, A, P> = this.parent;
@@ -29,6 +33,7 @@ export class LinkedStateType<S, A extends string, P> {
 
     private readonly transitions: Map<A, LinkedStateType<S, A, P>> = new Map();
     private readonly _children: LinkedStateType<S, A, P>[] = [];
+    private startChild: LinkedStateType<S, A, P> | undefined;
 
     constructor(
         public readonly type: StateType<S, A, P>,
@@ -45,6 +50,10 @@ export class LinkedStateType<S, A extends string, P> {
 
     public setTransition(action: A, destination: LinkedStateType<S, A, P>): void {
         this.transitions.set(action, destination);
+    }
+
+    public setStartChildName(name: string): void {
+        this.startChild = this._children.find(child => child.name === name);
     }
 
     public mapEntries(): IterableIterator<[A, LinkedStateType<S, A, P>]> {
