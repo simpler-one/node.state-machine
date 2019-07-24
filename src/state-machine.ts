@@ -378,12 +378,13 @@ export class StateMachine<S, A extends string, P = void> {
             `${joinName(common)} {${joinName(old)} -> ${joinName(newWrappers)}}` :
             `${joinName(old)} -> ${joinName(newWrappers)}`
         ;
+        const forcedMsg = forced ? '(forced)' : '';
         const event = new StateChangedEvent(
             common.map(wrapper => wrapper.instance),
             old.map(wrapper => wrapper.instance),
             newWrappers.map(wrapper => wrapper.instance),
             action, params,
-            `[${this.name}] ${transitionMsg} : ${actionName}`
+            `[${this.name}] ${transitionMsg} : ${actionName}${forcedMsg}`
         );
 
         this._stateChanged.next(event);
