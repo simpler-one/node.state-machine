@@ -1,6 +1,6 @@
 import { StateType, StateMachineItem } from "../../interface";
 import { MetaState } from "../../state-meta";
-import { Item } from "../../private-interface";
+import { NolItem } from "../../private-interface";
 
 
 export abstract class TypeGetter<S, A extends string> {
@@ -25,7 +25,7 @@ export abstract class TypeGetter<S, A extends string> {
         return type;
     }
 
-    public convert(items: StateMachineItem<S, A>[]): Item<S, A>[] {
+    public convert(items: StateMachineItem<S, A>[]): NolItem<S, A>[] {
         if (!items) {
             return undefined;
         }
@@ -33,7 +33,7 @@ export abstract class TypeGetter<S, A extends string> {
         return items.map(item => this.convertOne(item));
     }
 
-    private convertOne(item: StateMachineItem<S, A>): Item<S, A> {
+    private convertOne(item: StateMachineItem<S, A>): NolItem<S, A> {
         return {
             state: this.get(item.state),
             transitions: item.transitions.map(tr => [tr[0], this.get(tr[1])] as [A, StateType<S, A>]),

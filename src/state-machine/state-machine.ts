@@ -9,7 +9,7 @@ import { StateHistory } from '../state-history';
 import { StartType, StartName } from '../state-meta/meta-state';
 import { LinkedStateType } from './linked-state-type';
 import { MapBuilder } from './map-builder';
-import { Item } from '../private-interface';
+import { NolItem } from '../private-interface';
 import { NamedTypeGetter, StringTypeGetter } from './type-getter';
 import { ActiveState } from './active-state';
 
@@ -76,7 +76,7 @@ export class StateMachine<S, A extends string, P = void> {
     protected constructor(
         public readonly name: string,
         start: StateType<S, A, P>,
-        items: Item<S, A, P>[]
+        items: NolItem<S, A, P>[]
     ) {
         const anytimeI: number = items.findIndex(item => `${item.state}` === MetaState.AnytimeName);
         let anytimeActions: [A, StateType<S, A, P>][] = [];
