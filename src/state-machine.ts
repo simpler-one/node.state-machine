@@ -8,6 +8,7 @@ import { Subject, Observable } from 'rxjs';
 import { StateHistory } from './state-history';
 import { StartType, StartName } from './state-meta/meta-state';
 import { LinkedStateType } from './linked-state-type';
+import { MapBuilder } from './map-builder';
 
 
 type Item<S, A extends string, P = void> = StateMachineItem<StateType<S, A, P>, A>;
@@ -81,7 +82,7 @@ export class StateMachine<S, A extends string, P = void> {
             anytimeActions = items.splice(anytimeI, 1)[0].transitions;
         }
 
-        this.map = StateMachine.createMap(items, anytimeActions);
+        this.map = MapBuilder.build(items, anytimeActions);
 
         const metaStart = new LinkedStateType<S, A, P>(StartType, undefined);
         this.map.set(MetaState.StartName, metaStart);
@@ -121,77 +122,6 @@ export class StateMachine<S, A extends string, P = void> {
         ...items: StateMachineItem<LooseStateType<S, A, P>, A>[]
     ): StateMachine<S, A, P> {
         return new StateMachine<S, A, P>(name, start, [...items]);
-    }
-
-
-    private static createMap<S, A extends string, P>(
-        items: Item<S, A, P>[],
-        anytimeTransitions: [A, StateType<S, A, P>][],
-    ): Map<string, LinkedStateType<S, A, P>> {
-        const nameToType = new Map<string, StateType<S, A, P>>();
-        for (const item of items) {
-            nameToType.set(item.state.name, item.state);
-            for (const transition of item.transitions) {
-                nameToType.set(transition[1].name, transition[1]);
-            }
-        }
-
-        for (const transition of anytimeTransitions) {
-            nameToType.set(transition[1].name, transition[1]);
-        }
-
-        const nameToParent = new Map<string, StateType<S, A, P>>();
-        items
-        .filter(item => item.children)
-        .forEach(item => {
-            const type = nameToType.get(item.state.name);
-            item.children.forEach(child => {
-                nameToParent.set(child.state.name, type);
-            })
-        });
-
-        const map = new Map<string, LinkedStateType<S, A, P>>();
-        for (const name of nameToType.keys()) {
-            this.setMap(map, name, nameToType, nameToParent);
-        }
-
-        for (const item of items) {
-            const type = map.get(item.state.name);
-            for (const tr of [...item.transitions, ...anytimeTransitions]) {
-                type.setTransition(tr[0], map.get(tr[1].name));
-            }
-
-            if (item.startChild) {
-                type.setStartChild(item.startChild.name);
-            }
-        }
-
-        return map;
-    }
-
-    private static setMap<S, A extends string, P>(
-        map: Map<string, LinkedStateType<S, A, P>>,
-        name: string,
-        nameToType: Map<string, StateType<S, A, P>>,
-        nameToParent: Map<string, StateType<S, A, P>>,
-    ): LinkedStateType<S, A, P> {
-        let node = map.get(name);
-        if (node) {
-            return node;
-        }
-
-        let parent: LinkedStateType<S, A, P> = undefined;
-        const parentType = nameToParent.get(name);
-        if (parentType) {
-            parent = map.get(parentType.name);
-            if (!parent) {
-                parent = this.setMap(map, parentType.name, nameToType, nameToParent); // Recursive
-            }
-        }
-
-        node = new LinkedStateType(nameToType.get(name), parent);
-        map.set(name, node);
-        return node;
     }
 
 
