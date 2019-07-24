@@ -1,8 +1,7 @@
 import { LinkedStateType } from './linked-state-type';
-import { StateType, StateMachineItem } from './interface';
+import { StateType } from '../interface';
+import { Item } from '../private-interface';
 
-
-type Item<S, A extends string, P = void> = StateMachineItem<StateType<S, A, P>, A>;
 
 export class MapBuilder<S, A extends string, P> {
 

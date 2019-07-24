@@ -1,17 +1,19 @@
 import {
     StateType, StateMachineItem, NamedState, StatechartWriter,
     Statechart, StatechartItem, StatechartTransition, OnLeaveState, OnEnterState
-} from './interface';
-import { StateChangedEvent, StateChangeFailedEvent } from './event-args';
-import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from './state-meta';
+} from '../interface';
+import { StateChangedEvent, StateChangeFailedEvent } from '../event-args';
+import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from '../state-meta';
 import { Subject, Observable } from 'rxjs';
-import { StateHistory } from './state-history';
-import { StartType, StartName } from './state-meta/meta-state';
+import { StateHistory } from '../state-history';
+import { StartType, StartName } from '../state-meta/meta-state';
 import { LinkedStateType } from './linked-state-type';
 import { MapBuilder } from './map-builder';
+import { Item } from '../private-interface';
+import { NamedTypeGetter, StringTypeGetter } from './type-getter';
+import { ActiveState } from './active-state';
 
 
-type Item<S, A extends string, P = void> = StateMachineItem<StateType<S, A, P>, A>;
 type LooseStateType<S, A extends string, P> = StateType<S, A | undefined, P | void>;
 
 export class StateMachine<S, A extends string, P = void> {
@@ -254,7 +256,7 @@ export class StateMachine<S, A extends string, P = void> {
     private getDestination(action: A): LinkedStateType<S, A, P> {
         let type: LinkedStateType<S, A, P>;
         for (let i = this._current.length; i-- > 0 && !type; ) {
-            type = this._current[i].map.when(action);
+            type = this._current[i].linked.when(action);
         }
 
         return type;
@@ -309,121 +311,8 @@ export class StateMachine<S, A extends string, P = void> {
 
         this._stateChanged.next(event);
         
-        old.forEach(w => OnLeaveState.tryCall(w.map.type, event));
-        newWrappers.forEach(w => OnEnterState.tryCall(w.map.type, event));
-    }
-}
-
-
-// tslint:disable-next-line:max-classes-per-file
-class ActiveState<S, A extends string, P> {
-    public get name(): string {
-        return this.map.type.name;
-    } 
-
-    constructor(
-        public readonly map: LinkedStateType<S, A, P>,
-        public readonly instance: S
-    ) {
-    }
-}
-
-// tslint:disable-next-line:max-classes-per-file
-class StringType<S extends string, A extends string> implements StateType<S, A> {
-    public get name(): string {
-        return this.state;
-    }
-
-    constructor(
-        private readonly state: S
-    ) {
-    }
-
-    public getState(): S {
-        return this.state;
-    }
-}
-// tslint:disable-next-line:max-classes-per-file
-class NamedType<S extends NamedState, A extends string, P> implements StateType<S, A, P>, OnEnterState.Any, OnLeaveState.Any {
-    public get name(): string {
-        return this.state.name;
-    }
-
-    public readonly onEnterState: (event: StateChangedEvent<S, A, P>) => void;
-    public readonly onLeaveState: (event: StateChangedEvent<S, A, P>) => void;
-
-    constructor(
-        private readonly state: S,
-    ) {
-        this.onEnterState = OnEnterState.get(state);
-        this.onLeaveState = OnLeaveState.get(state);
-    }
-
-    public getState(): S {
-        return this.state;
-    }
-}
-
-
-// tslint:disable-next-line:max-classes-per-file
-abstract class TypeGetter<S, A extends string> {
-    private map: Map<string, StateType<S, A>> = new Map();
-    
-    public get(state: S): StateType<S, A> {
-        if (state === undefined) {
-            return undefined;
-        }
-
-        if (state === MetaState.Anytime) {
-            return MetaState.Anytime;
-        }
-
-        const name = this.nameOf(state);
-        let type = this.map.get(name);
-        if (!type) {
-            type = this.wrap(state);
-            this.map.set(name, type);
-        }
-
-        return type;
-    }
-
-    public convert(items: StateMachineItem<S, A>[]): Item<S, A>[] {
-        if (!items) {
-            return undefined;
-        }
-
-        return items.map(item => this.convertOne(item));
-    }
-
-    private convertOne(item: StateMachineItem<S, A>): Item<S, A> {
-        return {
-            state: this.get(item.state),
-            transitions: item.transitions.map(tr => [tr[0], this.get(tr[1])] as [A, StateType<S, A>]),
-            children: this.convert(item.children),
-            startChild: this.get(item.startChild),
-        };
-    }
-
-    protected abstract nameOf(state: S): string;
-    protected abstract wrap(state: S): StateType<S, A>;
-}
-// tslint:disable-next-line:max-classes-per-file
-class StringTypeGetter<S extends string, A extends string> extends TypeGetter<S, A> {
-    protected nameOf(state: S): string {
-        return state;
-    }
-    protected wrap(state: S): StateType<S, A> {
-        return new StringType(state);
-    }
-}
-// tslint:disable-next-line:max-classes-per-file
-class NamedTypeGetter<S extends NamedState, A extends string> extends TypeGetter<S, A> {
-    protected nameOf(state: S): string {
-        return state.name;
-    }
-    protected wrap(state: S): StateType<S, A> {
-        return new NamedType(state);
+        old.forEach(w => OnLeaveState.tryCall(w.linked.type, event));
+        newWrappers.forEach(w => OnEnterState.tryCall(w.linked.type, event));
     }
 }
 

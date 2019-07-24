@@ -1,9 +1,8 @@
-
-import { StateMachine } from './state-machine'
-import { MetaState, MetaStateAction } from './state-meta'
-import { Statechart } from './interface';
+import { StateMachine } from '.'
+import { MetaState, MetaStateAction } from '../state-meta'
+import { Statechart } from '../interface';
 import { buildDataMatrix } from '@working-sloth/data-matrix';
-import { StateHistory } from './state-history';
+import { StateHistory } from '../state-history';
 
 enum StringState {
     State1 = 'State1',
