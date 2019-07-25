@@ -118,11 +118,11 @@ describe('StateMachine', () => {
     describe('instance', () => {
         describe('do', () => {
             const startTests = buildDataMatrix<{type: string, fsm: StateMachine<{}, Action>, expect: {}}>([
-                'type       fsm                                                                         expect',
+                'type       fsm                                                                             expect',
             ], [
-                ['string',  StateMachine.fromString<StringState, Action>('name', StringState.State1),   StringState.State1],
-                ['named',   StateMachine.fromNamed<NamedState, Action>('name', NamedState.State1),      NamedState.State1],
-                ['typed',   StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1),      StringState.State1],
+                ['string',  StateMachine.fromString<StringState, Action>('name', StringState.State1),       StringState.State1],
+                ['named',   StateMachine.fromNamed<NamedState, Action>('name', NamedState.State1),          NamedState.State1],
+                ['typed',   StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1),    StringState.State1],
             ]);
             for (const test of startTests) {
                 it(`should transit to user-defined start state when do start if ${test.type} state is start`, () => {
@@ -159,6 +159,34 @@ describe('StateMachine', () => {
     
                 // Then
                 expect(fsm.current).toBe(StringState.State2);
+            });
+
+            it('should transit to next state when do action if child transition is defined', () => {
+                // Given
+                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
+                {
+                    state: StringState.State1,
+                    transitions: [
+                        [Action.Action1, StringState.State3]
+                    ]
+                }, {
+                    state: StringState.State2,
+                    transitions: [
+                    ],
+                    children: [{
+                        state: StringState.State3,
+                        transitions: [
+                        ],
+                    }]
+                });
+                fsm.start();
+    
+                // When
+                fsm.do(Action.Action1);
+    
+                // Then
+                expect(fsm.current).toBe(StringState.State3);
+                expect(fsm.currentStates).toEqual([StringState.State2, StringState.State3]);
             });
 
             it('should NOT transit to next state when do action if transition is NOT defined', () => {
