@@ -12,7 +12,7 @@ export interface StateType<S, A extends string, P = void> {
     getState(stateMachine: StateMachine<S, A, P>, params?: P): S;
 }
 
-export interface OnEnterState<S, A, P = void> {
+export interface OnEnterState<S = {}, A = {}, P = void> {
     onEnterState(event: StateChangedEvent<S, A, P>): void;
 }
 export namespace OnEnterState {
@@ -29,7 +29,7 @@ export namespace OnEnterState {
     }
 }
 
-export interface OnLeaveState<S, A, P = void> {
+export interface OnLeaveState<S = {}, A = {}, P = void> {
     onLeaveState(event: StateChangedEvent<S, A, P>): void;
 }
 export namespace OnLeaveState {

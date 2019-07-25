@@ -1,8 +1,9 @@
 import { StateMachine } from '.'
 import { MetaState, MetaStateAction } from '../state-meta'
-import { Statechart } from '../interface';
+import { Statechart, StateType, OnEnterState, OnLeaveState } from '../interface';
 import { buildDataMatrix } from '@working-sloth/data-matrix';
 import { StateHistory } from '../state-history';
+import { StateChangedEvent } from '../event-args';
 
 enum StringState {
     State1 = 'State1',
@@ -19,10 +20,10 @@ class NamedState {
     }
 }
 
-class TypedState {
-    public static readonly State1 = new TypedState(StringState.State1);
-    public static readonly State2 = new TypedState(StringState.State2);
-    public static readonly State3 = new TypedState(StringState.State3);
+class MinimumStateType implements StateType<StringState, Action> {
+    public static readonly State1 = new MinimumStateType(StringState.State1);
+    public static readonly State2 = new MinimumStateType(StringState.State2);
+    public static readonly State3 = new MinimumStateType(StringState.State3);
 
     get name(): string {
         return this.state;
@@ -36,10 +37,10 @@ class TypedState {
     }
 }
 
-class FullTypedState {
-    public static readonly State1 = new FullTypedState(StringState.State1);
-    public static readonly State2 = new FullTypedState(StringState.State2);
-    public static readonly State3 = new FullTypedState(StringState.State3);
+class FullStateType implements StateType<StringState, Action>, OnEnterState, OnLeaveState {
+    public static readonly State1 = new FullStateType(StringState.State1);
+    public static readonly State2 = new FullStateType(StringState.State2);
+    public static readonly State3 = new FullStateType(StringState.State3);
 
     public enterCalled: number = 0;
     public leaveCalled: number = 0;
@@ -105,7 +106,7 @@ describe('StateMachine', () => {
                 const name = 'name';
 
                 // When
-                const fsm = StateMachine.fromType<StringState, Action>(name, TypedState.State1);
+                const fsm = StateMachine.fromType<StringState, Action>(name, MinimumStateType.State1);
 
                 // Then
                 expect(fsm.name).toBe(name);
@@ -121,7 +122,7 @@ describe('StateMachine', () => {
             ], [
                 ['string',  StateMachine.fromString<StringState, Action>('name', StringState.State1),   StringState.State1],
                 ['named',   StateMachine.fromNamed<NamedState, Action>('name', NamedState.State1),      NamedState.State1],
-                ['typed',   StateMachine.fromType<StringState, Action>('name', TypedState.State1),      StringState.State1],
+                ['typed',   StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1),      StringState.State1],
             ]);
             for (const test of startTests) {
                 it(`should transit to user-defined start state when do start if ${test.type} state is start`, () => {
@@ -144,11 +145,11 @@ describe('StateMachine', () => {
 
             it('should transit to next state when do action if transition is defined', () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
+                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
                 {
-                    state: TypedState.State1,
+                    state: MinimumStateType.State1,
                     transitions: [
-                        [Action.Action1, TypedState.State2]
+                        [Action.Action1, MinimumStateType.State2]
                     ]
                 });
                 fsm.start();
@@ -164,9 +165,9 @@ describe('StateMachine', () => {
                 // Given
                 let changedEventCalled = false;
                 let failedEventCalled = false;
-                const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
+                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
                 {
-                    state: TypedState.State1,
+                    state: MinimumStateType.State1,
                     transitions: [
                     ]
                 });
@@ -185,14 +186,14 @@ describe('StateMachine', () => {
 
             it('should transit to next state when do action if anytime transition is defined', () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
+                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
                 {
                     state: MetaState.Anytime,
                     transitions: [
-                        [Action.Action1, TypedState.State2]
+                        [Action.Action1, MinimumStateType.State2]
                     ]
                 }, {
-                    state: TypedState.State1,
+                    state: MinimumStateType.State1,
                     transitions: [
                     ]
                 });
@@ -207,31 +208,75 @@ describe('StateMachine', () => {
 
             it('should call enter/leave event when do action if event handler is defined', () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', FullTypedState.State1,
+                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
                 {
                     state: MetaState.Anytime,
                     transitions: [
-                        [Action.Action1, FullTypedState.State2]
+                        [Action.Action1, FullStateType.State2]
                     ]
                 },
                 {
-                    state: FullTypedState.State1,
+                    state: FullStateType.State1,
                     transitions: [
                     ]
                 });
                 fsm.start();
-                const calledCount1 = { enter: FullTypedState.State1.enterCalled, leave: FullTypedState.State1.leaveCalled };
-                const calledCount2 = { enter: FullTypedState.State2.enterCalled, leave: FullTypedState.State2.leaveCalled };
+                const calledCount1 = { enter: FullStateType.State1.enterCalled, leave: FullStateType.State1.leaveCalled };
+                const calledCount2 = { enter: FullStateType.State2.enterCalled, leave: FullStateType.State2.leaveCalled };
     
                 // When
                 fsm.do(Action.Action1);
     
                 // Then
                 expect(fsm.current).toBe(StringState.State2);
-                expect(FullTypedState.State1.enterCalled).toBe(calledCount1.enter);
-                expect(FullTypedState.State1.leaveCalled).toBe(calledCount1.leave + 1);
-                expect(FullTypedState.State2.enterCalled).toBe(calledCount2.enter + 1);
-                expect(FullTypedState.State2.leaveCalled).toBe(calledCount2.leave);
+                expect(FullStateType.State1.enterCalled).toBe(calledCount1.enter);
+                expect(FullStateType.State1.leaveCalled).toBe(calledCount1.leave + 1);
+                expect(FullStateType.State2.enterCalled).toBe(calledCount2.enter + 1);
+                expect(FullStateType.State2.leaveCalled).toBe(calledCount2.leave);
+            });
+        });
+
+        describe('forceIfFail', () => {
+            it(`should transit normally if transition is defined`, () => {
+                // Given
+                const fsm = StateMachine.fromString('name', StringState.State1,
+                {
+                    state: StringState.State1,
+                    transitions: [
+                        [Action.Action1, StringState.State2]
+                    ]
+                });
+    
+                // When
+                fsm.start();
+                const result = fsm.forceIfFail(Action.Action1, StringState.State2);
+    
+                // Then
+                expect(fsm.current).toBe(StringState.State2);
+                expect(result).toBe(true);
+            });
+
+            it(`should transit forcibly if transition is NOT defined`, () => {
+                // Given
+                const fsm = StateMachine.fromString('name', StringState.State1,
+                {
+                    state: StringState.State1,
+                    transitions: [
+                    ]
+                },
+                {
+                    state: StringState.State2,
+                    transitions: [
+                    ]
+                });
+    
+                // When
+                fsm.start();
+                const result = fsm.forceIfFail(Action.Action1, StringState.State2);
+    
+                // Then
+                expect(fsm.current).toBe(StringState.State2);
+                expect(result).toBe(false);
             });
         });
 
@@ -250,18 +295,18 @@ describe('StateMachine', () => {
 
             it('should called "onLeave" event callback when reset if callback is defined', () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', FullTypedState.State1);
+                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1);
                 fsm.start();
-                const enterCalled = FullTypedState.State1.enterCalled;
-                const leaveCalled = FullTypedState.State1.leaveCalled;
+                const enterCalled = FullStateType.State1.enterCalled;
+                const leaveCalled = FullStateType.State1.leaveCalled;
 
                 // When
                 fsm.reset();
     
                 // Then
                 expect(fsm.current).toBe(MetaState.Start);
-                expect(FullTypedState.State1.enterCalled).toBe(enterCalled);
-                expect(FullTypedState.State1.leaveCalled).toBe(leaveCalled + 1);
+                expect(FullStateType.State1.enterCalled).toBe(enterCalled);
+                expect(FullStateType.State1.leaveCalled).toBe(leaveCalled + 1);
             });
         });
 
@@ -291,7 +336,7 @@ describe('StateMachine', () => {
         describe('can', () => {
             it('should return true when try to do start if state is start', () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1);
+                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1);
     
                 // When
                 const result = fsm.can(MetaStateAction.DoStart);
@@ -302,11 +347,11 @@ describe('StateMachine', () => {
 
             it('should return true when try to do action if transition is defined', () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
+                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
                 {
-                    state: TypedState.State1,
+                    state: MinimumStateType.State1,
                     transitions: [
-                        [Action.Action1, TypedState.State2]
+                        [Action.Action1, MinimumStateType.State2]
                     ]
                 });
                 fsm.start();
@@ -320,9 +365,9 @@ describe('StateMachine', () => {
 
             it('should return false when try to do action if transition is NOT defined', () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
+                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
                 {
-                    state: TypedState.State1,
+                    state: MinimumStateType.State1,
                     transitions: [
                     ]
                 });
@@ -337,15 +382,15 @@ describe('StateMachine', () => {
 
             it('should return true when try to do action if anytime transition is defined', () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', TypedState.State1,
+                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
                 {
                     state: MetaState.Anytime,
                     transitions: [
-                        [Action.Action1, TypedState.State2]
+                        [Action.Action1, MinimumStateType.State2]
                     ]
                 },
                 {
-                    state: TypedState.State1,
+                    state: MinimumStateType.State1,
                     transitions: [
                     ]
                 });
@@ -491,30 +536,30 @@ describe('StateMachine', () => {
                 );
                 const typedFsm = StateMachine.fromType<StringState, Action>(
                     name,
-                    TypedState.State1,
+                    MinimumStateType.State1,
                     {
                         state: MetaState.Anytime,
                         transitions: [
-                            [Action.Action3, TypedState.State1]
+                            [Action.Action3, MinimumStateType.State1]
                         ]
                     },
                     {
-                        state: TypedState.State1,
+                        state: MinimumStateType.State1,
                         transitions: [
-                            [Action.Action1, TypedState.State2]
+                            [Action.Action1, MinimumStateType.State2]
                         ]
                     },
                     {
-                        state: TypedState.State2,
+                        state: MinimumStateType.State2,
                         transitions: [
-                            [Action.Action2, TypedState.State3]
+                            [Action.Action2, MinimumStateType.State3]
                         ]
                     },
                     {
-                        state: TypedState.State3,
+                        state: MinimumStateType.State3,
                         transitions: [
-                            [Action.Action1, TypedState.State2],
-                            [Action.Action3, TypedState.State1]
+                            [Action.Action1, MinimumStateType.State2],
+                            [Action.Action3, MinimumStateType.State1]
                         ]
                     }
                 );
