@@ -33,14 +33,7 @@ export class StateMachine<S, A extends string, P = void> {
     public get currentStates(): S[] | [undefined] {
         return this._current.map(state => state.instance);
     }
-    public get currentIs(stateOrName: S | string): boolean {
-        if (typeof stateOrName === 'string') {
-            this._current.find(cur => cur.name === stateOrName)
-        } else {
-            
-        }
-    }
-    
+
     /** Histories */
     public get histories(): StateHistory<A>[] {
         return [...this._histories];
@@ -133,6 +126,22 @@ export class StateMachine<S, A extends string, P = void> {
         return new StateMachine<S, A, P>(name, start, [...items]);
     }
 
+    /**
+     * Check current state
+     * @param state state
+     */
+    public currentIs(state: S): boolean;
+    /**
+     * Check current state
+     * @param name name
+     */
+    public currentIs(name: string): boolean;
+    public currentIs(stateOrName: S | string): boolean {
+        return typeof stateOrName === 'string'
+            ? this._current.some(cur => cur.name === stateOrName)
+            : this._current.some(cur => cur.instance === stateOrName)
+        ;
+    }
 
     /**
      * Start action
@@ -164,16 +173,17 @@ export class StateMachine<S, A extends string, P = void> {
     }
 
     /**
-     * Try the action and set current state if transition failed
+     * Change current state forcibly if transition failed
      * @param action action
-     * @param state state on failed
+     * @param forcedStateName forced state name on failed
      * @param params params for getState(*)
      * @returns success
+     * @throws RangeError
      */
-    public tryCatchForceSet(action: A, stateName: string, params?: P): boolean {
+    public forceIfFail(action: A, forcedStateName: string, params?: P): boolean {
         const success = this.do(action, params);
         if (!success) {
-            this.forceSet(stateName, action, params);
+            this.forceSet(forcedStateName, action, params);
         }
 
         return success;
@@ -208,17 +218,17 @@ export class StateMachine<S, A extends string, P = void> {
     /**
      * Set current state forcibly
      * @param stateName state name
-     * @param action action
+     * @param nominalAction nominal action
      * @param params params
      * @throws RangeError
      */
-    public forceSet(stateName: string, action: A, params?: P): void {
+    public forceSet(stateName: string, nominalAction: A, params?: P): void {
         const newType = this.map.get(stateName);
         if (!newType) {
             throw new RangeError(`[${this.name}] forceSet failed. Unknown state name. ${stateName}`);
         }
 
-        this.setState(newType, action, params, true);
+        this.setState(newType, nominalAction, params, true);
     }
 
     /**
@@ -295,31 +305,32 @@ export class StateMachine<S, A extends string, P = void> {
     private onStateChanged(
         common: ActiveState<S, A, P>[],
         old: ActiveState<S, A, P>[],
-        newWrappers: ActiveState<S, A, P>[],
+        newStates: ActiveState<S, A, P>[],
         action: A,
         actionName: A,
         params: P,
         forced: boolean
     ): void {
-        this.addHistory(StateHistory.ok([], old.map(s => s.name), newWrappers.map(s => s.name), action, forced));
+        this.addHistory(StateHistory.ok([], old.map(s => s.name), newStates.map(s => s.name), action, forced));
 
         const transitionMsg = common.length > 0 ?
-            `${joinName(common)} {${joinName(old)} -> ${joinName(newWrappers)}}` :
-            `${joinName(old)} -> ${joinName(newWrappers)}`
+            `${joinName(common)} {${joinName(old)} -> ${joinName(newStates)}}` :
+            `${joinName(old)} -> ${joinName(newStates)}`
         ;
         const forcedMsg = forced ? '(forced)' : '';
         const event = new StateChangedEvent(
-            common.map(wrapper => wrapper.instance),
-            old.map(wrapper => wrapper.instance),
-            newWrappers.map(wrapper => wrapper.instance),
+            common.map(state => state.instance),
+            old.map(state => state.instance),
+            newStates.map(state => state.instance),
             action, params,
+            forced,
             `[${this.name}] ${transitionMsg} : ${actionName}${forcedMsg}`
         );
 
         this._stateChanged.next(event);
         
         old.forEach(w => OnLeaveState.tryCall(w.linked.type, event));
-        newWrappers.forEach(w => OnEnterState.tryCall(w.linked.type, event));
+        newStates.forEach(w => OnEnterState.tryCall(w.linked.type, event));
     }
 }
 

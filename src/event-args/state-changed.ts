@@ -19,18 +19,8 @@ export class StateChangedEvent<S, A, P = void> {
         public readonly currentStates: S[] | [undefined] | [],
         public readonly action: A,
         public readonly params: P,
+        public readonly forced: boolean,
         public readonly message: string,    
     ) {
-    }
-
-    public clone(): StateChangedEvent<S, A, P> {
-        return new StateChangedEvent(
-            [...this.commonParents],
-            [...this.oldStates],
-            [...this.currentStates],
-            this.action,
-            this.params,
-            this.message
-        )
     }
 }
