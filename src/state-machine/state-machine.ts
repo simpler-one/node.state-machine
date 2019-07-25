@@ -33,6 +33,13 @@ export class StateMachine<S, A extends string, P = void> {
     public get currentStates(): S[] | [undefined] {
         return this._current.map(state => state.instance);
     }
+    public get currentIs(stateOrName: S | string): boolean {
+        if (typeof stateOrName === 'string') {
+            this._current.find(cur => cur.name === stateOrName)
+        } else {
+            
+        }
+    }
     
     /** Histories */
     public get histories(): StateHistory<A>[] {
