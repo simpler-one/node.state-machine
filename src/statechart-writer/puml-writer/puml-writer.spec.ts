@@ -1,5 +1,5 @@
 import { PumlWriter } from './puml-writer';
-import { Statechart, StatechartItem } from '../../interface';
+import { Statechart, StatechartItem, StatechartTransition } from '../../interface';
 import { AutoIndex } from '../interface';
 import { MetaState } from '../../state-meta';
 
@@ -22,40 +22,19 @@ describe('PumlWriter', () => {
         describe('export()', () => {
             const map: Statechart = {
                 name: 'SampleState',
-                states: [{
-                    name: MetaState.StartName,
-                    transitions: [{
-                        action: '',
-                        destination: 'State1'
-                    }]
-                }, {
-                    name: 'State1',
-                    transitions: [{
-                        action: 'Next',
-                        destination: 'State2'
-                    }]
-                }, {
-                    name: 'State2',
-                    transitions: [{
-                        action: 'OK',
-                        destination: 'State3'
-                    }, {
-                        action: 'Next',
-                        destination: 'State3'
-                    }, {
-                        action: 'Prev',
-                        destination: 'State1'
-                    }]
-                }, {
-                    name: 'State3',
-                    transitions: [{
-                        action: 'Next',
-                        destination: 'State1'
-                    }, {
-                        action: 'Prev',
-                        destination: 'State2'
-                    }]
-                }] as StatechartItem[]
+                states: [
+                    item(MetaState.StartName, [transition('', 'State1')]),
+                    item('State1', [transition('Next', 'State2')]),
+                    item('State2', [
+                        transition('OK', 'State3'),
+                        transition('Next', 'State3'),
+                        transition('Prev', 'State1'),
+                    ]),
+                    item('State3', [
+                        transition('Next', 'State1'),
+                        transition('Prev', 'State2'),
+                    ])
+                ]
             };
 
             it('should return default optioned machine map', () => {
@@ -196,3 +175,19 @@ describe('PumlWriter', () => {
     });
 
 });
+
+
+function item(name: string, transitions: StatechartTransition[], children: StatechartItem[] = []): StatechartItem {
+    return {
+        name,
+        transitions,
+        children,
+    };
+}
+
+function transition(action: string, destination: string): StatechartTransition {
+    return {
+        action,
+        destination,
+    };
+}

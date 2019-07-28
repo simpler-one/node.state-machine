@@ -126,6 +126,19 @@ export class StateMachine<S, A extends string, P = void> {
         return new StateMachine<S, A, P>(name, start, [...items]);
     }
 
+    private static toChartItem<S, A extends string, P>(
+        type: LinkedStateType<S, A, P>
+    ): StatechartItem {
+        return {
+            name: type.name,
+            transitions: Array.from(type.mapEntries()).map(transition => ({
+                action: transition[0],
+                destination: transition[1].name,
+            } as StatechartTransition)),
+            children: type.children.map(child => this.toChartItem(child)),
+        };
+    }
+
     /**
      * Check current state
      * @param state state
@@ -245,14 +258,7 @@ export class StateMachine<S, A extends string, P = void> {
     public toChart(): Statechart {
         return {
             name: this.name,
-            states: Array.from(this.map.entries()).map(state => ({
-                name: state[0],
-                transitions: Array.from(state[1].mapEntries()).map(transition => ({
-                    action: transition[0],
-                    destination: transition[1].name,
-                } as StatechartTransition)),
-                children: state[1].children.map(child => child.name),
-            } as StatechartItem))
+            states: Array.from(this.map.values()).map(type => StateMachine.toChartItem(type))
         };
     }
 
