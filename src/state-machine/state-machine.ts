@@ -25,8 +25,8 @@ export class StateMachine<S, A extends string, P = void> {
     public get current(): S | undefined {
         return this.curLeaf.instance;
     }
-    /** Current top state */
-    public get currentTop(): S | undefined {
+    /** Current root state */
+    public get currentRoot(): S | undefined {
         return this._current[0].instance;
     }
     /** Current states */
@@ -280,7 +280,7 @@ export class StateMachine<S, A extends string, P = void> {
     }
 
     private getCommonDepth(newTypes: LinkedStateType<S, A, P>[]): number {
-        const maxDepth = Math.max(this._current.length, newTypes.length);
+        const maxDepth = Math.min(this._current.length, newTypes.length);
 
         let depth = 0;
         while (depth < maxDepth && this._current[depth].name === newTypes[depth].name) {
@@ -317,7 +317,6 @@ export class StateMachine<S, A extends string, P = void> {
             `${joinName(common)} {${joinName(old)} -> ${joinName(newStates)}}` :
             `${joinName(old)} -> ${joinName(newStates)}`
         ;
-        const forcedMsg = forced ? '(forced)' : '';
         const event = new StateChangedEvent(
             common.map(state => state.instance),
             old.map(state => state.instance),

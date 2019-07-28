@@ -44,6 +44,8 @@ class FullStateType implements StateType<StringState, Action>, OnEnterState, OnL
 
     public enterCalled: number = 0;
     public leaveCalled: number = 0;
+    public lastEnter: StateChangedEvent<StringState, Action>;
+    public lastLeave: StateChangedEvent<StringState, Action>;
 
     get name(): string {
         return this.state;
@@ -56,10 +58,12 @@ class FullStateType implements StateType<StringState, Action>, OnEnterState, OnL
         return this.state;
     }
 
-    onEnterState(): void {
+    onEnterState(event: StateChangedEvent<StringState, Action>): void {
+        this.lastEnter = event;
         this.enterCalled++;
     }
-    onLeaveState(): void {
+    onLeaveState(event: StateChangedEvent<StringState, Action>): void {
+        this.lastLeave = event;
         this.leaveCalled++;
     }
 }
@@ -143,7 +147,7 @@ describe('StateMachine', () => {
                 });
             }
 
-            it('should transit to next state when do action if transition is defined', () => {
+            it('should transit if transition is defined', () => {
                 // Given
                 const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
                 {
@@ -161,25 +165,28 @@ describe('StateMachine', () => {
                 expect(fsm.current).toBe(StringState.State2);
             });
 
-            it('should transit to next state when do action if child transition is defined', () => {
+            it('should transit if child transition is defined', () => {
                 // Given
-                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
+                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
                 {
-                    state: StringState.State1,
+                    state: FullStateType.State1,
                     transitions: [
-                        [Action.Action1, StringState.State3]
+                        [Action.Action1, FullStateType.State3]
                     ]
                 }, {
-                    state: StringState.State2,
+                    state: FullStateType.State2,
                     transitions: [
                     ],
                     children: [{
-                        state: StringState.State3,
+                        state: FullStateType.State3,
                         transitions: [
                         ],
                     }]
                 });
                 fsm.start();
+                FullStateType.State1.lastLeave = undefined;
+                FullStateType.State2.lastEnter = undefined;
+                FullStateType.State3.lastEnter = undefined;
     
                 // When
                 fsm.do(Action.Action1);
@@ -187,6 +194,92 @@ describe('StateMachine', () => {
                 // Then
                 expect(fsm.current).toBe(StringState.State3);
                 expect(fsm.currentStates).toEqual([StringState.State2, StringState.State3]);
+
+                expect(FullStateType.State1.lastLeave).toBeTruthy();
+                expect(FullStateType.State1.lastLeave.commonParents).toEqual([]);
+                expect(FullStateType.State1.lastLeave.oldStates).toEqual([StringState.State1]);
+                expect(FullStateType.State1.lastLeave.newStates).toEqual([StringState.State2, StringState.State3]);
+                expect(FullStateType.State1.lastLeave.forced).toEqual(false);
+
+                expect(FullStateType.State3.lastEnter).toBeTruthy();
+                expect(FullStateType.State3.lastEnter.commonParents).toEqual([]);
+                expect(FullStateType.State3.lastEnter.oldStates).toEqual([StringState.State1]);
+                expect(FullStateType.State3.lastEnter.newStates).toEqual([StringState.State2, StringState.State3]);
+                expect(FullStateType.State3.lastEnter.forced).toEqual(false);
+
+                expect(FullStateType.State2.lastEnter).toBeTruthy();
+                expect(FullStateType.State2.lastEnter.commonParents).toEqual([]);
+                expect(FullStateType.State2.lastEnter.oldStates).toEqual([StringState.State1]);
+                expect(FullStateType.State2.lastEnter.newStates).toEqual([StringState.State2, StringState.State3]);
+                expect(FullStateType.State2.lastEnter.forced).toEqual(false);
+            });
+
+            it('should transit if parent transition is defined', () => {
+                // Given
+                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
+                {
+                    state: FullStateType.State1,
+                    transitions: [
+                        [Action.Action1, FullStateType.State3]
+                    ]
+                }, {
+                    state: FullStateType.State2,
+                    transitions: [
+                        [Action.Action2, FullStateType.State1]
+                    ],
+                    children: [{
+                        state: FullStateType.State3,
+                        transitions: [
+                        ],
+                    }]
+                });
+                fsm.start();
+                fsm.do(Action.Action1);
+    
+                // When
+                fsm.do(Action.Action2);
+    
+                // Then
+                expect(fsm.current).toBe(StringState.State1);
+                expect(fsm.currentStates).toEqual([StringState.State1]);
+            });
+
+            it('should transit if child to parent parent transition is defined', () => {
+                // Given
+                let event: StateChangedEvent<StringState, Action>;
+                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
+                {
+                    state: FullStateType.State1,
+                    transitions: [
+                        [Action.Action1, FullStateType.State3]
+                    ]
+                }, {
+                    state: FullStateType.State2,
+                    transitions: [
+                    ],
+                    children: [{
+                        state: FullStateType.State3,
+                        transitions: [
+                            [Action.Action2, FullStateType.State2]
+                        ],
+                    }]
+                });
+                fsm.start();
+                fsm.do(Action.Action1);
+                fsm.stateChanged.subscribe(e => event = e);
+    
+                // When
+                fsm.do(Action.Action2);
+    
+                // Then
+                expect(fsm.current).toBe(StringState.State2);
+                expect(fsm.currentStates).toEqual([StringState.State2]);
+
+                expect(event).toBeTruthy();
+                expect(event.commonParents).toEqual([StringState.State2]);
+                expect(event.oldStates).toEqual([StringState.State3]);
+                expect(event.newStates).toEqual([]);
+                expect(event.forced).toEqual(false);
             });
 
             it('should NOT transit to next state when do action if transition is NOT defined', () => {
