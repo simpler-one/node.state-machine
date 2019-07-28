@@ -74,6 +74,9 @@ export class PumlWriter {
         this.indices[ActionIndex] = 0;
         const from = idOf(fromState.name);
         this.definitions.push(`state "${fromState.name}" as ${from}`);
+        if (fromState.children.length > 0) {
+            
+        }
 
         const transitions = new Map<string, string>();
         for (const action of fromState.transitions) {
