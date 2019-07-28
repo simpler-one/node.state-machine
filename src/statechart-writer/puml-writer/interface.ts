@@ -47,10 +47,19 @@ export namespace ArrowDirection {
 }
 
 
+export enum LeftToRightOption {
+    None,
+    JustInsert,
+    AutoPosition,
+}
+
+
 export interface PumlWriterOptions {
     autoIndex?: AutoIndex;
+    authBundleOutgo?: boolean;
     indentChar?: string;
     indentSize?: number;
+    leftToRight?: LeftToRightOption;
     /** Transition arrows */
     arrows?: {
         /** state name */
@@ -79,8 +88,10 @@ export namespace PumlWriterOptions {
     export function fill(options: PumlWriterOptions): PumlWriterOptions {
         return {
             autoIndex: AutoIndex.AlphaNumIndex,
+            authBundleOutgo: false,
             indentChar: ' ',
             indentSize: DefaultIndent,
+            leftToRight: LeftToRightOption.None,
             arrows: [],
             positions: [],
             ...options

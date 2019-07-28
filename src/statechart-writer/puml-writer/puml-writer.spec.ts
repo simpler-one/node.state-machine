@@ -2,6 +2,7 @@ import { PumlWriter } from './puml-writer';
 import { Statechart, StatechartItem, StatechartTransition } from '../../interface';
 import { AutoIndex } from '../interface';
 import { MetaState } from '../../state-meta';
+import { LeftToRightOption } from './interface';
 
 
 describe('PumlWriter', () => {

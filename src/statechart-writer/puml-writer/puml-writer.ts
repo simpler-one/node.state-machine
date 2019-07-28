@@ -1,5 +1,5 @@
 import { Statechart, StatechartItem } from "../../interface";
-import { PumlWriterOptions, ArrowDirection } from "./interface";
+import { PumlWriterOptions, ArrowDirection, LeftToRightOption } from "./interface";
 import { MetaState } from "../../state-meta";
 import { StringLines } from "./string-lines";
 
@@ -13,15 +13,37 @@ const NonId = new RegExp([
 ].join('|'), 'g');
 const ZeroPos = {x: 0, y: 0};
 
+const NormalDirectionMap = new Map([
+    [ArrowDirection.Up, ArrowDirection.Up],
+    [ArrowDirection.Down, ArrowDirection.Down],
+    [ArrowDirection.Do, ArrowDirection.Do],
+    [ArrowDirection.Left, ArrowDirection.Left],
+    [ArrowDirection.Right, ArrowDirection.Right],
+    [ArrowDirection.Le, ArrowDirection.Le],
+    [ArrowDirection.Ri, ArrowDirection.Ri],
+]);
+const LtoRDirectionMap = new Map([
+    [ArrowDirection.Up, ArrowDirection.Left],
+    [ArrowDirection.Down, ArrowDirection.Right],
+    [ArrowDirection.Do, ArrowDirection.Ri],
+    [ArrowDirection.Left, ArrowDirection.Up],
+    [ArrowDirection.Right, ArrowDirection.Down],
+    [ArrowDirection.Le, ArrowDirection.Up],
+    [ArrowDirection.Ri, ArrowDirection.Do],
+]);
+
+
 export class PumlWriter {
 
     private indices: number[];
     private count: number;
+    private heads: StringLines = new StringLines();
     private definitions: StringLines = new StringLines();
     private transitions: StringLines = new StringLines();
     private readonly directionMap: Map<string, ArrowDirection>;
     private readonly positionMap: Map<string, Position>;
     private readonly defaultDirection: ArrowDirection;
+    private readonly directionConversion: Map<string, string>;
 
     private constructor(
         private readonly map: Statechart,
@@ -32,6 +54,11 @@ export class PumlWriter {
             options.positions.map(pos => [idOf(pos.state), {x: pos.x || 0, y: pos.y || 0}])
         );
         this.defaultDirection = this.directionMap.get(pathOf('', ''));
+        
+        this.directionConversion = this.options.leftToRight !== LeftToRightOption.AutoPosition
+            ? NormalDirectionMap
+            : LtoRDirectionMap
+        ;
     }
 
     public static getWriter(options?: PumlWriterOptions): (map: Statechart) => string {
@@ -51,6 +78,12 @@ export class PumlWriter {
         }
 
         return map;
+    }
+
+    private setHeads(): void {
+        if (this.options.leftToRight !== LeftToRightOption.None) {
+            this.heads.newLine('left to right direction');
+        }
     }
 
     private setStates(): void {
@@ -132,14 +165,16 @@ export class PumlWriter {
             ArrowDirection.Down,
         ];
 
-        return candidates.find(candidate => candidate);
+        return this.directionConversion.get(candidates.find(candidate => candidate));
     }
 
     private export(): string {
+        this.setHeads();
         this.setStates();
 
         return [
             `@startuml ${this.map.name}`,
+            ...this.heads.toArray(),
             '',
             ...this.definitions.toArray(),
             ...this.transitions.toArray(),
