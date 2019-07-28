@@ -49,6 +49,8 @@ export namespace ArrowDirection {
 
 export interface PumlWriterOptions {
     autoIndex?: AutoIndex;
+    indentChar?: string;
+    indentSize?: number;
     /** Transition arrows */
     arrows?: {
         /** state name */
@@ -72,10 +74,13 @@ export interface PumlWriterOptions {
 }
 export namespace PumlWriterOptions {
     export const Model: PumlWriterOptions = {};
+    const DefaultIndent = 4;
 
     export function fill(options: PumlWriterOptions): PumlWriterOptions {
         return {
             autoIndex: AutoIndex.AlphaNumIndex,
+            indentChar: ' ',
+            indentSize: DefaultIndent,
             arrows: [],
             positions: [],
             ...options

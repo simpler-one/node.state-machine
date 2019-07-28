@@ -19,7 +19,7 @@ describe('PumlWriter', () => {
             });
         });
 
-        describe('export()', () => {
+        describe('export(without children)', () => {
             const map: Statechart = {
                 name: 'SampleState',
                 states: [
@@ -45,14 +45,14 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('state "State1" as State1')).toBeTruthy();
-                expect(result.includes('state "State2" as State2')).toBeTruthy();
-                expect(result.includes('[*] -->')).toBeTruthy();
-                expect(result.includes('-down->')).toBeTruthy();
-                expect(result.includes('-up->')).toBeFalsy();
-                expect(result.includes('-left->')).toBeFalsy();
-                expect(result.includes('-right->')).toBeFalsy();
-                expect(result.includes('(a1)')).toBeTruthy();
+                expect(result).toMatch(escape('state "State1" as State1'));
+                expect(result).toMatch(escape('state "State2" as State2'));
+                expect(result).toMatch(escape('[*] -->'));
+                expect(result).toMatch(escape('-down->'));
+                expect(result).not.toMatch(escape('-up->'));
+                expect(result).not.toMatch(escape('-left->'));
+                expect(result).not.toMatch(escape('-right->'));
+                expect(result).toMatch(escape('(a1)'));
             });
 
             it('should return no-index optioned machine map', () => {
@@ -63,15 +63,15 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('state "State1" as State1')).toBeTruthy();
-                expect(result.includes('state "State2" as State2')).toBeTruthy();
-                expect(result.includes('[*] -->')).toBeTruthy();
-                expect(result.includes('-down->')).toBeTruthy();
-                expect(result.includes('-up->')).toBeFalsy();
-                expect(result.includes('-left->')).toBeFalsy();
-                expect(result.includes('-right->')).toBeFalsy();
-                expect(result.includes('(1)')).toBeFalsy();
-                expect(result.includes('OK,Next')).toBeTruthy();
+                expect(result).toMatch(escape('state "State1" as State1'));
+                expect(result).toMatch(escape('state "State2" as State2'));
+                expect(result).toMatch(escape('[*] -->'));
+                expect(result).toMatch(escape('-down->'));
+                expect(result).not.toMatch(escape('-up->'));
+                expect(result).not.toMatch(escape('-left->'));
+                expect(result).not.toMatch(escape('-right->'));
+                expect(result).not.toMatch(escape('(1)'));
+                expect(result).toMatch(escape('OK,Next'));
             });
 
             it('should return auto-number machine map', () => {
@@ -82,12 +82,12 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('state "State1" as State1')).toBeTruthy();
-                expect(result.includes('state "State2" as State2')).toBeTruthy();
-                expect(result.includes('[*] -->')).toBeTruthy();
-                expect(result.includes('-down->')).toBeTruthy();
-                expect(result.includes('(1)')).toBeTruthy();
-                expect(result.includes('(2),(3)')).toBeTruthy();
+                expect(result).toMatch(escape('state "State1" as State1'));
+                expect(result).toMatch(escape('state "State2" as State2'));
+                expect(result).toMatch(escape('[*] -->'));
+                expect(result).toMatch(escape('-down->'));
+                expect(result).toMatch(escape('(1)'));
+                expect(result).toMatch(escape('(2),(3)'));
             });
 
             it('should return default arrow machine map', () => {
@@ -98,11 +98,11 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('state "State1" as State1')).toBeTruthy();
-                expect(result.includes('state "State2" as State2')).toBeTruthy();
-                expect(result.includes('[*] -->')).toBeTruthy();
-                expect(result.includes('-down->')).toBeTruthy();
-                expect(result.includes('(1)')).toBeFalsy();
+                expect(result).toMatch(escape('state "State1" as State1'));
+                expect(result).toMatch(escape('state "State2" as State2'));
+                expect(result).toMatch(escape('[*] -->'));
+                expect(result).toMatch(escape('-down->'));
+                expect(result).not.toMatch(escape('(1)'));
             });
 
             it('should return customized arrow machine map', () => {
@@ -124,13 +124,13 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('State1 -up-> State2')).toBeTruthy();
+                expect(result).toMatch(escape('State1 -up-> State2'));
 
-                expect(result.includes('State2 -right-> State1')).toBeTruthy();
-                expect(result.includes('State2 -up-> State3')).toBeTruthy();
+                expect(result).toMatch(escape('State2 -right-> State1'));
+                expect(result).toMatch(escape('State2 -up-> State3'));
 
-                expect(result.includes('State3 -down-> State1')).toBeTruthy();
-                expect(result.includes('State3 -up-> State2')).toBeTruthy();
+                expect(result).toMatch(escape('State3 -down-> State1'));
+                expect(result).toMatch(escape('State3 -up-> State2'));
             });
 
             it('should return both way arrow machine map', () => {
@@ -147,8 +147,8 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('-right-> State1')).toBeTruthy();
-                expect(result.includes('State1 -left->')).toBeTruthy();
+                expect(result).toMatch(escape('-right-> State1'));
+                expect(result).toMatch(escape('State1 -left->'));
             });
 
             it('should return positioned machine map', () => {
@@ -165,15 +165,44 @@ describe('PumlWriter', () => {
                 const result = writer(map);
 
                 // Then
-                expect(result.includes('State1 -down-> State2')).toBeTruthy();
-                expect(result.includes('State2 -up-> State1')).toBeTruthy();
-                expect(result.includes('State2 -left-> State3')).toBeTruthy();
-                expect(result.includes('State3 -right-> State2')).toBeTruthy();
-                expect(result.includes('State3 -right-> State1')).toBeTruthy();
+                expect(result).toMatch(escape('State1 -down-> State2'));
+                expect(result).toMatch(escape('State2 -up-> State1'));
+                expect(result).toMatch(escape('State2 -left-> State3'));
+                expect(result).toMatch(escape('State3 -right-> State2'));
+                expect(result).toMatch(escape('State3 -right-> State1'));
+            });
+        });
+
+        describe('export(with children)', () => {
+            const map: Statechart = {
+                name: 'SampleState',
+                states: [
+                    item(MetaState.StartName, [transition('', 'State1')]),
+                    item('State1', [transition('Next', 'State2')]),
+                    item('State2', [
+                        transition('Prev', 'State1'),
+                    ], [
+                        item('State2-1', [transition('Reset', 'State1')]),
+                    ]),
+                    item('State3', [
+                        transition('Next', 'State1'),
+                        transition('Prev', 'State2'),
+                    ])
+                ]
+            };
+
+            it('should return default optioned machine map', () => {
+                // Given
+                const writer = PumlWriter.getWriter();
+
+                // When
+                const result = writer(map);
+
+                // Then
+                expect(result).toMatch(escape('state "State2" as State2 {'));
             });
         });
     });
-
 });
 
 
@@ -191,3 +220,7 @@ function transition(action: string, destination: string): StatechartTransition {
         destination,
     };
 }
+
+function escape(s: string) {  
+    return s.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+};

@@ -1,12 +1,20 @@
+const DefaultIndentUnit = 4;
+
 export class StringLines {
 
-    public indent: number = 0;
-    public indentChar: string = ' ';
-
+    public indentCount: number = 0;
+    private readonly indentStr: string;
     private readonly lines: string[] = [];
 
+    constructor(
+        indentChar = ' ',
+        indentUnitLength = DefaultIndentUnit,
+    ) {
+        this.indentStr = indentChar.repeat(indentUnitLength);
+    }
+
     public newLine(line = ''): void {
-        this.lines.push(this.indentChar.repeat(this.indent) + line);
+        this.lines.push(this.indentStr.repeat(this.indentCount) + line);
     }
 
     public append(str: string): void {
@@ -15,5 +23,14 @@ export class StringLines {
 
     public toArray(): string[] {
         return [...this.lines];
+    }
+
+    public indent(): void {
+        this.indentCount++;
+    }
+    public unindent(): void {
+        if (this.indentCount > 0) {
+            this.indentCount--;
+        }
     }
 }

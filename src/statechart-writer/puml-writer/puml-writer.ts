@@ -56,7 +56,7 @@ export class PumlWriter {
     private setStates(): void {
         this.indices = [0, 0];
         this.count = 0;
-        this.definitions = new StringLines();
+        this.definitions = new StringLines(this.options.indentChar, this.options.indentSize);
         this.transitions = new StringLines();
 
         const start = this.map.states.find(state => state.name === MetaState.StartName);
@@ -77,10 +77,11 @@ export class PumlWriter {
         this.definitions.newLine(`state "${fromState.name}" as ${from}`);
         if (fromState.children.length > 0) {
             this.definitions.append(' {');
-            this.shiftIndent(4);
+            this.definitions.indent();
             fromState.children.forEach(child => this.setState(child));
-            this.shiftIndent(-4);
+            this.definitions.unindent();
             this.definitions.newLine(`}`);
+            this.definitions.newLine();
         }
 
         const transitions = new Map<string, string>();
@@ -132,11 +133,6 @@ export class PumlWriter {
         ];
 
         return candidates.find(candidate => candidate);
-    }
-
-    private shiftIndent(shift: number): void {
-        this.definitions.indent += shift;
-        this.transitions.indent += shift;
     }
 
     private export(): string {
