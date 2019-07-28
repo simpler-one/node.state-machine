@@ -8,7 +8,8 @@ import { StateChangedEvent } from '../event-args';
 enum StringState {
     State1 = 'State1',
     State2 = 'State2',
-    State3 = 'State3'
+    State3 = 'State3',
+    State4 = 'State4',
 }
 
 class NamedState {
@@ -41,6 +42,7 @@ class FullStateType implements StateType<StringState, Action>, OnEnterState, OnL
     public static readonly State1 = new FullStateType(StringState.State1);
     public static readonly State2 = new FullStateType(StringState.State2);
     public static readonly State3 = new FullStateType(StringState.State3);
+    public static readonly State4 = new FullStateType(StringState.State4);
 
     public enterCalled: number = 0;
     public leaveCalled: number = 0;
@@ -58,6 +60,7 @@ class FullStateType implements StateType<StringState, Action>, OnEnterState, OnL
         this.State1.reset();
         this.State2.reset();
         this.State3.reset();
+        this.State4.reset();
     }
 
 
@@ -332,6 +335,53 @@ describe('StateMachine', () => {
                 expect(FullStateType.State2.enterCalled).toBe(0);
                 expect(FullStateType.State2.leaveCalled).toBe(0);
                 expect(FullStateType.State3.enterCalled).toBe(1);
+            });
+
+            it('should transit if child to child transition is defined', () => {
+                // Given
+                let event: StateChangedEvent<StringState, Action>;
+                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
+                {
+                    state: FullStateType.State1,
+                    transitions: [
+                        [Action.Action1, FullStateType.State3]
+                    ]
+                }, {
+                    state: FullStateType.State2,
+                    transitions: [
+                    ],
+                    children: [{
+                        state: FullStateType.State3,
+                        transitions: [
+                            [Action.Action2, FullStateType.State4]
+                        ],
+                    }, {
+                        state: FullStateType.State4,
+                        transitions: [
+                        ],
+                    }]
+                });
+                fsm.start();
+                fsm.do(Action.Action1);
+                FullStateType.reset();
+                fsm.stateChanged.subscribe(e => event = e);
+
+                // When
+                fsm.do(Action.Action2);
+
+                // Then
+                expect(fsm.current).toBe(StringState.State4);
+                expect(fsm.currentStates).toEqual([StringState.State2, StringState.State4]);
+
+                expect(event).toBeTruthy();
+                expect(event.commonParents).toEqual([StringState.State2]);
+                expect(event.oldStates).toEqual([StringState.State3]);
+                expect(event.newStates).toEqual([StringState.State4]);
+
+                expect(FullStateType.State2.enterCalled).toBe(0);
+                expect(FullStateType.State2.leaveCalled).toBe(0);
+                expect(FullStateType.State3.leaveCalled).toBe(1);
+                expect(FullStateType.State4.enterCalled).toBe(1);
             });
 
             it('should NOT transit to next state when do action if transition is NOT defined', () => {
