@@ -1,6 +1,7 @@
 import { Statechart, StatechartItem } from "../../interface";
 import { PumlWriterOptions, ArrowDirection } from "./interface";
 import { MetaState } from "../../state-meta";
+import { StringLines } from "./string-lines";
 
 
 type Position = { x: number, y: number };
@@ -16,8 +17,8 @@ export class PumlWriter {
 
     private indices: number[];
     private count: number;
-    private definitions: string[] = [];
-    private transitions: string[] = [];
+    private definitions: StringLines = new StringLines();
+    private transitions: StringLines = new StringLines();
     private readonly directionMap: Map<string, ArrowDirection>;
     private readonly positionMap: Map<string, Position>;
     private readonly defaultDirection: ArrowDirection;
@@ -55,8 +56,8 @@ export class PumlWriter {
     private setStates(): void {
         this.indices = [0, 0];
         this.count = 0;
-        this.definitions = [];
-        this.transitions = [];
+        this.definitions = new StringLines();
+        this.transitions = new StringLines();
 
         const start = this.map.states.find(state => state.name === MetaState.StartName);
         const states = this.map.states.filter(state => state.name !== MetaState.StartName);
@@ -67,15 +68,19 @@ export class PumlWriter {
     }
 
     private setStart(start: StatechartItem): void {
-        this.transitions.push(`${start.name} --> ${idOf(start.transitions[0].destination)}`);
+        this.transitions.newLine(`${start.name} --> ${idOf(start.transitions[0].destination)}`);
     }
 
     private setState(fromState: StatechartItem): void {
         this.indices[ActionIndex] = 0;
         const from = idOf(fromState.name);
-        this.definitions.push(`state "${fromState.name}" as ${from}`);
+        this.definitions.newLine(`state "${fromState.name}" as ${from}`);
         if (fromState.children.length > 0) {
-            
+            this.definitions.append(' {');
+            this.shiftIndent(4);
+            fromState.children.forEach(child => this.setState(child));
+            this.shiftIndent(-4);
+            this.definitions.newLine(`}`);
         }
 
         const transitions = new Map<string, string>();
@@ -87,10 +92,10 @@ export class PumlWriter {
             if (this.options.autoIndex) {
                 act = this.options.autoIndex(this.indices, ++this.count);
                 this.indices[ActionIndex]++;
-                this.definitions.push(`${from}: ${act} ${action.action}`);
+                this.definitions.newLine(`${from}: ${act} ${action.action}`);
             } else {
                 act = action.action;
-                this.definitions.push(`${from}: ${action.action}`);
+                this.definitions.newLine(`${from}: ${action.action}`);
             }
 
             let transition = transitions.get(path);
@@ -105,11 +110,11 @@ export class PumlWriter {
         }
 
         transitions.forEach(transition => {
-            this.transitions.push(transition);
+            this.transitions.newLine(transition);
         });
 
-        this.definitions.push('');
-        this.transitions.push('');
+        this.definitions.newLine();
+        this.transitions.newLine();
         this.indices[StateIndex]++;
     }
 
@@ -129,14 +134,19 @@ export class PumlWriter {
         return candidates.find(candidate => candidate);
     }
 
+    private shiftIndent(shift: number): void {
+        this.definitions.indent += shift;
+        this.transitions.indent += shift;
+    }
+
     private export(): string {
         this.setStates();
 
         return [
             `@startuml ${this.map.name}`,
             '',
-            ...this.definitions,
-            ...this.transitions,
+            ...this.definitions.toArray(),
+            ...this.transitions.toArray(),
             `@enduml`
         ].join('\n');
     }
