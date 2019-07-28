@@ -317,6 +317,7 @@ export class StateMachine<S, A extends string, P = void> {
             `${joinName(common)} {${joinName(old)} -> ${joinName(newStates)}}` :
             `${joinName(old)} -> ${joinName(newStates)}`
         ;
+        const forcedMsg = forced ? '(forced)' : '';
         const event = new StateChangedEvent(
             common.map(state => state.instance),
             old.map(state => state.instance),
