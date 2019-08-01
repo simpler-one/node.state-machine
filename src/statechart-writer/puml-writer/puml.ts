@@ -22,8 +22,15 @@ export class Puml {
         this.definitions.newLine(definition);
     }
 
-    public appendDefinition(definition: string): void {
-        this.definitions.append(definition);
+    public openBlock(): void {
+        this.definitions.append(' {');
+        this.definitions.indent();
+    }
+
+    public closeBlock(): void {
+        this.definitions.newLine('}');
+        this.definitions.newLine();
+        this.definitions.unindent();
     }
 
     public newAction(state: string, action: string): void {
@@ -40,13 +47,6 @@ export class Puml {
 
     public newTransition(transition: string): void {
         this.transitions.newLine(transition);
-    }
-
-    public indent(): void {
-        this.definitions.indent();
-    }
-    public unindent(): void {
-        this.definitions.unindent();
     }
 
     public nextLine(): void {
