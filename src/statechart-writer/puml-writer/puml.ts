@@ -45,8 +45,8 @@ export class Puml {
         this.transitions.newLine(`${from} --> ${to}`);
     }
 
-    public newTransition(transition: string): void {
-        this.transitions.newLine(transition);
+    public newTransition(from: string, to: string, action: string, direction: string): void {
+        this.transitions.newLine(`${from} -${direction}-> ${to}: ${action}`);
     }
 
     public nextLine(): void {
