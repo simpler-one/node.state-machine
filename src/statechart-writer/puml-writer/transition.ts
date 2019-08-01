@@ -6,6 +6,10 @@ export class Transition {
         public readonly action: string,
     ) {
     }
+    
+    public static compare(transition1: Transition, transition2: Transition): number {
+        return transition1.order - transition2.order;
+    }
 
     public appendAction(action: string): Transition {
         return new Transition(
