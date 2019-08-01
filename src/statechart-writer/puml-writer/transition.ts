@@ -11,15 +11,21 @@ export class Transition {
         return tr1.order - tr2.order;
     }
 
-    public static join(tr1: Transition, tr2: Transition): Transition {
-        return tr1 ?
-            new Transition(
-                tr1.order,
-                tr1.from,
-                tr1.to,
-                tr1.action + ',' + tr2.action,
-            )
-            : tr2
-        ;
+    public static join(...transitions: Transition[]): Transition {
+        if (!transitions) {
+            return undefined;
+        }
+
+        const list = transitions.filter(tr => Boolean(tr));
+        if (list.length === 0) {
+            return undefined;
+        }
+
+        return new Transition(
+            list[0].order,
+            list[0].from,
+            list[0].to,
+            list.map(tr => tr.action).join(','),
+        );
     }
 }
