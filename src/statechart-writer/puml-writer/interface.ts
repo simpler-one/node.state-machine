@@ -56,7 +56,7 @@ export enum LeftToRightOption {
 
 export interface PumlWriterOptions {
     autoIndex?: AutoIndex;
-    authBundleOutgo?: boolean;
+    autoBundleOutgo?: boolean;
     indentChar?: string;
     indentSize?: number;
     leftToRight?: LeftToRightOption;
@@ -86,9 +86,9 @@ export namespace PumlWriterOptions {
     const DefaultIndent = 4;
 
     export function fill(options: PumlWriterOptions): PumlWriterOptions {
-        return {
+        const opt = {
             autoIndex: AutoIndex.AlphaNumIndex,
-            authBundleOutgo: false,
+            autoBundleOutgo: false,
             indentChar: ' ',
             indentSize: DefaultIndent,
             leftToRight: LeftToRightOption.None,
@@ -96,5 +96,9 @@ export namespace PumlWriterOptions {
             positions: [],
             ...options
         };
+
+        opt.autoIndex = opt.autoIndex || AutoIndex.None;
+
+        return opt;
     }
 }

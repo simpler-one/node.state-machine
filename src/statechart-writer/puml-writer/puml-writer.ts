@@ -17,7 +17,6 @@ export class PumlWriter {
     private count: number;
     private puml: Puml;
     private readonly directionMap: DirectionMap;
-    private readonly actionGetter: (indices: number[], count: number, action: string) => string;
 
     private constructor(
         private readonly options: PumlWriterOptions,
@@ -45,13 +44,13 @@ export class PumlWriter {
 
     private setStates(states: StatechartItem[], transitions: Transitions): void {
         const start = states.find(state => state.name === MetaState.StartName);
-        const states = states.filter(state => state.name !== MetaState.StartName);
+        const normalStates = states.filter(state => state.name !== MetaState.StartName);
 
         if (start) {
             this.puml.newStart(start.name, idOf(start.transitions[0].destination));
         }
 
-        for (const state of states) {
+        for (const state of normalStates) {
             this.setState(state, transitions);
         }
     }
@@ -66,20 +65,18 @@ export class PumlWriter {
             this.puml.openBlock();
             this.setStates(fromState.children, childrenTr);
             this.puml.closeBlock();
-            this.setTransitions(childrenTr.toArray(this.options.autoBundleOutGo, from));
+            this.setTransitions(childrenTr.toArray(this.options.autoBundleOutgo, from));
         }
 
         for (const tr of fromState.transitions) {
             const to = idOf(tr.destination);
             const path = `${from}-path-${to}`;
 
-            const index = this.options.autoIndex(this.indices, ++this.count, tr.action);
+            const index = this.options.autoIndex(this.indices, ++this.count);
             const act = index || tr.action;
             this.puml.newAction(from, tr.action, index);
 
-            const prevTr = transitions.get(path);
-            const newTr = Transition.join(prevTr, new Transition(this.count, from, to, act));
-            transitions.set(path, newTr);
+            transitions.add(path, new Transition(this.count, from, to, act));
             this.indices[ActionIndex]++;
         }
 
