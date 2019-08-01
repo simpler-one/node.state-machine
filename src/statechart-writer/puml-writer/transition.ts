@@ -7,16 +7,19 @@ export class Transition {
     ) {
     }
     
-    public static compare(transition1: Transition, transition2: Transition): number {
-        return transition1.order - transition2.order;
+    public static compare(tr1: Transition, tr2: Transition): number {
+        return tr1.order - tr2.order;
     }
 
-    public appendAction(action: string): Transition {
-        return new Transition(
-            this.order,
-            this.from,
-            this.to,
-            this.action + ',' + action,
-        );
+    public static join(tr1: Transition, tr2: Transition): Transition {
+        return tr1 ?
+            new Transition(
+                tr1.order,
+                tr1.from,
+                tr1.to,
+                tr1.action + ',' + tr2.action,
+            )
+            : tr2
+        ;
     }
 }
