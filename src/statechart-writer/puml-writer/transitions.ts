@@ -11,11 +11,11 @@ export class Transitions {
         this.map.set(path, newTr);
     }
     
-    public toArray(): Transitions[] {
-        return this.map.values();
+    public toArray(bundle: boolean, from?: string): Transitions[] {
+        return bundle ? this.bundle(from) : this.map.values();
     }
     
-    public bundle(from: string): Transitions[] {
+    private bundle(from: string): Transitions[] {
         const bundler = new Map<string, Transition[]>();
         this.map.forEach(tr => {
             const bundled = bundler.get(tr.from);
@@ -30,7 +30,7 @@ export class Transitions {
         const result: Transition[] = [];
         bundler.forEach(transitions => {
             transitions.sort(Transition.compare);
-            result.push(Transition.join(transitions));
+            result.push(Transition.join(...transitions));
         });
 
         return result;
