@@ -3,6 +3,7 @@ import { PumlWriterOptions, ArrowDirection, LeftToRightOption } from "./interfac
 import { MetaState } from "../../state-meta";
 import { idOf } from "./utils";
 import { DirectionMap } from "./direction-map";
+import { Transition } from "./transition";
 import { Puml } from "./puml";
 
 
@@ -15,6 +16,7 @@ export class PumlWriter {
     private count: number;
     private puml: Puml;
     private readonly directionMap: DirectionMap;
+    private readonly actionGetter: (indices: number[], count: number, action: string) => string;
 
     private constructor(
         private readonly options: PumlWriterOptions,
@@ -68,27 +70,17 @@ export class PumlWriter {
             const to = idOf(tr.destination);
             const path = `${from}-path-${to}`;
 
-            let act: string;
-            if (this.options.autoIndex) {
-                act = this.options.autoIndex(this.indices, ++this.count);
-                this.indices[ActionIndex]++;
-                this.puml.newIndexedAction(from, tr.action, act);
-            } else {
-                act = tr.action;
-                this.puml.newAction(from, tr.action);
-            }
+            const index = this.options.autoIndex(this.indices, ++this.count, tr.action);
+            const act = index || tr.action;
+            this.puml.newAction(from, tr.action, index);
 
-            let transition = transitions.get(path);
-            if (transition) {
-                transition = transition.appendAction(act);
-            } else {
-                transition = new Transition(this.count, from, to, act);
-            }
-
-            transitions.set(path, transition);
+            const prevTr = transitions.get(path);
+            const newTr = Transition.join(prevTr, new Transition(this.count, from, to, act));
+            transitions.set(path, newTr);
+            this.indices[ActionIndex]++;
         }
 
-        transitions.values().sort((tr1, tr2) => tr1.order - tr2.order).forEach(tr => {
+        transitions.values().sort(Transition.compare).forEach(tr => {
             const direction = this.directionMap.get(tr.from, tr.to);
             this.puml.newTransition(tr.from, tr.to, tr.action, direction);
         });
