@@ -49,24 +49,21 @@ export class PumlWriter {
         }
 
         for (const state of states) {
-            this.setState(state);
+            this.setState(state, new Map<string, Transition>());
         }
     }
 
-    private setState(fromState: StatechartItem): void {
+    private setState(fromState: StatechartItem, transitions: Map<string, Transition>): void {
         this.indices[ActionIndex] = 0;
         const from = idOf(fromState.name);
+
         this.puml.newDefinition(`state "${fromState.name}" as ${from}`);
         if (fromState.children.length > 0) {
-            this.puml.appendDefinition(' {');
-            this.puml.indent();
-            this.setStates(fromState.children);
-            this.puml.unindent();
-            this.puml.newDefinition(`}`);
-            this.puml.newDefinition('');
+            this.puml.openBlock();
+            this.setStates(fromState.children, transitions);
+            this.puml.closeBlock();
         }
 
-        const transitions = new Map<string, string>();
         for (const tr of fromState.transitions) {
             const to = idOf(tr.destination);
             const path = `${from}-path-${to}`;
@@ -83,17 +80,17 @@ export class PumlWriter {
 
             let transition = transitions.get(path);
             if (transition) {
-                transition += `,${act}`; // Append
+                transition = transition.appendAction(act);
             } else {
-                const direction = this.directionMap.get(from, to);
-                transition = `${from} -${direction}-> ${to}: ${act}`; // New
+                transition = new Transition(this.count, from, to, act);
             }
 
             transitions.set(path, transition);
         }
 
-        transitions.forEach(transition => {
-            this.puml.newTransition(transition);
+        transitions.values().sort((tr1, tr2) => tr1.order - tr2.order).forEach(tr => {
+            const direction = this.directionMap.get(tr.from, tr.to);
+            this.puml.newTransition(tr.from, tr.to, tr.action, direction);
         });
 
         this.puml.nextLine();
