@@ -64,6 +64,7 @@ export class PumlWriter {
             this.puml.openBlock();
             this.setStates(fromState.children, transitions);
             this.puml.closeBlock();
+            this.setTransitions(transitions.toArray(this.options.autoBundleOutGo, from));
         }
 
         for (const tr of fromState.transitions) {
@@ -80,20 +81,23 @@ export class PumlWriter {
             this.indices[ActionIndex]++;
         }
 
-        transitions.values().sort(Transition.compare).forEach(tr => {
-            const direction = this.directionMap.get(tr.from, tr.to);
-            this.puml.newTransition(tr.from, tr.to, tr.action, direction);
-        });
-
         this.puml.nextLine();
         this.indices[StateIndex]++;
     }
 
+    private setTransitions(transitions: Transition[]): void {
+        for (const tr of transitions) {
+            const direction = this.directionMap.get(tr.from, tr.to);
+            this.puml.newTransition(tr.from, tr.to, tr.action, direction);
+        }
+    }
 
     private export(chart: Statechart): string {
+        const transitions = new Transitions();
         this.init(chart);
         this.setHeads();
         this.setStates();
+        this.setTransitions(transitions.toArray());
         return this.puml.toString();
     }
 }
