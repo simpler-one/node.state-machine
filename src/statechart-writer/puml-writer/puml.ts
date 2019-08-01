@@ -33,12 +33,15 @@ export class Puml {
         this.definitions.unindent();
     }
 
-    public newAction(state: string, action: string): void {
-        this.definitions.newLine(`${state}: ${action}`);
+    public newAction(state: string, action: string, index: string | undefined): void {
+        if (index) {
+            this.transitions.newLine(`${state}: ${index} ${action}`);
+        } else {
+            this.definitions.newLine(`${state}: ${action}`);
+        }
     }
 
     public newIndexedAction(state: string, action: string, index: string): void {
-        this.transitions.newLine(`${state}: ${index} ${action}`);
     }
 
     public newStart(from: string, to: string): void {
