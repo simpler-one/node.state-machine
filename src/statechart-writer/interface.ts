@@ -4,13 +4,13 @@
  * @param indices 0-based index array
  * @param count 1-based count
  */
-export type AutoIndex = (indices: number[], count: number, action: string) => string;
+export type AutoIndex = (indices: number[], count: number) => string;
 export namespace AutoIndex {
     const SmallA: number = 'a'.charCodeAt(0);
     const LargeA: number = 'A'.charCodeAt(0);
     const AlphaSpan: number = 'Z'.charCodeAt(0) - LargeA + 1;
 
-    export const None: AutoIndex = (indices, count, action) => action;
+    export const None: AutoIndex = () => undefined;
     export const Number: AutoIndex = (indices, count) => `(${count})`;
     export const NumberDot: AutoIndex = (indices, count) => `${count}.`;
     export const NumberColon: AutoIndex = (indices, count) => `${count}:`;
