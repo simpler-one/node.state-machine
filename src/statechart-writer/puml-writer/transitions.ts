@@ -11,7 +11,7 @@ export class Transitions {
         this.map.set(path, newTr);
     }
     
-    public toArray(bundle: boolean, from?: string): Transitions[] {
+    public toArray(bundle: boolean = false, from?: string): Transitions[] {
         return bundle ? this.bundle(from) : this.map.values();
     }
     
