@@ -4,6 +4,7 @@ import { MetaState } from "../../state-meta";
 import { idOf } from "./utils";
 import { DirectionMap } from "./direction-map";
 import { Transition } from "./transition";
+import { Transitions } from "./transitions";
 import { Puml } from "./puml";
 
 
@@ -42,7 +43,7 @@ export class PumlWriter {
         this.puml = new Puml(chart.name, this.options);
     }
 
-    private setStates(states: StatechartItem[]): void {
+    private setStates(states: StatechartItem[], transitions: Transitions): void {
         const start = states.find(state => state.name === MetaState.StartName);
         const states = states.filter(state => state.name !== MetaState.StartName);
 
@@ -51,20 +52,21 @@ export class PumlWriter {
         }
 
         for (const state of states) {
-            this.setState(state, new Map<string, Transition>());
+            this.setState(state, transitions);
         }
     }
 
-    private setState(fromState: StatechartItem, transitions: Map<string, Transition>): void {
+    private setState(fromState: StatechartItem, transitions: Transitions): void {
         this.indices[ActionIndex] = 0;
         const from = idOf(fromState.name);
 
         this.puml.newDefinition(`state "${fromState.name}" as ${from}`);
         if (fromState.children.length > 0) {
+            const childrenTr = new Transitions();
             this.puml.openBlock();
-            this.setStates(fromState.children, transitions);
+            this.setStates(fromState.children, childrenTr);
             this.puml.closeBlock();
-            this.setTransitions(transitions.toArray(this.options.autoBundleOutGo, from));
+            this.setTransitions(childrenTr.toArray(this.options.autoBundleOutGo, from));
         }
 
         for (const tr of fromState.transitions) {
@@ -96,7 +98,7 @@ export class PumlWriter {
         const transitions = new Transitions();
         this.init(chart);
         this.setHeads();
-        this.setStates();
+        this.setStates(chart.states, transitions);
         this.setTransitions(transitions.toArray());
         return this.puml.toString();
     }
