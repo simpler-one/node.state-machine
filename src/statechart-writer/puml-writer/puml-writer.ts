@@ -17,15 +17,15 @@ export class PumlWriter {
     private readonly directionMap: DirectionMap;
 
     private constructor(
-        private readonly map: Statechart,
         private readonly options: PumlWriterOptions,
     ) {
         this.directionMap = new DirectionMap(options);
     }
 
-    public static getWriter(options?: PumlWriterOptions): (map: Statechart) => string {
+    public static getWriter(options?: PumlWriterOptions): (chart: Statechart) => string {
         const opt = PumlWriterOptions.fill(options);
-        return (map) => new PumlWriter(map, opt).export();
+        const writer = new PumlWriter(opt);
+        return (chart) => writer.export(chart);
     }
 
     private setHeads(): void {
@@ -34,21 +34,23 @@ export class PumlWriter {
         }
     }
 
-    private setStates(): void {
+    private init(chart: Statechart): void {
         this.indices = [0, 0];
         this.count = 0;
-        this.puml = new Puml(this.map.name, this.options);
+        this.puml = new Puml(chart.name, this.options);
+    }
 
-        const start = this.map.states.find(state => state.name === MetaState.StartName);
-        const states = this.map.states.filter(state => state.name !== MetaState.StartName);
-        this.setStart(start);
+    private setStates(states: StatechartItem[]): void {
+        const start = states.find(state => state.name === MetaState.StartName);
+        const states = states.filter(state => state.name !== MetaState.StartName);
+
+        if (start) {
+            this.puml.newStart(start.name, idOf(start.transitions[0].destination));
+        }
+
         for (const state of states) {
             this.setState(state);
         }
-    }
-
-    private setStart(start: StatechartItem): void {
-        this.puml.newStart(start.name, idOf(start.transitions[0].destination));
     }
 
     private setState(fromState: StatechartItem): void {
@@ -58,7 +60,7 @@ export class PumlWriter {
         if (fromState.children.length > 0) {
             this.puml.appendDefinition(' {');
             this.puml.indent();
-            fromState.children.forEach(child => this.setState(child));
+            this.setStates(fromState.children);
             this.puml.unindent();
             this.puml.newDefinition(`}`);
             this.puml.newDefinition('');
@@ -99,7 +101,8 @@ export class PumlWriter {
     }
 
 
-    private export(): string {
+    private export(chart: Statechart): string {
+        this.init(chart);
         this.setHeads();
         this.setStates();
         return this.puml.toString();
