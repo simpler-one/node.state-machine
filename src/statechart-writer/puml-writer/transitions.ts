@@ -12,7 +12,8 @@ export class Transitions {
     }
     
     public toArray(bundle: boolean = false, from?: string): Transitions[] {
-        return bundle ? this.bundle(from) : this.map.values();
+        return (bundle ? this.bundle(from) : this.map.values())
+        .sort(Transition.compare);
     }
     
     private bundle(from: string): Transitions[] {
