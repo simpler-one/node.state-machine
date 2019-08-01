@@ -11,7 +11,11 @@ export class Transitions {
         this.map.set(path, newTr);
     }
     
-    public bundleSameDestination(from: string): Transitions[] {
+    public toArray(): Transitions[] {
+        return this.map.values();
+    }
+    
+    public bundle(from: string): Transitions[] {
         const bundler = new Map<string, Transition[]>();
         this.map.forEach(tr => {
             const bundled = bundler.get(tr.from);
