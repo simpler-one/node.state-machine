@@ -28,4 +28,13 @@ export class Transition {
             list.map(tr => tr.action).join(','),
         );
     }
+
+    public newFrom(from: string): Transition {
+        return new Transition(
+            this.order,
+            from,
+            this.to,
+            this.action,
+        );
+    }
 }
