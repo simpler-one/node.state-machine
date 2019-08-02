@@ -86,18 +86,20 @@ export namespace PumlWriterOptions {
     const DefaultIndent = 4;
 
     export function fill(options: PumlWriterOptions): PumlWriterOptions {
+        // Default
         const opt = {
             autoIndex: AutoIndex.AlphaNumIndex,
             autoBundleOutgo: false,
             indentChar: ' ',
             indentSize: DefaultIndent,
             leftToRight: LeftToRightOption.None,
-            arrows: [],
-            positions: [],
             ...options
         };
 
+        // Not null
         opt.autoIndex = opt.autoIndex || AutoIndex.None;
+        opt.arrows = opt.arrows || [];
+        opt.positions = opt.positions || [];
 
         return opt;
     }
