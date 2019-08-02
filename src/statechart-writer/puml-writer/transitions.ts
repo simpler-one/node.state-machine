@@ -31,7 +31,7 @@ export class Transitions {
         const result: Transition[] = [];
         bundler.forEach(transitions => {
             transitions.sort(Transition.compare);
-            result.push(Transition.join(...transitions));
+            result.push(Transition.join(...transitions).newfrom(from));
         });
 
         return result;
