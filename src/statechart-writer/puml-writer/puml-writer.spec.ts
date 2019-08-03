@@ -179,11 +179,12 @@ describe('PumlWriter', () => {
                 name: 'SampleState',
                 states: [
                     item(MetaState.StartName, [transition('', 'State1')]),
-                    item('State1', [transition('Next', 'State2')]),
+                    item('State1', [transition('Next', 'State2-1')]),
                     item('State2', [
                         transition('Prev', 'State1'),
                     ], [
                         item('State2-1', [transition('Reset', 'State1')]),
+                        item('State2-2', [transition('Reset', 'State1'), transition('3', 'State3')]),
                     ]),
                     item('State3', [
                         transition('Next', 'State1'),
@@ -195,12 +196,19 @@ describe('PumlWriter', () => {
             it('should return default optioned machine map', () => {
                 // Given
                 const writer = PumlWriter.getWriter();
-
                 // When
                 const result = writer(map);
-
                 // Then
                 expect(result).toMatch(esc('state "State2" as State2 {'));
+            });
+
+            it('should return auto-bundled machine map', () => {
+                // Given
+                const writer = PumlWriter.getWriter({ autoBundleOutgo: true });
+                // When
+                const result = writer(map);
+                // Then
+                console.log(result);
             });
         });
     });

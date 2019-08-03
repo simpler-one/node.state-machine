@@ -1,4 +1,10 @@
+import { pathOf } from "./utils";
+
 export class Transition {
+    public get path(): string {
+        return pathOf(this.from, this.to);
+    }
+
     public constructor(
         public readonly order: number,
         public readonly from: string,

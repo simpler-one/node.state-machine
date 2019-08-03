@@ -67,9 +67,9 @@ export class DirectionMap {
         for (const arrow of arrows) {
             const from = arrow.from ? idOf(arrow.from) : '';
             const to = arrow.to ? idOf(arrow.to) : '';
-            map.set(`${from}-path-${to}`, arrow.direction);
+            map.set(pathOf(from, to), arrow.direction);
             if (arrow.bothWays && (arrow.from || arrow.to)) {
-                map.set(`${to}-path-${from}`, ArrowDirection.reverse(arrow.direction));
+                map.set(pathOf(to, from), ArrowDirection.reverse(arrow.direction));
             }
         }
 

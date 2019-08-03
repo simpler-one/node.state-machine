@@ -28,9 +28,9 @@ export class Puml {
     }
 
     public closeBlock(): void {
+        this.definitions.unindent();
         this.definitions.newLine('}');
         this.definitions.newLine();
-        this.definitions.unindent();
     }
 
     public newAction(state: string, action: string, index: string | undefined): void {

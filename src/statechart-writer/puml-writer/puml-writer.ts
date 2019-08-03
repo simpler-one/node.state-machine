@@ -59,25 +59,24 @@ export class PumlWriter {
         this.indices[ActionIndex] = 0;
         const from = idOf(fromState.name);
 
+        for (const tr of fromState.transitions) {
+            const to = idOf(tr.destination);
+
+            const index = this.options.autoIndex(this.indices, ++this.count);
+            const act = index || tr.action;
+            this.puml.newAction(from, tr.action, index);
+
+            transitions.add(new Transition(this.count, from, to, act));
+            this.indices[ActionIndex]++;
+        }
+
         this.puml.newDefinition(`state "${fromState.name}" as ${from}`);
         if (fromState.children.length > 0) {
             const childrenTr = new Transitions();
             this.puml.openBlock();
             this.setStates(fromState.children, childrenTr);
             this.puml.closeBlock();
-            this.setTransitions(childrenTr.toArray(this.options.autoBundleOutgo, from));
-        }
-
-        for (const tr of fromState.transitions) {
-            const to = idOf(tr.destination);
-            const path = `${from}-path-${to}`;
-
-            const index = this.options.autoIndex(this.indices, ++this.count);
-            const act = index || tr.action;
-            this.puml.newAction(from, tr.action, index);
-
-            transitions.add(path, new Transition(this.count, from, to, act));
-            this.indices[ActionIndex]++;
+            transitions.add(...childrenTr.toArray(this.options.autoBundleOutgo, from));
         }
 
         this.puml.nextLine();
