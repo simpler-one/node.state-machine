@@ -1,4 +1,4 @@
-import { StateMachine, StateType } from '@working-sloth/state-machine';
+import { StateMachine, StateType, OnEnterState, OnLeaveState } from '@working-sloth/state-machine';
 
 type SlothParams = { sleepiness: number, sleepingTime: string };
 
@@ -25,7 +25,7 @@ class SlothState {
     }
 }
 
-class SlothStateType implements StateType<SlothState, SlothAction, SlothParams> {
+class SlothStateType implements StateType<SlothState, SlothAction, SlothParams>, OnEnterState<SlothState, SlothAction>, OnLeaveState<SlothState, SlothAction> {
     public static readonly Idle = new SlothStateType('Idle', 'data1');
     public static readonly Working = new SlothStateType('Working', 'data2');
     public static readonly Eating = new SlothStateType('Eating', 'data3');

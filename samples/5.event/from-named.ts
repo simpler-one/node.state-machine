@@ -1,4 +1,4 @@
-import { StateMachine, NamedState } from '@working-sloth/state-machine';
+import { StateMachine, NamedState, OnEnterState, OnLeaveState } from '@working-sloth/state-machine';
 
 
 enum SlothAction {
@@ -9,7 +9,7 @@ enum SlothAction {
     Stop = 'Stop'
 }
 
-class SlothState implements NamedState<SlothState, SlothAction> {
+class SlothState implements NamedState, OnEnterState<SlothState, SlothAction>, OnLeaveState<SlothState, SlothAction> {
     public static readonly Idle = new SlothState('Idle', 0, 0);
     public static readonly Working = new SlothState('Working', 1, 2);
     public static readonly Eating = new SlothState('Eating', 3, 4);
