@@ -19,7 +19,7 @@ export class StateHistory<A extends string> {
         newState: string[] | [] | undefined,
         action: A,
         forced: boolean,
-    ) {
+    ): StateHistory<A> {
         return new StateHistory(new Date(), commonParents, oldState, newState, action, forced);
     }
 
@@ -27,7 +27,7 @@ export class StateHistory<A extends string> {
         commonParents: string[] | [],
         oldState: string[] | [],
         action: A,
-    ) {
+    ): StateHistory<A> {
         return new StateHistory(new Date(), commonParents, oldState, undefined, action, false);
     }
 }

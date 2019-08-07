@@ -7,13 +7,13 @@ export class StringLines {
     private readonly lines: string[] = [];
 
     constructor(
-        indentChar = ' ',
-        indentUnitLength = DefaultIndentUnit,
+        indentChar: string = ' ',
+        indentUnitLength: number = DefaultIndentUnit,
     ) {
         this.indentStr = indentChar.repeat(indentUnitLength);
     }
 
-    public newLine(line = ''): void {
+    public newLine(line: string = ''): void {
         this.lines.push(this.indentStr.repeat(this.indentCount) + line);
     }
 
