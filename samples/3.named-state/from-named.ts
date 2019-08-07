@@ -29,7 +29,7 @@ const fsm = StateMachine.fromNamed<SlothState, SlothAction>(
     SlothState.Idle,
     {
         state: SlothState.Idle,
-        actions: [
+        transitions: [
             [SlothAction.Sleep, SlothState.Sleeping],
             [SlothAction.Work, SlothState.Working],
             [SlothAction.Eat, SlothState.Eating]
@@ -37,20 +37,20 @@ const fsm = StateMachine.fromNamed<SlothState, SlothAction>(
     },
     {
         state: SlothState.Working,
-        actions: [
+        transitions: [
             [SlothAction.Sleep, SlothState.Sleeping],
             [SlothAction.Stop, SlothState.Idle]
         ]
     },
     {
         state: SlothState.Sleeping,
-        actions: [
+        transitions: [
             [SlothAction.Wake, SlothState.Idle]
         ]
     },
     {
         state: SlothState.Eating,
-        actions: [
+        transitions: [
             [SlothAction.Sleep, SlothState.Sleeping],
             [SlothAction.Stop, SlothState.Idle]
         ]
