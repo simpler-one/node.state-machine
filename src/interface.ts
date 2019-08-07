@@ -1,41 +1,74 @@
 // tslint:disable:no-namespace
 import { StateMachine } from "./state-machine";
+import { StateChangedEvent } from "./event-args";
 
-export interface NamedState<S, A extends string, P = void> {
+
+export interface NamedState {
     readonly name: string;
-    onEnterState?(oldState: S | undefined, newState: S, action: A, params: P): void;
-    onLeaveState?(oldState: S, newState: S | undefined, action: A, params: P): void;
 }
 
 export interface StateType<S, A extends string, P = void> {
     readonly name: string;
-    getState(stateMachine: StateMachine<S, A, P>, params: P): S;
-    onEnterState?(oldState: S | undefined, newState: S, action: A, params: P): void;
-    onLeaveState?(oldState: S, newState: S | undefined, action: A, params: P): void;
+    getState(stateMachine: StateMachine<S, A, P>, params?: P): S;
 }
 
-export interface StateMachineItem<S, T, A> {
+export interface OnEnterState<S = {}, A = {}, P = void> {
+    onEnterState(event: StateChangedEvent<S, A, P>): void;
+}
+export namespace OnEnterState {
+    export type Any = OnEnterState<{}, {}, {}>;
+
+    export function tryCall<S, A, P>(obj: {}, event: StateChangedEvent<S, A, P>): void {
+        if ((<Any>obj).onEnterState) {
+            (<Any>obj).onEnterState(event);
+        }
+    }
+
+    export function get<S, A, P>(obj: {}): ((event: StateChangedEvent<S, A, P>) => void) | undefined {
+        return (<Any>obj).onEnterState ? (event) => (<Any>obj).onEnterState(event) : undefined;
+    }
+}
+
+export interface OnLeaveState<S = {}, A = {}, P = void> {
+    onLeaveState(event: StateChangedEvent<S, A, P>): void;
+}
+export namespace OnLeaveState {
+    export type Any = OnLeaveState<{}, {}, {}>;
+
+    export function tryCall<S, A, P>(obj: {}, event: StateChangedEvent<S, A, P>): void {
+        if ((<Any>obj).onLeaveState) {
+            (<Any>obj).onLeaveState(event);
+        }
+    }
+
+    export function get<S, A, P>(obj: {}): ((event: StateChangedEvent<S, A, P>) => void) | undefined {
+        return (<Any>obj).onLeaveState ? (event) => (<Any>obj).onLeaveState(event) : undefined;
+    }
+}
+
+
+export interface StateMachineItem<S, A> {
     state: S;
-    actions: [A, T][];
+    transitions: [A, S][];
+    startChild?: S;
+    children?: StateMachineItem<S, A>[];
 }
 
-export type StateChangedArgs<S, A> = { oldState: S | undefined, newState: S | undefined, action: A, message: string };
-export type StateChangeFailedArgs<S, A> = { curState: S | undefined, action: A, message: string };
 
-
-export interface StateMachineMap {
+export interface Statechart {
     name: string;
-    states: StateMachineMapItem[];
+    states: StatechartItem[];
 }
 
-export interface StateMachineMapItem {
+export interface StatechartItem {
     name: string;
-    actions: StateMachineMapAction[];
+    transitions: StatechartTransition[];
+    children: StatechartItem[];
 }
 
-export interface StateMachineMapAction {
-    name: string;
+export interface StatechartTransition {
+    action: string;
     destination: string;
 }
 
-export type StatechartWriter = (map: StateMachineMap) => string;
+export type StatechartWriter = (map: Statechart) => string;
