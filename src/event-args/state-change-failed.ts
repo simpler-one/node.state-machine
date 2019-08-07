@@ -1,4 +1,4 @@
-export class StateChangeFailedEvent<S, A, P = void> {
+export class StateChangeFailedEvent<S, A, P = {}> {
     public get current(): S | undefined {
         return this.currentStates[this.currentStates.length - 1];
     }
