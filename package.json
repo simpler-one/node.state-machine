@@ -1,6 +1,6 @@
 {
   "name": "@working-sloth/state-machine",
-  "version": "1.6.0",
+  "version": "2.0.0",
   "description": "State Machine for NodeJS",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
