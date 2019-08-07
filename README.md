@@ -80,13 +80,13 @@ const fsm = StateMachine.fromString<SlothState, SlothAction>(
     SlothState.Idle, // start state
     {
         state: SlothState.Idle,
-        actions: [
+        transitions: [
             [SlothAction.Sleep, SlothState.Sleeping],
             [SlothAction.Eat, SlothState.Eating],
         ]
     }, {
         state: SlothState.Sleeping,
-        actions: [
+        transitions: [
             [SlothAction.Wake, SlothState.Idle],
         ]
     },
