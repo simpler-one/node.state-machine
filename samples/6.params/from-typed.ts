@@ -1,4 +1,4 @@
-import { StateMachine, StateType } from '@working-sloth/state-machine';
+import { StateMachine, StateType, OnEnterState, OnLeaveState, StateChangedEvent } from '@working-sloth/state-machine';
 
 type SlothParams = { sleepiness: number, sleepingTime: string };
 
@@ -25,7 +25,7 @@ class SlothState {
     }
 }
 
-class SlothStateType implements StateType<SlothState, SlothAction, SlothParams> {
+class SlothStateType implements StateType<SlothState, SlothAction, SlothParams>, OnEnterState, OnLeaveState {
     public static readonly Idle = new SlothStateType('Idle', 'data1');
     public static readonly Working = new SlothStateType('Working', 'data2');
     public static readonly Eating = new SlothStateType('Eating', 'data3');
@@ -43,13 +43,13 @@ class SlothStateType implements StateType<SlothState, SlothAction, SlothParams> 
     }
 
     // You can receive optional params
-    onEnterState(oldState: SlothState, newState: SlothState, action: SlothAction, params: SlothParams) {
+    onEnterState(event: StateChangedEvent<SlothState, SlothAction, SlothParams>) {
         // Hoge fuga
     }
 
     // You can receive optional params
-    onLeaveState(oldState: SlothState, newState: SlothState, action: SlothAction, params: SlothParams) {
-        oldState.dispose(params); // For example, you can dispose the state
+    onLeaveState(event: StateChangedEvent<SlothState, SlothAction, SlothParams>) {
+        event.old.dispose(event.params); // For example, you can dispose the state
     }
 }
 
@@ -60,7 +60,7 @@ const fsm = StateMachine.fromType<SlothState, SlothAction, SlothParams>(
     SlothStateType.Idle,
     {
         state: SlothStateType.Idle,
-        actions: [
+        transitions: [
             [SlothAction.Sleep, SlothStateType.Sleeping],
             [SlothAction.Work, SlothStateType.Working],
             [SlothAction.Eat, SlothStateType.Eating]
@@ -68,20 +68,20 @@ const fsm = StateMachine.fromType<SlothState, SlothAction, SlothParams>(
     },
     {
         state: SlothStateType.Working,
-        actions: [
+        transitions: [
             [SlothAction.Sleep, SlothStateType.Sleeping],
             [SlothAction.Stop, SlothStateType.Idle]
         ]
     },
     {
         state: SlothStateType.Sleeping,
-        actions: [
+        transitions: [
             [SlothAction.Wake, SlothStateType.Idle]
         ]
     },
     {
         state: SlothStateType.Eating,
-        actions: [
+        transitions: [
             [SlothAction.Sleep, SlothStateType.Sleeping],
             [SlothAction.Stop, SlothStateType.Idle]
         ]
