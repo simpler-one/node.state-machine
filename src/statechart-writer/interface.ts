@@ -10,6 +10,7 @@ export namespace AutoIndex {
     const LargeA: number = 'A'.charCodeAt(0);
     const AlphaSpan: number = 'Z'.charCodeAt(0) - LargeA + 1;
 
+    export const None: AutoIndex = () => undefined;
     export const Number: AutoIndex = (indices, count) => `(${count})`;
     export const NumberDot: AutoIndex = (indices, count) => `${count}.`;
     export const NumberColon: AutoIndex = (indices, count) => `${count}:`;

@@ -7,8 +7,6 @@ branches:
   only:
   - master
   - develop
-  - ts2.5/master
-  - ts2.5/develop
 
 after_success:
   - npm run remapcov
