@@ -14,9 +14,7 @@ import { NamedTypeGetter, StringTypeGetter } from './type-getter';
 import { ActiveState } from './active-state';
 
 
-type LooseStateType<S, A extends string, P> = StateType<S, A | undefined, P | void>;
-
-export class StateMachine<S, A extends string, P = void> {
+export class StateMachine<S, A extends string, P = {}> {
 
     //
     // Public var
@@ -79,12 +77,12 @@ export class StateMachine<S, A extends string, P = void> {
         items: NolItem<S, A, P>[]
     ) {
         const anytimeI: number = items.findIndex(item => `${item.state}` === MetaState.AnytimeName);
-        let anytimeActions: [A, StateType<S, A, P>][] = [];
+        let anytimeTransitions: [A, StateType<S, A, P>][] = [];
         if (anytimeI >= 0) {
-            anytimeActions = items.splice(anytimeI, 1)[0].transitions;
+            anytimeTransitions = items.splice(anytimeI, 1)[0].transitions;
         }
 
-        this.map = MapBuilder.build(items, anytimeActions);
+        this.map = MapBuilder.build(items, anytimeTransitions);
 
         const metaStart = new LinkedStateType<S, A, P>(StartType, undefined);
         this.map.set(MetaState.StartName, metaStart);
@@ -118,10 +116,10 @@ export class StateMachine<S, A extends string, P = void> {
         return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
     }
 
-    public static fromType<S, A extends string, P = void>(
+    public static fromType<S, A extends string, P = {}>(
         name: string,
-        start: LooseStateType<S, A, P>,
-        ...items: StateMachineItem<LooseStateType<S, A, P>, A>[]
+        start: StateType<S, A, P>,
+        ...items: StateMachineItem<StateType<S, A, P>, A>[]
     ): StateMachine<S, A, P> {
         return new StateMachine<S, A, P>(name, start, [...items]);
     }
