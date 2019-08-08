@@ -317,10 +317,7 @@ export class StateMachine<S, A extends string, P = {}> {
     ): void {
         this.addHistory(StateHistory.ok([], old.map(s => s.name), newStates.map(s => s.name), action, forced));
 
-        const transitionMsg = common.length > 0 ?
-            `${joinName(common)} {${joinName(old)} -> ${joinName(newStates)}}` :
-            `${joinName(old)} -> ${joinName(newStates)}`
-        ;
+        const transitionMsg = toTransition(common, old, newStates);
         const forcedMsg = forced ? '(forced)' : '';
         const event = new StateChangedEvent(
             common.map(state => state.instance),
@@ -339,6 +336,10 @@ export class StateMachine<S, A extends string, P = {}> {
 }
 
 
-function joinName(named: ActiveState<{}, string, {}>[]): string {
-    return named.map(s => s.name).join('/');
+function toTransition(
+    common: ActiveState<{}, string, {}>[],
+    old: ActiveState<{}, string, {}>[],
+    newStates: ActiveState<{}, string, {}>[],
+): string {
+    return `${[...common, ...old].pop().name} -> ${[...common, ...newStates].pop().name}`;
 }
