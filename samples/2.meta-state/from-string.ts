@@ -22,33 +22,33 @@ const fsm = StateMachine.fromString<SlothState, SlothAction>(
     SlothState.Idle,
     {
         state: MetaState.Anytime, // import MetaState before declaration
-        actions: [
+        transitions: [
             // You can allow all states always to do something such as reset
             [SlothAction.Sleep, SlothState.Sleeping]
         ]
     },
     {
         state: SlothState.Idle,
-        actions: [
+        transitions: [
             [SlothAction.Work, SlothState.Working],
             [SlothAction.Eat, SlothState.Eating]
         ]
     },
     {
         state: SlothState.Working,
-        actions: [
+        transitions: [
             [SlothAction.Stop, SlothState.Idle]
         ]
     },
     {
         state: SlothState.Sleeping,
-        actions: [
+        transitions: [
             [SlothAction.Wake, SlothState.Idle]
         ]
     },
     {
         state: SlothState.Eating,
-        actions: [
+        transitions: [
             [SlothAction.Stop, SlothState.Idle]
         ]
     }

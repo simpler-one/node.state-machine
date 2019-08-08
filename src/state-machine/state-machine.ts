@@ -14,9 +14,7 @@ import { NamedTypeGetter, StringTypeGetter } from './type-getter';
 import { ActiveState } from './active-state';
 
 
-type LooseStateType<S, A extends string, P> = StateType<S, A | undefined, P | void>;
-
-export class StateMachine<S, A extends string, P = void> {
+export class StateMachine<S, A extends string, P = {}> {
 
     //
     // Public var
@@ -79,12 +77,12 @@ export class StateMachine<S, A extends string, P = void> {
         items: NolItem<S, A, P>[]
     ) {
         const anytimeI: number = items.findIndex(item => `${item.state}` === MetaState.AnytimeName);
-        let anytimeActions: [A, StateType<S, A, P>][] = [];
+        let anytimeTransitions: [A, StateType<S, A, P>][] = [];
         if (anytimeI >= 0) {
-            anytimeActions = items.splice(anytimeI, 1)[0].transitions;
+            anytimeTransitions = items.splice(anytimeI, 1)[0].transitions;
         }
 
-        this.map = MapBuilder.build(items, anytimeActions);
+        this.map = MapBuilder.build(items, anytimeTransitions);
 
         const metaStart = new LinkedStateType<S, A, P>(StartType, undefined);
         this.map.set(MetaState.StartName, metaStart);
@@ -118,10 +116,10 @@ export class StateMachine<S, A extends string, P = void> {
         return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
     }
 
-    public static fromType<S, A extends string, P = void>(
+    public static fromType<S, A extends string, P = {}>(
         name: string,
-        start: LooseStateType<S, A, P>,
-        ...items: StateMachineItem<LooseStateType<S, A, P>, A>[]
+        start: StateType<S, A, P>,
+        ...items: StateMachineItem<StateType<S, A, P>, A>[]
     ): StateMachine<S, A, P> {
         return new StateMachine<S, A, P>(name, start, [...items]);
     }
@@ -176,7 +174,7 @@ export class StateMachine<S, A extends string, P = void> {
             this.addHistory(StateHistory.error([], this._current.map(s => s.name), action));
             this._stateChangeFailed.next(new StateChangeFailedEvent(
                 this.currentStates, action, params,
-                `[${this.name}] Invalid action. ${joinName(this._current)} -> ? : ${action}`
+                `[${this.name}] Invalid action. ${this.curLeaf.name} -> ? : ${action}`
             ));
             return false;
         }
@@ -193,10 +191,30 @@ export class StateMachine<S, A extends string, P = void> {
      * @returns success
      * @throws RangeError
      */
-    public forceIfFail(action: A, forcedStateName: string, params?: P): boolean {
+    public forceIfFail(action: A, forcedStateName: string, params?: P): boolean;
+    /**
+     * Change current state forcibly if transition failed
+     * @param action action
+     * @param forcedStateNameOwner forced state name owner on failed
+     * @param params params for getState(*)
+     * @returns success
+     * @throws RangeError
+     */
+    public forceIfFail(action: A, forcedStateNameOwner: NamedState, params?: P): boolean;
+    /**
+     * Change current state forcibly if transition failed
+     * @param action action
+     * @param forcedStateNameOwner forced state name owner on failed
+     * @param params params for getState(*)
+     * @returns success
+     * @throws RangeError
+     */
+    public forceIfFail(action: A, forcedStateNameOwner: StateType<S, A, P>, params?: P): boolean;
+    public forceIfFail(action: A, forcedStateNameLike: string | NamedState | StateType<S, A, P>, params?: P): boolean {
         const success = this.do(action, params);
         if (!success) {
-            this.forceSet(forcedStateName, action, params);
+            const name = typeof forcedStateNameLike === "string" ? forcedStateNameLike : forcedStateNameLike.name;
+            this.forceSet(name, action, params);
         }
 
         return success;
@@ -258,7 +276,9 @@ export class StateMachine<S, A extends string, P = void> {
     public toChart(): Statechart {
         return {
             name: this.name,
-            states: Array.from(this.map.values()).map(type => StateMachine.toChartItem(type))
+            states: Array.from(this.map.values())
+                .filter(type => type.parent === undefined)
+                .map(type => StateMachine.toChartItem(type))
         };
     }
 
@@ -319,10 +339,7 @@ export class StateMachine<S, A extends string, P = void> {
     ): void {
         this.addHistory(StateHistory.ok([], old.map(s => s.name), newStates.map(s => s.name), action, forced));
 
-        const transitionMsg = common.length > 0 ?
-            `${joinName(common)} {${joinName(old)} -> ${joinName(newStates)}}` :
-            `${joinName(old)} -> ${joinName(newStates)}`
-        ;
+        const transitionMsg = toTransition(common, old, newStates);
         const forcedMsg = forced ? '(forced)' : '';
         const event = new StateChangedEvent(
             common.map(state => state.instance),
@@ -341,6 +358,10 @@ export class StateMachine<S, A extends string, P = void> {
 }
 
 
-function joinName(named: ActiveState<{}, string, {}>[]): string {
-    return named.map(s => s.name).join('/');
+function toTransition(
+    common: ActiveState<{}, string, {}>[],
+    old: ActiveState<{}, string, {}>[],
+    newStates: ActiveState<{}, string, {}>[],
+): string {
+    return `${[...common, ...old].pop().name} -> ${[...common, ...newStates].pop().name}`;
 }
