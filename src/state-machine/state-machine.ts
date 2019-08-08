@@ -174,7 +174,7 @@ export class StateMachine<S, A extends string, P = {}> {
             this.addHistory(StateHistory.error([], this._current.map(s => s.name), action));
             this._stateChangeFailed.next(new StateChangeFailedEvent(
                 this.currentStates, action, params,
-                `[${this.name}] Invalid action. ${joinName(this._current)} -> ? : ${action}`
+                `[${this.name}] Invalid action. ${this.curLeaf.name} -> ? : ${action}`
             ));
             return false;
         }
