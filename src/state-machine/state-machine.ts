@@ -191,9 +191,13 @@ export class StateMachine<S, A extends string, P = {}> {
      * @returns success
      * @throws RangeError
      */
-    public forceIfFail(action: A, forcedStateName: string, params?: P): boolean {
+    public forceIfFail(action: A, forcedStateName: string, params?: P): boolean;
+    public forceIfFail(action: A, forcedStateNameOwner: NamedState, params?: P): boolean;
+    public forceIfFail(action: A, forcedStateNameOwner: StateType<S, A, P>, params?: P): boolean;
+    public forceIfFail(action: A, forcedStateNameLike: string | NamedState | StateType<S, A, P>>, params?: P): boolean {
         const success = this.do(action, params);
         if (!success) {
+            const name = typeof forcedStateNameLike === string ? forcedStateNameLike : forcedStateNameLike.name;
             this.forceSet(forcedStateName, action, params);
         }
 
