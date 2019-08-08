@@ -276,7 +276,9 @@ export class StateMachine<S, A extends string, P = {}> {
     public toChart(): Statechart {
         return {
             name: this.name,
-            states: Array.from(this.map.values()).map(type => StateMachine.toChartItem(type))
+            states: Array.from(this.map.values())
+                .filter(type => type.parent === undefined)
+                .map(type => StateMachine.toChartItem(type))
         };
     }
 
