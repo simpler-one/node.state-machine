@@ -480,24 +480,24 @@ describe('StateMachine', () => {
 
             it(`should transit forcibly if transition is NOT defined`, () => {
                 // Given
-                const fsm = StateMachine.fromString('name', StringState.State1,
+                const fsm = StateMachine.fromNamed('name', NamedState.State1,
                 {
-                    state: StringState.State1,
+                    state: NamedState.State1,
                     transitions: [
                     ]
                 },
                 {
-                    state: StringState.State2,
+                    state: NamedState.State2,
                     transitions: [
                     ]
                 });
     
                 // When
                 fsm.start();
-                const result = fsm.forceIfFail(Action.Action1, StringState.State2);
+                const result = fsm.forceIfFail(Action.Action1, NamedState.State2);
     
                 // Then
-                expect(fsm.current).toBe(StringState.State2);
+                expect(fsm.current).toBe(NamedState.State2);
                 expect(result).toBe(false);
             });
         });

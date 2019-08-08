@@ -192,13 +192,29 @@ export class StateMachine<S, A extends string, P = {}> {
      * @throws RangeError
      */
     public forceIfFail(action: A, forcedStateName: string, params?: P): boolean;
+    /**
+     * Change current state forcibly if transition failed
+     * @param action action
+     * @param forcedStateNameOwner forced state name owner on failed
+     * @param params params for getState(*)
+     * @returns success
+     * @throws RangeError
+     */
     public forceIfFail(action: A, forcedStateNameOwner: NamedState, params?: P): boolean;
+    /**
+     * Change current state forcibly if transition failed
+     * @param action action
+     * @param forcedStateNameOwner forced state name owner on failed
+     * @param params params for getState(*)
+     * @returns success
+     * @throws RangeError
+     */
     public forceIfFail(action: A, forcedStateNameOwner: StateType<S, A, P>, params?: P): boolean;
-    public forceIfFail(action: A, forcedStateNameLike: string | NamedState | StateType<S, A, P>>, params?: P): boolean {
+    public forceIfFail(action: A, forcedStateNameLike: string | NamedState | StateType<S, A, P>, params?: P): boolean {
         const success = this.do(action, params);
         if (!success) {
-            const name = typeof forcedStateNameLike === string ? forcedStateNameLike : forcedStateNameLike.name;
-            this.forceSet(forcedStateName, action, params);
+            const name = typeof forcedStateNameLike === "string" ? forcedStateNameLike : forcedStateNameLike.name;
+            this.forceSet(name, action, params);
         }
 
         return success;
