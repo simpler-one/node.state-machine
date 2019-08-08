@@ -653,7 +653,7 @@ describe('StateMachine', () => {
                 });
             });
 
-            it('should return user-defined map if some states are defined', () => {
+            it('should return user-defined map if some states are defined (without children)', () => {
                 // Given
                 const name = 'name';
                 const fsm = StateMachine.fromString<StringState, Action>(
@@ -684,6 +684,52 @@ describe('StateMachine', () => {
                         name: StringState.State2,
                         transitions: [],
                         children: [],
+                    }, {
+                        name: MetaState.StartName,
+                        transitions: [{
+                            action: MetaStateAction.DoStart,
+                            destination: StringState.State1
+                        }],
+                        children: [],
+                    }]
+                });
+            });
+
+            it('should return user-defined map if some states are defined (with children)', () => {
+                // Given
+                const name = 'name';
+                const fsm = StateMachine.fromString<StringState, Action>(
+                    name,
+                    StringState.State1,
+                    {
+                        state: StringState.State1,
+                        transitions: [
+                            [Action.Action1, StringState.State2]
+                        ],
+                        children: [{
+                            state: StringState.State2,
+                            transitions: []
+                        }]
+                    }
+                );
+
+                // When
+                const result = fsm.toChart();
+
+                // Then
+                expect(result).toEqual({
+                    name,
+                    states: [{
+                        name: StringState.State1,
+                        transitions: [{
+                            action: Action.Action1,
+                            destination: StringState.State2
+                        }],
+                        children: [{
+                            name: StringState.State2,
+                            transitions: [],
+                            children: [],
+                        }],
                     }, {
                         name: MetaState.StartName,
                         transitions: [{
