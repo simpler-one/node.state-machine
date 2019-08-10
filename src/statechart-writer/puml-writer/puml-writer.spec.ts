@@ -208,7 +208,7 @@ describe('PumlWriter', () => {
                 // When
                 const result = writer(map);
                 // Then
-                console.log(result);
+                expect(result).toMatch(esc('<<choice>>'));
             });
         });
     });

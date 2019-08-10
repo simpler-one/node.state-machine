@@ -70,13 +70,17 @@ export class PumlWriter {
             this.indices[ActionIndex]++;
         }
 
-        this.puml.newDefinition(`state "${fromState.name}" as ${from}`);
+        this.puml.newDefinition(fromState.name, from);
         if (fromState.children.length > 0) {
             const childrenTr = new Transitions();
             this.puml.openBlock();
             this.setStates(fromState.children, childrenTr);
+
+            const bundle = childrenTr.bundleAsNeeded(this.options.autoBundleOutgo, fromState);
+            this.puml.newBundlers(...bundle.bundlers);
+            transitions.add(...bundle.transitions);
+
             this.puml.closeBlock();
-            transitions.add(...childrenTr.toArray(this.options.autoBundleOutgo, fromState));
         }
 
         this.puml.nextDefinition();
@@ -95,7 +99,7 @@ export class PumlWriter {
         this.init(chart);
         this.setHeads();
         this.setStates(chart.states, transitions);
-        this.setTransitions(transitions.toArray());
+        this.setTransitions(transitions.bundleAsNeeded().transitions);
         return this.puml.toString();
     }
 }
