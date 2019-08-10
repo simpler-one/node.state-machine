@@ -49,17 +49,26 @@ export class Puml {
         this.transitions.newLine(`${from} -${direction}-> ${to}: ${action}`);
     }
 
-    public nextLine(): void {
+    public nextDefinition(): void {
         this.definitions.newLine();
-        this.transitions.newLine();
     }
 
     public toString(): string {
         return [
             `@startuml ${this.name}`,
+            '',
+            `''`,
+            `'' Options`,
+            `''`,
             ...this.heads.toArray(),
             '',
+            `''`,
+            `'' Definitions`,
+            `''`,
             ...this.definitions.toArray(),
+            `''`,
+            `'' Transitions`,
+            `''`,
             ...this.transitions.toArray(),
             `@enduml`
         ].join('\n');

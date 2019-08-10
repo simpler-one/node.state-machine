@@ -76,10 +76,10 @@ export class PumlWriter {
             this.puml.openBlock();
             this.setStates(fromState.children, childrenTr);
             this.puml.closeBlock();
-            transitions.add(...childrenTr.toArray(this.options.autoBundleOutgo, from));
+            transitions.add(...childrenTr.toArray(this.options.autoBundleOutgo, fromState));
         }
 
-        this.puml.nextLine();
+        this.puml.nextDefinition();
         this.indices[StateIndex]++;
     }
 
