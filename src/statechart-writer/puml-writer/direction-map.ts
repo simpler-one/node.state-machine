@@ -3,6 +3,7 @@ import { idOf, pathOf } from "./utils";
 
 
 type Position = { x: number, y: number };
+type DirectionGetter = () => string | undefined;
 const ZeroPos: Position = {x: 0, y: 0};
 
 const NormalDirectionMap = new Map([
@@ -46,22 +47,6 @@ export class DirectionMap {
         ;
     }
 
-    public get(from: string, to: string): string {
-        const fromP = this.positions.get(from) || ZeroPos;
-        const toP = this.positions.get(to) || ZeroPos;
-
-        const candidates = [
-            this.arrows.get(pathOf(from, to)),
-            this.arrows.get(pathOf(from, '')),
-            this.arrows.get(pathOf('', to)),
-            ArrowDirection.fromPosition(fromP.x, fromP.y, toP.x, toP.y),
-            this.defaultDirection,
-            ArrowDirection.Down,
-        ];
-
-        return this.conversion.get(candidates.find(candidate => candidate));
-    }
-
     private static buildArrows(arrows: typeof PumlWriterOptions.Model.arrows): Map<string, ArrowDirection> {
         const map = new Map();
         for (const arrow of arrows) {
@@ -74,5 +59,45 @@ export class DirectionMap {
         }
 
         return map;
+    }
+
+    public get(from: string[], to: string[]): string {
+        const candidates = [
+            ...this.fromPath(from[from.length - 1], to[to.length - 1]),
+            ...this.fromPosition(from, to),
+            () => this.defaultDirection,
+            () => ArrowDirection.Down,
+        ];
+
+        return this.conversion.get(candidates.reduce((prev, cur) => prev || cur(), ''));
+    }
+
+    private fromPath(from: string, to: string): DirectionGetter[] {
+        return [
+            () => this.arrows.get(pathOf(from, to)),
+            () => this.arrows.get(pathOf(from, '')),
+            () => this.arrows.get(pathOf('', to)),
+        ];
+    }
+
+    private fromPosition(from: string[], to: string[]): DirectionGetter[] {
+        return [
+            () => {
+                const fromP = this.positionOf(from);
+                const toP = this.positionOf(to);
+                return ArrowDirection.fromPosition(fromP.x, fromP.y, toP.x, toP.y)
+            },
+        ];
+    }
+
+    private positionOf(stateChain: string[]): Position {
+        let pos: Position = { x: 0, y: 0 };
+        for (const state of stateChain) {
+            const curPos = this.positions.get(state) || ZeroPos;
+            pos.x += curPos.x;
+            pos.y += curPos.y;
+        }
+
+        return pos;
     }
 }

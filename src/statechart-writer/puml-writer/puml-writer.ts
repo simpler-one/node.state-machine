@@ -16,6 +16,7 @@ export class PumlWriter {
     private indices: number[];
     private count: number;
     private puml: Puml;
+    private parentMap: Map<string, string>;
     private readonly directionMap: DirectionMap;
 
     private constructor(
@@ -30,7 +31,7 @@ export class PumlWriter {
         return (chart) => writer.export(chart);
     }
 
-    private setHeads(): void {
+    private setOptions(): void {
         if (this.options.leftToRight !== LeftToRightOption.None) {
             this.puml.newHead('left to right direction');
         }
@@ -40,6 +41,18 @@ export class PumlWriter {
         this.indices = [0, 0];
         this.count = 0;
         this.puml = new Puml(chart.name, this.options);
+        this.parentMap = new Map();
+        this.setMap(chart.states, undefined);
+    }
+
+    private setMap(states: StatechartItem[], parent: string): void {
+        for (const state of states) {
+            if (parent) {
+                this.parentMap.set(state.name, parent);
+            }
+
+            this.setMap(state.children, state.name);
+        }
     }
 
     private setStates(states: StatechartItem[], transitions: Transitions): void {
@@ -89,7 +102,7 @@ export class PumlWriter {
 
     private setTransitions(transitions: Transition[]): void {
         for (const tr of transitions) {
-            const direction = this.directionMap.get(tr.from, tr.to);
+            const direction = this.directionMap.get(this.chainOf(tr.from), this.chainOf(tr.to));
             this.puml.newTransition(tr.from, tr.to, tr.action, direction);
         }
     }
@@ -97,9 +110,20 @@ export class PumlWriter {
     private export(chart: Statechart): string {
         const transitions = new Transitions();
         this.init(chart);
-        this.setHeads();
+        this.setOptions();
         this.setStates(chart.states, transitions);
         this.setTransitions(transitions.bundleAsNeeded().transitions);
         return this.puml.toString();
+    }
+
+    private chainOf(state: string): string[] {
+        const chain: string[] = [];
+        let cur = state;
+        do {
+            chain.push(cur);
+            cur = this.parentMap.get(cur);
+        } while (cur);
+
+        return chain;
     }
 }
