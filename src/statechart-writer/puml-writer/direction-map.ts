@@ -29,6 +29,7 @@ export class DirectionMap {
 
     private readonly arrows: Map<string, ArrowDirection>;
     private readonly positions: Map<string, Position>;
+    private readonly innerDirections: Map<string, ArrowDirection>;
     private readonly defaultDirection: ArrowDirection;
     private readonly conversion: Map<string, string>;
 
@@ -37,7 +38,10 @@ export class DirectionMap {
     ) {
         this.arrows = DirectionMap.buildArrows(options.arrows);
         this.positions = new Map(
-            options.positions.map(pos => [idOf(pos.state), {x: pos.x || 0, y: pos.y || 0}])
+            options.states.map(pos => [idOf(pos.state), {x: pos.x || 0, y: pos.y || 0}])
+        );
+        this.innerDirections = nee Map(
+            options.states.map(state => [state.name, state.innerDirection])
         );
         this.defaultDirection = this.arrows.get(pathOf('', ''));
         
@@ -64,7 +68,9 @@ export class DirectionMap {
     public get(from: string[], to: string[]): string {
         const candidates = [
             ...this.fromPath(from[from.length - 1], to[to.length - 1]),
-            ...this.fromPosition(from, to),
+            () => this.fromPosition(from, to),
+            () => this.fromInnerDirection(from, to),
+            
             () => this.defaultDirection,
             () => ArrowDirection.Down,
         ];
@@ -80,14 +86,10 @@ export class DirectionMap {
         ];
     }
 
-    private fromPosition(from: string[], to: string[]): DirectionGetter[] {
-        return [
-            () => {
-                const fromP = this.positionOf(from);
-                const toP = this.positionOf(to);
-                return ArrowDirection.fromPosition(fromP.x, fromP.y, toP.x, toP.y)
-            },
-        ];
+    private fromPosition(from: string[], to: string[]): ArrowDirection {
+        const fromP = this.positionOf(from);
+        const toP = this.positionOf(to);
+        return ArrowDirection.fromPosition(fromP.x, fromP.y, toP.x, toP.y);
     }
 
     private positionOf(stateChain: string[]): Position {
@@ -99,5 +101,19 @@ export class DirectionMap {
         }
 
         return pos;
+    }
+
+
+    private fromInnerDirection(from: string[], to: string[]): ArrowDirection {
+        if (from.length < 2 || to.length < 2) {
+            return undefined;
+        }
+
+        const parent = from[from.length - 1];
+        if (to[to.length - 1] !== parent) {
+            return undefined;
+        }
+
+        return this.innerDirections.get(parent);
     }
 }
