@@ -221,6 +221,25 @@ export class StateMachine<S, A extends string, P = {}> {
     }
 
     /**
+     * Require state to equal expected after the action.
+     * If the action makes state expected one, do nothing
+     * Else, set state forcibly
+     * @param action action
+     * @param 
+     */
+    public require(action: A, expectedStateNameLike: string | NamedState | StateType<S, A, P>, params?: P): boolean {
+        const name = typeof expectedStateNameLike === 'string' ? expectedStateNameLike : expectedStateNameLike.name;
+        const type = this.getDestination(action);
+        if (type !== undefined && type.name === name) {
+            this.setState(type, action, params, false);
+            return true;
+        }
+
+        this.forceSet(name, action, params);
+        return false;
+    }
+
+    /**
      * Reset state
      */
     public reset(): void {
