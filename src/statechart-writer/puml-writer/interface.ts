@@ -101,7 +101,7 @@ export namespace PumlWriterOptions {
         // Not null
         opt.autoIndex = opt.autoIndex || AutoIndex.None;
         opt.arrows = opt.arrows || [];
-        opt.positions = opt.positions || [];
+        opt.states = opt.states || [];
 
         return opt;
     }
