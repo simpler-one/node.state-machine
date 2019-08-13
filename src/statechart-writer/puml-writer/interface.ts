@@ -66,19 +66,21 @@ export interface PumlWriterOptions {
         from?: string;
         /** state name */
         to?: string;
-        /** Arrow direction. This is more prior than positions */
+        /** Arrow direction. This is more prior than state position */
         direction: ArrowDirection;
         bothWays?: boolean;
         /* color?: string; reserved for future */
     }[];
-    /** State node's position */
-    positions?: {
+    /** State node's attributes */
+    states?: {
         /** state name */
-        state: string;
+        name: string;
         /** Relative horizontal position. Larger goes right */
         x?: number;
         /** Relative vertical position. Larger goes right */
         y?: number;
+        /** Inner direction */
+        innerDirection: ArrowDirection;
     }[];
 }
 export namespace PumlWriterOptions {
