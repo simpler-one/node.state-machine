@@ -235,7 +235,7 @@ export class StateMachine<S, A extends string, P = {}> {
      * @param action action
      * @param expectedStateNameOwner expected state name owner
      */
-    public require(action: A, expectedStateNameOwner: string | NamedState | StateType<S, A, P>, params?: P): boolean 
+    public require(action: A, expectedStateNameOwner: NamedState, params?: P): boolean 
     /**
      * Require state to equal expected after the action.
      * If the action makes state expected one, do nothing
