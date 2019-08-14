@@ -225,8 +225,25 @@ export class StateMachine<S, A extends string, P = {}> {
      * If the action makes state expected one, do nothing
      * Else, set state forcibly
      * @param action action
-     * @param 
+     * @param expectedStateName expected state name
      */
+    public require(action: A, expectedStateName: string, params?: P): boolean 
+    /**
+     * Require state to equal expected after the action.
+     * If the action makes state expected one, do nothing
+     * Else, set state forcibly
+     * @param action action
+     * @param expectedStateNameOwner expected state name owner
+     */
+    public require(action: A, expectedStateNameOwner: string | NamedState | StateType<S, A, P>, params?: P): boolean 
+    /**
+     * Require state to equal expected after the action.
+     * If the action makes state expected one, do nothing
+     * Else, set state forcibly
+     * @param action action
+     * @param expectedStateNameOwner expected state name owner
+     */
+    public require(action: A, expectedStateNameOwner: StateType<S, A, P>, params?: P): boolean;
     public require(action: A, expectedStateNameLike: string | NamedState | StateType<S, A, P>, params?: P): boolean {
         const name = typeof expectedStateNameLike === 'string' ? expectedStateNameLike : expectedStateNameLike.name;
         const type = this.getDestination(action);
