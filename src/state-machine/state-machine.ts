@@ -188,7 +188,7 @@ export class StateMachine<S, A extends string, P = {}> {
      * @param action action
      * @param forcedStateName forced state name on failed
      * @param params params for getState(*)
-     * @returns success
+     * @returns transited normally
      * @throws RangeError
      */
     public forceIfFail(action: A, forcedStateName: string, params?: P): boolean;
@@ -197,7 +197,7 @@ export class StateMachine<S, A extends string, P = {}> {
      * @param action action
      * @param forcedStateNameOwner forced state name owner on failed
      * @param params params for getState(*)
-     * @returns success
+     * @returns transited normally
      * @throws RangeError
      */
     public forceIfFail(action: A, forcedStateNameOwner: NamedState, params?: P): boolean;
@@ -206,7 +206,7 @@ export class StateMachine<S, A extends string, P = {}> {
      * @param action action
      * @param forcedStateNameOwner forced state name owner on failed
      * @param params params for getState(*)
-     * @returns success
+     * @returns transited normally
      * @throws RangeError
      */
     public forceIfFail(action: A, forcedStateNameOwner: StateType<S, A, P>, params?: P): boolean;
@@ -226,6 +226,8 @@ export class StateMachine<S, A extends string, P = {}> {
      * Else, set state forcibly
      * @param action action
      * @param expectedStateName expected state name
+     * @returns transited normally
+     * @throws RangeError
      */
     public require(action: A, expectedStateName: string, params?: P): boolean 
     /**
@@ -234,6 +236,8 @@ export class StateMachine<S, A extends string, P = {}> {
      * Else, set state forcibly
      * @param action action
      * @param expectedStateNameOwner expected state name owner
+     * @returns transited normally
+     * @throws RangeError
      */
     public require(action: A, expectedStateNameOwner: NamedState, params?: P): boolean 
     /**
@@ -242,6 +246,8 @@ export class StateMachine<S, A extends string, P = {}> {
      * Else, set state forcibly
      * @param action action
      * @param expectedStateNameOwner expected state name owner
+     * @returns transited normally
+     * @throws RangeError
      */
     public require(action: A, expectedStateNameOwner: StateType<S, A, P>, params?: P): boolean;
     public require(action: A, expectedStateNameLike: string | NamedState | StateType<S, A, P>, params?: P): boolean {
