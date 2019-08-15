@@ -18,8 +18,14 @@ export class Puml {
         this.heads.newLine(head);
     }
 
-    public newDefinition(definition: string): void {
-        this.definitions.newLine(definition);
+    public newDefinition(fullName: string, alias: string): void {
+        this.definitions.newLine(`state "${fullName}" as ${alias}`);
+    }
+
+    public newBundlers(...bundlers: string[]): void {
+        for (const bundler of bundlers) {
+            this.definitions.newLine(`state ${bundler} <<choice>>`);
+        }
     }
 
     public openBlock(): void {
@@ -46,20 +52,30 @@ export class Puml {
     }
 
     public newTransition(from: string, to: string, action: string, direction: string): void {
-        this.transitions.newLine(`${from} -${direction}-> ${to}: ${action}`);
+        const act = action ? `: ${action}` : '';
+        this.transitions.newLine(`${from} -${direction}-> ${to}${act}`);
     }
 
-    public nextLine(): void {
+    public nextDefinition(): void {
         this.definitions.newLine();
-        this.transitions.newLine();
     }
 
     public toString(): string {
         return [
             `@startuml ${this.name}`,
+            '',
+            `''`,
+            `'' Options`,
+            `''`,
             ...this.heads.toArray(),
             '',
+            `''`,
+            `'' Definitions`,
+            `''`,
             ...this.definitions.toArray(),
+            `''`,
+            `'' Transitions`,
+            `''`,
             ...this.transitions.toArray(),
             `@enduml`
         ].join('\n');

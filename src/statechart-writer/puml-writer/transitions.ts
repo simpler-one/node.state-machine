@@ -1,4 +1,7 @@
 import { Transition } from './transition';
+import { StatechartItem } from '../../interface';
+import { TransitionBundle } from './private-interfaces';
+import { pathOf } from './utils';
 
 
 export class Transitions {
@@ -11,9 +14,10 @@ export class Transitions {
         }
     }
     
-    public toArray(bundle: boolean = false, from?: string): Transition[] {
-        return (bundle ? this.bundle(from) : [...this.map.values()])
-        .sort(Transition.compare);
+    public bundleAsNeeded(bundle: boolean = false, from?: StatechartItem): TransitionBundle {
+        const result = bundle ? this.bundle(from) : { transitions: [...this.map.values()], bundlers: [] };
+        result.transitions.sort(Transition.compare);
+        return result;
     }
 
     private addOne(transition: Transition): void {
@@ -22,7 +26,9 @@ export class Transitions {
         this.map.set(transition.path, newTr);
     }
 
-    private bundle(from: string): Transition[] {
+    private bundle(from: StatechartItem): TransitionBundle {
+        const internals = new Set<string>(getNameList(from));
+
         const bundler = new Map<string, Transition[]>();
         this.map.forEach(tr => {
             let bundled = bundler.get(tr.to);
@@ -34,17 +40,29 @@ export class Transitions {
             bundled.push(tr);
         });
 
-        const result: Transition[] = [];
-        bundler.forEach(transitions => {
-            if (transitions.length === 1) {
-                result.push(transitions[0]); // No bundle
+        const result: TransitionBundle = {
+            transitions: [],
+            bundlers: [],
+        };
+        bundler.forEach((transitions, to) => {
+            if (transitions.length === 1 || internals.has(to)) {
+                result.transitions.push(...transitions); // No bundle
                 return; // continue
             }
 
             transitions.sort(Transition.compare);
-            result.push(Transition.join(...transitions).newFrom(from));
+            const bundler = `__bundler_${from.name}_${to}_`;
+            result.transitions.push(...transitions.map(tr => tr.newDestination(bundler)));
+            result.transitions.push(new Transition(-1, bundler, to, ''));
+            result.bundlers.push(bundler);
         });
 
         return result;
     }
+}
+
+function getNameList(state: StatechartItem, result: string[] = []): string[] {
+    result.push(state.name);
+    state.children.forEach(child => getNameList(child, result));
+    return result;
 }

@@ -16,6 +16,7 @@ export class PumlWriter {
     private indices: number[];
     private count: number;
     private puml: Puml;
+    private parentMap: Map<string, string>;
     private readonly directionMap: DirectionMap;
 
     private constructor(
@@ -30,7 +31,7 @@ export class PumlWriter {
         return (chart) => writer.export(chart);
     }
 
-    private setHeads(): void {
+    private setOptions(): void {
         if (this.options.leftToRight !== LeftToRightOption.None) {
             this.puml.newHead('left to right direction');
         }
@@ -40,6 +41,19 @@ export class PumlWriter {
         this.indices = [0, 0];
         this.count = 0;
         this.puml = new Puml(chart.name, this.options);
+        this.parentMap = new Map();
+        this.setMap(chart.states, undefined);
+    }
+
+    private setMap(states: StatechartItem[], parent: string): void {
+        for (const state of states) {
+            const id = idOf(state.name);
+            if (parent) {
+                this.parentMap.set(id, parent);
+            }
+
+            this.setMap(state.children, id);
+        }
     }
 
     private setStates(states: StatechartItem[], transitions: Transitions): void {
@@ -70,22 +84,26 @@ export class PumlWriter {
             this.indices[ActionIndex]++;
         }
 
-        this.puml.newDefinition(`state "${fromState.name}" as ${from}`);
+        this.puml.newDefinition(fromState.name, from);
         if (fromState.children.length > 0) {
             const childrenTr = new Transitions();
             this.puml.openBlock();
             this.setStates(fromState.children, childrenTr);
+
+            const bundle = childrenTr.bundleAsNeeded(this.options.autoBundleOutgo, fromState);
+            this.puml.newBundlers(...bundle.bundlers);
+            transitions.add(...bundle.transitions);
+
             this.puml.closeBlock();
-            transitions.add(...childrenTr.toArray(this.options.autoBundleOutgo, from));
         }
 
-        this.puml.nextLine();
+        this.puml.nextDefinition();
         this.indices[StateIndex]++;
     }
 
     private setTransitions(transitions: Transition[]): void {
         for (const tr of transitions) {
-            const direction = this.directionMap.get(tr.from, tr.to);
+            const direction = this.directionMap.get(this.chainOf(tr.from), this.chainOf(tr.to));
             this.puml.newTransition(tr.from, tr.to, tr.action, direction);
         }
     }
@@ -93,9 +111,20 @@ export class PumlWriter {
     private export(chart: Statechart): string {
         const transitions = new Transitions();
         this.init(chart);
-        this.setHeads();
+        this.setOptions();
         this.setStates(chart.states, transitions);
-        this.setTransitions(transitions.toArray());
+        this.setTransitions(transitions.bundleAsNeeded().transitions);
         return this.puml.toString();
+    }
+
+    private chainOf(state: string): string[] {
+        const chain: string[] = [];
+        let cur = state;
+        do {
+            chain.push(cur);
+            cur = this.parentMap.get(cur);
+        } while (cur);
+
+        return chain;
     }
 }

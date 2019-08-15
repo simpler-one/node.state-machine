@@ -35,11 +35,11 @@ export class Transition {
         );
     }
 
-    public newFrom(from: string): Transition {
+    public newDestination(destination: string): Transition {
         return new Transition(
             this.order,
-            from,
-            this.to,
+            this.from,
+            destination,
             this.action,
         );
     }
