@@ -502,6 +502,74 @@ describe('StateMachine', () => {
             });
         });
 
+        describe('require', () => {
+            it(`should transit normally if transition is defined and state is expected`, () => {
+                // Given
+                const fsm = StateMachine.fromString('name', StringState.State1,
+                {
+                    state: StringState.State1,
+                    transitions: [
+                        [Action.Action1, StringState.State2]
+                    ]
+                });
+    
+                // When
+                fsm.start();
+                const result = fsm.require(Action.Action1, StringState.State2);
+    
+                // Then
+                expect(fsm.current).toBe(StringState.State2);
+                expect(result).toBe(true);
+            });
+
+            it(`should transit forcibly if transition is NOT defined`, () => {
+                // Given
+                const fsm = StateMachine.fromNamed('name', NamedState.State1,
+                {
+                    state: NamedState.State1,
+                    transitions: [
+                    ]
+                },
+                {
+                    state: NamedState.State2,
+                    transitions: [
+                    ]
+                });
+    
+                // When
+                fsm.start();
+                const result = fsm.require(Action.Action1, NamedState.State2);
+    
+                // Then
+                expect(fsm.current).toBe(NamedState.State2);
+                expect(result).toBe(false);
+            });
+
+            it(`should transit forcibly if transition is defined and state is NOT expected`, () => {
+                // Given
+                const fsm = StateMachine.fromNamed('name', NamedState.State1,
+                {
+                    state: NamedState.State1,
+                    transitions: [
+                        [Action.Action1, NamedState.State3]
+                    ]
+                },
+                {
+                    state: NamedState.State2,
+                    transitions: [
+                    ]
+                });
+    
+                // When
+                fsm.start();
+                const result = fsm.require(Action.Action1, NamedState.State2);
+    
+                // Then
+                expect(fsm.current).toBe(NamedState.State2);
+                expect(result).toBe(false);
+            });
+        });
+
         describe('reset', () => {
             it('should become meta start state when reset', () => {
                 // Given
