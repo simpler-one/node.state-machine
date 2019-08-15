@@ -47,11 +47,12 @@ export class PumlWriter {
 
     private setMap(states: StatechartItem[], parent: string): void {
         for (const state of states) {
+            const id = idOf(state.name);
             if (parent) {
-                this.parentMap.set(state.name, parent);
+                this.parentMap.set(id, parent);
             }
 
-            this.setMap(state.children, state.name);
+            this.setMap(state.children, id);
         }
     }
 

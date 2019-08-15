@@ -80,7 +80,7 @@ export interface PumlWriterOptions {
         /** Relative vertical position. Larger goes right */
         y?: number;
         /** Inner direction */
-        innerDirection: ArrowDirection;
+        innerDirection?: ArrowDirection;
     }[];
 }
 export namespace PumlWriterOptions {

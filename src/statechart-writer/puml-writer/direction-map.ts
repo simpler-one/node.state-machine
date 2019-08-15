@@ -38,9 +38,9 @@ export class DirectionMap {
     ) {
         this.arrows = DirectionMap.buildArrows(options.arrows);
         this.positions = new Map(
-            options.states.map(pos => [idOf(pos.state), {x: pos.x || 0, y: pos.y || 0}])
+            options.states.map(pos => [idOf(pos.name), {x: pos.x || 0, y: pos.y || 0}])
         );
-        this.innerDirections = nee Map(
+        this.innerDirections = new Map(
             options.states.map(state => [state.name, state.innerDirection])
         );
         this.defaultDirection = this.arrows.get(pathOf('', ''));
