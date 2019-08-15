@@ -8,7 +8,7 @@ import { ArrowDirection } from './interface';
 
 describe('PumlWriter', () => {
     describe('static', () => {
-        xdescribe('getWriter()', () => {
+        describe('getWriter()', () => {
             it('should return a writer', () => {
                 // Given
                 const opt = undefined;
@@ -21,7 +21,7 @@ describe('PumlWriter', () => {
             });
         });
 
-        xdescribe('export(without children)', () => {
+        describe('export(without children)', () => {
             const map: Statechart = {
                 name: 'SampleState',
                 states: [
@@ -194,7 +194,7 @@ describe('PumlWriter', () => {
                 ]
             };
 
-            xit('should return default optioned machine map', () => {
+            it('should return default optioned machine map', () => {
                 // Given
                 const writer = PumlWriter.getWriter();
                 // When
@@ -203,7 +203,7 @@ describe('PumlWriter', () => {
                 expect(result).toMatch(esc('state "State2" as State2 {'));
             });
 
-            xit('should return auto-bundled machine map', () => {
+            it('should return auto-bundled machine map', () => {
                 // Given
                 const writer = PumlWriter.getWriter({ autoBundleOutgo: true });
                 // When
