@@ -93,7 +93,7 @@ export class DirectionMap {
     }
 
     private positionOf(stateChain: string[]): Position {
-        let pos: Position = { x: 0, y: 0 };
+        const pos: Position = { x: 0, y: 0 };
         for (const state of stateChain) {
             const curPos = this.positions.get(state) || ZeroPos;
             pos.x += curPos.x;
