@@ -7,7 +7,7 @@
   "scripts": {
     "prepublishOnly": "npm uninstall && npm install && npm run build",
     "build": "rimraf dist && tsc -p src",
-    "test": "rimraf spec/built && tsc -p spec && istanbul cover node_modules/jasmine/bin/jasmine.js",
+    "test": "rimraf spec/built && tsc -p spec && istanbul cover node_modules/jasmine/bin/jasmine.js -x \"**/*.spec.js\"",
     "remapcov": "cat coverage/coverage.json | ./node_modules/.bin/remap-istanbul > coverage/coverage-remap.json && mv -f coverage/coverage-remap.json coverage/coverage.json",
     "remapcov:win": "type coverage\\coverage.json | .\\node_modules\\.bin\\remap-istanbul > coverage\\coverage-remap.json && del coverage\\coverage.json && ren coverage\\coverage-remap.json coverage.json",
     "exec": "ts-node -P .config/tsconfig.base.json --files"
@@ -34,6 +34,8 @@
   },
   "homepage": "https://github.com/work-work-komei/node.state-machine#readme",
   "dependencies": {
+    "@working-sloth/puml-writer": "^1.0.0",
+    "@working-sloth/statechart-interface": "^1.1.0",
     "rxjs": "^5.5.12"
   },
   "devDependencies": {

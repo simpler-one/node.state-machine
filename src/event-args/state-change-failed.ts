@@ -2,7 +2,7 @@ export class StateChangeFailedEvent<S, A, P = {}> {
     public get current(): S | undefined {
         return this.currentStates[this.currentStates.length - 1];
     }
-    public get currentTop(): S | undefined {
+    public get currentRoot(): S | undefined {
         return this.currentStates[0];
     }
 

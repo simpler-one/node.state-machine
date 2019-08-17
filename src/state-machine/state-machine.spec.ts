@@ -1,9 +1,10 @@
 import { StateMachine } from '.'
 import { MetaState, MetaStateAction } from '../state-meta'
-import { Statechart, StateType, OnEnterState, OnLeaveState } from '../interface';
+import { StateType, OnEnterState, OnLeaveState } from '../interface';
 import { buildDataMatrix } from '@working-sloth/data-matrix';
 import { StateHistory } from '../state-history';
 import { StateChangedEvent } from '../event-args';
+import { MetaStartStateName, Statechart } from '@working-sloth/statechart-interface';
 
 enum StringState {
     State1 = 'State1',
@@ -458,6 +459,24 @@ describe('StateMachine', () => {
             });
         });
 
+        describe('forceSet', () => {
+            it(`should throw if state is NOT defined`, () => {
+                // Given
+                const fsm = StateMachine.fromString('name', StringState.State1);
+                let err = false;
+
+                // When
+                try {
+                    fsm.forceSet(StringState.State2, '');
+                } catch (e) {
+                    err = true;
+                }
+    
+                // Then
+                expect(err).toBe(true);
+            });
+        });
+
         describe('forceIfFail', () => {
             it(`should transit normally if transition is defined`, () => {
                 // Given
@@ -495,6 +514,74 @@ describe('StateMachine', () => {
                 // When
                 fsm.start();
                 const result = fsm.forceIfFail(Action.Action1, NamedState.State2);
+    
+                // Then
+                expect(fsm.current).toBe(NamedState.State2);
+                expect(result).toBe(false);
+            });
+        });
+
+        describe('require', () => {
+            it(`should transit normally if transition is defined and state is expected`, () => {
+                // Given
+                const fsm = StateMachine.fromString('name', StringState.State1,
+                {
+                    state: StringState.State1,
+                    transitions: [
+                        [Action.Action1, StringState.State2]
+                    ]
+                });
+    
+                // When
+                fsm.start();
+                const result = fsm.require(Action.Action1, StringState.State2);
+    
+                // Then
+                expect(fsm.current).toBe(StringState.State2);
+                expect(result).toBe(true);
+            });
+
+            it(`should transit forcibly if transition is NOT defined`, () => {
+                // Given
+                const fsm = StateMachine.fromNamed('name', NamedState.State1,
+                {
+                    state: NamedState.State1,
+                    transitions: [
+                    ]
+                },
+                {
+                    state: NamedState.State2,
+                    transitions: [
+                    ]
+                });
+    
+                // When
+                fsm.start();
+                const result = fsm.require(Action.Action1, NamedState.State2);
+    
+                // Then
+                expect(fsm.current).toBe(NamedState.State2);
+                expect(result).toBe(false);
+            });
+
+            it(`should transit forcibly if transition is defined and state is NOT expected`, () => {
+                // Given
+                const fsm = StateMachine.fromNamed('name', NamedState.State1,
+                {
+                    state: NamedState.State1,
+                    transitions: [
+                        [Action.Action1, NamedState.State3]
+                    ]
+                },
+                {
+                    state: NamedState.State2,
+                    transitions: [
+                    ]
+                });
+    
+                // When
+                fsm.start();
+                const result = fsm.require(Action.Action1, NamedState.State2);
     
                 // Then
                 expect(fsm.current).toBe(NamedState.State2);
@@ -626,6 +713,19 @@ describe('StateMachine', () => {
             });
         });
 
+        describe('currentIs', () => {
+            const fsm = StateMachine.fromNamed('name', NamedState.State1);
+            fsm.start();
+
+            it('(by string)', () => {
+                expect(fsm.currentIs(StringState.State1));
+            });
+
+            it('(by state)', () => {
+                expect(fsm.currentIs(NamedState.State1));
+            });
+        });
+
         describe('toChart', () => {
             it('should return only meta start map if state is empty', () => {
                 // Given
@@ -639,7 +739,7 @@ describe('StateMachine', () => {
                 expect(result).toEqual({
                     name,
                     states: [{
-                        name: MetaState.StartName,
+                        name: MetaStartStateName,
                         transitions: [{
                             action: MetaStateAction.DoStart,
                             destination: StringState.State1
@@ -685,7 +785,7 @@ describe('StateMachine', () => {
                         transitions: [],
                         children: [],
                     }, {
-                        name: MetaState.StartName,
+                        name: MetaStartStateName,
                         transitions: [{
                             action: MetaStateAction.DoStart,
                             destination: StringState.State1
@@ -731,7 +831,61 @@ describe('StateMachine', () => {
                             children: [],
                         }],
                     }, {
-                        name: MetaState.StartName,
+                        name: MetaStartStateName,
+                        transitions: [{
+                            action: MetaStateAction.DoStart,
+                            destination: StringState.State1
+                        }],
+                        children: [],
+                    }]
+                });
+            });
+
+            it('should return user-defined map if some states are defined (with start children)', () => {
+                // Given
+                const name = 'name';
+                const fsm = StateMachine.fromString<StringState, Action>(
+                    name,
+                    StringState.State1,
+                    {
+                        state: StringState.State1,
+                        transitions: [
+                            [Action.Action1, StringState.State2]
+                        ],
+                        children: [{
+                            state: StringState.State2,
+                            transitions: []
+                        }],
+                        startChild: StringState.State2,
+                    }
+                );
+
+                // When
+                const result = fsm.toChart();
+
+                // Then
+                expect(result).toEqual({
+                    name,
+                    states: [{
+                        name: StringState.State1,
+                        transitions: [{
+                            action: Action.Action1,
+                            destination: StringState.State2
+                        }],
+                        children: [{
+                            name: MetaStartStateName,
+                            transitions: [{
+                                action: MetaStateAction.DoStart,
+                                destination: StringState.State2,
+                            }],
+                            children: [],
+                        }, {
+                            name: StringState.State2,
+                            transitions: [],
+                            children: [],
+                        }],
+                    }, {
+                        name: MetaStartStateName,
                         transitions: [{
                             action: MetaStateAction.DoStart,
                             destination: StringState.State1
@@ -874,6 +1028,26 @@ describe('StateMachine', () => {
             });
         });
 
+        it('current', () => {
+            // Given
+            const fsm = StateMachine.fromString('name', StringState.State1);
+            fsm.start();
+            // When
+            const result = fsm.current;
+            // Then
+            expect(result).toBe(StringState.State1);
+        });
+
+        it('currentRoot', () => {
+            // Given
+            const fsm = StateMachine.fromString('name', StringState.State1);
+            fsm.start();
+            // When
+            const result = fsm.currentRoot;
+            // Then
+            expect(result).toBe(StringState.State1);
+        });
+
         describe('historyCapacity', () => {
             it('should set normally if not negative value was set', () => {
                 // Given
@@ -898,7 +1072,7 @@ describe('StateMachine', () => {
                 // Then
                 expect(fsm.historyCapacity).toBe(0);
             });
-        })
+        });
 
         describe('histories', () => {
             it('should return histories', () => {
@@ -925,7 +1099,7 @@ describe('StateMachine', () => {
 
                 // Then
                 const expected = [
-                    new StateHistory(undefined, [], [MetaState.StartName], [StringState.State1], MetaStateAction.DoStart, false),
+                    new StateHistory(undefined, [], [MetaStartStateName], [StringState.State1], MetaStateAction.DoStart, false),
                     new StateHistory(undefined, [], [StringState.State1], [StringState.State2], Action.Action1, false),
                     new StateHistory(undefined, [], [StringState.State2], [StringState.State1], Action.Action2, false),
                     new StateHistory(undefined, [], [StringState.State1], undefined, Action.Action2, false),
