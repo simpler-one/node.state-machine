@@ -127,13 +127,25 @@ export class StateMachine<S, A extends string, P = {}> {
     private static toChartItem<S, A extends string, P>(
         type: LinkedStateType<S, A, P>
     ): StatechartItem {
+        const startChild: StatechartItem[] = [];
+        if (type.startChild) {
+            startChild.push({
+                name: MetaStartStateName,
+                transitions: [{
+                    action: MetaAction.DoStart,
+                    destination: type.startChild.name,
+                }],
+                children: [],
+            });
+        }
+
         return {
             name: type.name,
             transitions: Array.from(type.mapEntries()).map(transition => ({
                 action: transition[0],
                 destination: transition[1].name,
             } as StatechartTransition)),
-            children: type.children.map(child => this.toChartItem(child)),
+            children: startChild.concat(type.children.map(child => this.toChartItem(child))),
         };
     }
 

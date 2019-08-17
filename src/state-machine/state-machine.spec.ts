@@ -823,6 +823,60 @@ describe('StateMachine', () => {
                 });
             });
 
+            it('should return user-defined map if some states are defined (with start children)', () => {
+                // Given
+                const name = 'name';
+                const fsm = StateMachine.fromString<StringState, Action>(
+                    name,
+                    StringState.State1,
+                    {
+                        state: StringState.State1,
+                        transitions: [
+                            [Action.Action1, StringState.State2]
+                        ],
+                        children: [{
+                            state: StringState.State2,
+                            transitions: []
+                        }],
+                        startChild: StringState.State2,
+                    }
+                );
+
+                // When
+                const result = fsm.toChart();
+
+                // Then
+                expect(result).toEqual({
+                    name,
+                    states: [{
+                        name: StringState.State1,
+                        transitions: [{
+                            action: Action.Action1,
+                            destination: StringState.State2
+                        }],
+                        children: [{
+                            name: MetaStartStateName,
+                            transitions: [{
+                                action: MetaStateAction.DoStart,
+                                destination: StringState.State2,
+                            }],
+                            children: [],
+                        }, {
+                            name: StringState.State2,
+                            transitions: [],
+                            children: [],
+                        }],
+                    }, {
+                        name: MetaStartStateName,
+                        transitions: [{
+                            action: MetaStateAction.DoStart,
+                            destination: StringState.State1
+                        }],
+                        children: [],
+                    }]
+                });
+            });
+
             it('should return same map each other', () => {
                 // Given
                 const name = 'name';
