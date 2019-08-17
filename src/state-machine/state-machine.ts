@@ -1,5 +1,7 @@
 import { StateType, StateMachineItem, NamedState, OnLeaveState, OnEnterState } from '../interface';
-import { StatechartWriter, Statechart, StatechartItem, StatechartTransition, MetaStartStateName, MetaAnytimeStateName } from '@working-sloth/statechart-interface';
+import {
+    StatechartWriter, Statechart, StatechartItem, StatechartTransition, MetaStartStateName, MetaAnytimeStateName
+} from '@working-sloth/statechart-interface';
 import { StateChangedEvent, StateChangeFailedEvent } from '../event-args';
 import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from '../state-meta';
 import { Subject, Observable } from 'rxjs';
