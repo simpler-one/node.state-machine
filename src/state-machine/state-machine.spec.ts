@@ -459,6 +459,24 @@ describe('StateMachine', () => {
             });
         });
 
+        describe('forceSet', () => {
+            it(`should throw if state is NOT defined`, () => {
+                // Given
+                const fsm = StateMachine.fromString('name', StringState.State1);
+                let err = false;
+
+                // When
+                try {
+                    fsm.forceSet(StringState.State2, '');
+                } catch (e) {
+                    err = true;
+                }
+    
+                // Then
+                expect(err).toBe(true);
+            });
+        });
+
         describe('forceIfFail', () => {
             it(`should transit normally if transition is defined`, () => {
                 // Given
