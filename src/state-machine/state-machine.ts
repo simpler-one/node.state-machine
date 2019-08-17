@@ -1,12 +1,12 @@
+import { StateType, StateMachineItem, NamedState, OnLeaveState, OnEnterState } from '../interface';
 import {
-    StateType, StateMachineItem, NamedState, StatechartWriter,
-    Statechart, StatechartItem, StatechartTransition, OnLeaveState, OnEnterState
-} from '../interface';
+    StatechartWriter, Statechart, StatechartItem, StatechartTransition, MetaStartStateName, MetaAnytimeStateName
+} from '@working-sloth/statechart-interface';
 import { StateChangedEvent, StateChangeFailedEvent } from '../event-args';
 import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from '../state-meta';
 import { Subject, Observable } from 'rxjs';
 import { StateHistory } from '../state-history';
-import { StartType, StartName } from '../state-meta/meta-state';
+import { StartType } from '../state-meta/meta-state';
 import { LinkedStateType } from './linked-state-type';
 import { MapBuilder } from './map-builder';
 import { NolItem } from '../private-interface';
@@ -76,7 +76,7 @@ export class StateMachine<S, A extends string, P = {}> {
         start: StateType<S, A, P>,
         items: NolItem<S, A, P>[]
     ) {
-        const anytimeI: number = items.findIndex(item => `${item.state}` === MetaState.AnytimeName);
+        const anytimeI: number = items.findIndex(item => `${item.state}` === MetaAnytimeStateName);
         let anytimeTransitions: [A, StateType<S, A, P>][] = [];
         if (anytimeI >= 0) {
             anytimeTransitions = items.splice(anytimeI, 1)[0].transitions;
@@ -85,7 +85,7 @@ export class StateMachine<S, A extends string, P = {}> {
         this.map = MapBuilder.build(items, anytimeTransitions);
 
         const metaStart = new LinkedStateType<S, A, P>(StartType, undefined);
-        this.map.set(MetaState.StartName, metaStart);
+        this.map.set(MetaStartStateName, metaStart);
         let startNode = this.map.get(start.name);
         if (!startNode) {
             startNode = new LinkedStateType(start, undefined);
@@ -267,7 +267,7 @@ export class StateMachine<S, A extends string, P = {}> {
      */
     public reset(): void {
         const old = this._current;
-        const metaStart = this.map.get(StartName);
+        const metaStart = this.map.get(MetaStartStateName);
         this._current = [new ActiveState(metaStart, MetaState.Start)];
         this.onStateChanged([], old, this._current, undefined, MetaStateAction.ResetName, undefined, true);
     }

@@ -1,9 +1,10 @@
 import { StateMachine } from '.'
 import { MetaState, MetaStateAction } from '../state-meta'
-import { Statechart, StateType, OnEnterState, OnLeaveState } from '../interface';
+import { StateType, OnEnterState, OnLeaveState } from '../interface';
 import { buildDataMatrix } from '@working-sloth/data-matrix';
 import { StateHistory } from '../state-history';
 import { StateChangedEvent } from '../event-args';
+import { MetaStartStateName, Statechart } from '@working-sloth/statechart-interface';
 
 enum StringState {
     State1 = 'State1',
@@ -707,7 +708,7 @@ describe('StateMachine', () => {
                 expect(result).toEqual({
                     name,
                     states: [{
-                        name: MetaState.StartName,
+                        name: MetaStartStateName,
                         transitions: [{
                             action: MetaStateAction.DoStart,
                             destination: StringState.State1
@@ -753,7 +754,7 @@ describe('StateMachine', () => {
                         transitions: [],
                         children: [],
                     }, {
-                        name: MetaState.StartName,
+                        name: MetaStartStateName,
                         transitions: [{
                             action: MetaStateAction.DoStart,
                             destination: StringState.State1
@@ -799,7 +800,7 @@ describe('StateMachine', () => {
                             children: [],
                         }],
                     }, {
-                        name: MetaState.StartName,
+                        name: MetaStartStateName,
                         transitions: [{
                             action: MetaStateAction.DoStart,
                             destination: StringState.State1
@@ -993,7 +994,7 @@ describe('StateMachine', () => {
 
                 // Then
                 const expected = [
-                    new StateHistory(undefined, [], [MetaState.StartName], [StringState.State1], MetaStateAction.DoStart, false),
+                    new StateHistory(undefined, [], [MetaStartStateName], [StringState.State1], MetaStateAction.DoStart, false),
                     new StateHistory(undefined, [], [StringState.State1], [StringState.State2], Action.Action1, false),
                     new StateHistory(undefined, [], [StringState.State2], [StringState.State1], Action.Action2, false),
                     new StateHistory(undefined, [], [StringState.State1], undefined, Action.Action2, false),
