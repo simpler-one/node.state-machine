@@ -7,7 +7,7 @@ describe('StateChangeFailedEvent', () => {
 
     type Test = { label: string, input: {}, expect: {} };
     const tests = buildDataMatrix<Test>([
-        'label',        'input',            'expect'
+        'label          input               expect',
     ], [
         ['current',     Arg.current,        '3'],
         ['currentRoot', Arg.currentRoot,    '1'],

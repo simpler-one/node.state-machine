@@ -9,7 +9,7 @@ describe('StateChangedEvent', () => {
 
     type Test = { label: string, input: {}, expect: {} };
     const tests = buildDataMatrix<Test>([
-        'label',            'input',            'expect'
+        'label              input               expect'
     ], [
         ['old',             Arg.old,            '3'],
         ['new',             Arg.new,            '5'],
