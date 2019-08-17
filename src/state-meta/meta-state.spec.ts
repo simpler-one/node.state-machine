@@ -1,6 +1,20 @@
-import { Anytime } from './meta-state';
+import { Anytime, StartType } from './meta-state';
 import { StateType } from '../interface';
 import { StateMachine } from '../state-machine';
+import { MetaAnytimeStateName, MetaStartStateName } from '@working-sloth/statechart-interface';
+
+
+
+describe('StartType', () => {
+    const start: StateType<string, string> = StartType;
+    it('getState()', () => {
+        expect(start.getState(undefined, undefined)).toBe(undefined);
+    });
+
+    it('toString()', () => {
+        expect(start.toString()).toBe(MetaStartStateName);
+    });
+});
 
 
 describe('Anytime', () => {
@@ -18,5 +32,10 @@ describe('Anytime', () => {
 
             expect(error).toBeTruthy();
         });
+    });
+
+    it('toString()', () => {
+        const anytime: {} = Anytime;
+        expect(anytime.toString()).toBe(MetaAnytimeStateName);
     });
 });
