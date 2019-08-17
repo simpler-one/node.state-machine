@@ -53,22 +53,3 @@ export interface StateMachineItem<S, A> {
     startChild?: S;
     children?: StateMachineItem<S, A>[];
 }
-
-
-export interface Statechart {
-    name: string;
-    states: StatechartItem[];
-}
-
-export interface StatechartItem {
-    name: string;
-    transitions: StatechartTransition[];
-    children: StatechartItem[];
-}
-
-export interface StatechartTransition {
-    action: string;
-    destination: string;
-}
-
-export type StatechartWriter = (map: Statechart) => string;

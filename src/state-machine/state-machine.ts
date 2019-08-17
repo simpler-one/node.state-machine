@@ -1,12 +1,12 @@
+import { StateType, StateMachineItem, NamedState, OnLeaveState, OnEnterState } from '../interface';
 import {
-    StateType, StateMachineItem, NamedState, StatechartWriter,
-    Statechart, StatechartItem, StatechartTransition, OnLeaveState, OnEnterState
-} from '../interface';
+    StatechartWriter, Statechart, StatechartItem, StatechartTransition, MetaStartStateName, MetaAnytimeStateName
+} from '@working-sloth/statechart-interface';
 import { StateChangedEvent, StateChangeFailedEvent } from '../event-args';
 import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from '../state-meta';
 import { Subject, Observable } from 'rxjs';
 import { StateHistory } from '../state-history';
-import { StartType, StartName } from '../state-meta/meta-state';
+import { StartType } from '../state-meta/meta-state';
 import { LinkedStateType } from './linked-state-type';
 import { MapBuilder } from './map-builder';
 import { NolItem } from '../private-interface';
@@ -76,7 +76,7 @@ export class StateMachine<S, A extends string, P = {}> {
         start: StateType<S, A, P>,
         items: NolItem<S, A, P>[]
     ) {
-        const anytimeI: number = items.findIndex(item => `${item.state}` === MetaState.AnytimeName);
+        const anytimeI: number = items.findIndex(item => `${item.state}` === MetaAnytimeStateName);
         let anytimeTransitions: [A, StateType<S, A, P>][] = [];
         if (anytimeI >= 0) {
             anytimeTransitions = items.splice(anytimeI, 1)[0].transitions;
@@ -85,7 +85,7 @@ export class StateMachine<S, A extends string, P = {}> {
         this.map = MapBuilder.build(items, anytimeTransitions);
 
         const metaStart = new LinkedStateType<S, A, P>(StartType, undefined);
-        this.map.set(MetaState.StartName, metaStart);
+        this.map.set(MetaStartStateName, metaStart);
         let startNode = this.map.get(start.name);
         if (!startNode) {
             startNode = new LinkedStateType(start, undefined);
@@ -127,13 +127,25 @@ export class StateMachine<S, A extends string, P = {}> {
     private static toChartItem<S, A extends string, P>(
         type: LinkedStateType<S, A, P>
     ): StatechartItem {
+        const startChild: StatechartItem[] = [];
+        if (type.startChild) {
+            startChild.push({
+                name: MetaStartStateName,
+                transitions: [{
+                    action: MetaAction.DoStart,
+                    destination: type.startChild.name,
+                }],
+                children: [],
+            });
+        }
+
         return {
             name: type.name,
             transitions: Array.from(type.mapEntries()).map(transition => ({
                 action: transition[0],
                 destination: transition[1].name,
             } as StatechartTransition)),
-            children: type.children.map(child => this.toChartItem(child)),
+            children: startChild.concat(type.children.map(child => this.toChartItem(child))),
         };
     }
 
@@ -174,7 +186,7 @@ export class StateMachine<S, A extends string, P = {}> {
             this.addHistory(StateHistory.error([], this._current.map(s => s.name), action));
             this._stateChangeFailed.next(new StateChangeFailedEvent(
                 this.currentStates, action, params,
-                `[${this.name}] Invalid action. ${joinName(this._current)} -> ? : ${action}`
+                `[${this.name}] Invalid action. ${this.curLeaf.name} -> ? : ${action}`
             ));
             return false;
         }
@@ -188,16 +200,78 @@ export class StateMachine<S, A extends string, P = {}> {
      * @param action action
      * @param forcedStateName forced state name on failed
      * @param params params for getState(*)
-     * @returns success
+     * @returns transited normally
      * @throws RangeError
      */
-    public forceIfFail(action: A, forcedStateName: string, params?: P): boolean {
+    public forceIfFail(action: A, forcedStateName: string, params?: P): boolean;
+    /**
+     * Change current state forcibly if transition failed
+     * @param action action
+     * @param forcedStateNameOwner forced state name owner on failed
+     * @param params params for getState(*)
+     * @returns transited normally
+     * @throws RangeError
+     */
+    public forceIfFail(action: A, forcedStateNameOwner: NamedState, params?: P): boolean;
+    /**
+     * Change current state forcibly if transition failed
+     * @param action action
+     * @param forcedStateNameOwner forced state name owner on failed
+     * @param params params for getState(*)
+     * @returns transited normally
+     * @throws RangeError
+     */
+    public forceIfFail(action: A, forcedStateNameOwner: StateType<S, A, P>, params?: P): boolean;
+    public forceIfFail(action: A, forcedStateNameLike: string | NamedState | StateType<S, A, P>, params?: P): boolean {
         const success = this.do(action, params);
         if (!success) {
-            this.forceSet(forcedStateName, action, params);
+            const name = typeof forcedStateNameLike === "string" ? forcedStateNameLike : forcedStateNameLike.name;
+            this.forceSet(name, action, params);
         }
 
         return success;
+    }
+
+    /**
+     * Require state to equal expected after the action.
+     * If the action makes state expected one, do nothing
+     * Else, set state forcibly
+     * @param action action
+     * @param expectedStateName expected state name
+     * @returns transited normally
+     * @throws RangeError
+     */
+    public require(action: A, expectedStateName: string, params?: P): boolean 
+    /**
+     * Require state to equal expected after the action.
+     * If the action makes state expected one, do nothing
+     * Else, set state forcibly
+     * @param action action
+     * @param expectedStateNameOwner expected state name owner
+     * @returns transited normally
+     * @throws RangeError
+     */
+    public require(action: A, expectedStateNameOwner: NamedState, params?: P): boolean 
+    /**
+     * Require state to equal expected after the action.
+     * If the action makes state expected one, do nothing
+     * Else, set state forcibly
+     * @param action action
+     * @param expectedStateNameOwner expected state name owner
+     * @returns transited normally
+     * @throws RangeError
+     */
+    public require(action: A, expectedStateNameOwner: StateType<S, A, P>, params?: P): boolean;
+    public require(action: A, expectedStateNameLike: string | NamedState | StateType<S, A, P>, params?: P): boolean {
+        const name = typeof expectedStateNameLike === 'string' ? expectedStateNameLike : expectedStateNameLike.name;
+        const type = this.getDestination(action);
+        if (type !== undefined && type.name === name) {
+            this.setState(type, action, params, false);
+            return true;
+        }
+
+        this.forceSet(name, action, params);
+        return false;
     }
 
     /**
@@ -205,7 +279,7 @@ export class StateMachine<S, A extends string, P = {}> {
      */
     public reset(): void {
         const old = this._current;
-        const metaStart = this.map.get(StartName);
+        const metaStart = this.map.get(MetaStartStateName);
         this._current = [new ActiveState(metaStart, MetaState.Start)];
         this.onStateChanged([], old, this._current, undefined, MetaStateAction.ResetName, undefined, true);
     }
@@ -256,7 +330,9 @@ export class StateMachine<S, A extends string, P = {}> {
     public toChart(): Statechart {
         return {
             name: this.name,
-            states: Array.from(this.map.values()).map(type => StateMachine.toChartItem(type))
+            states: Array.from(this.map.values())
+                .filter(type => type.parent === undefined)
+                .map(type => StateMachine.toChartItem(type))
         };
     }
 
@@ -317,10 +393,7 @@ export class StateMachine<S, A extends string, P = {}> {
     ): void {
         this.addHistory(StateHistory.ok([], old.map(s => s.name), newStates.map(s => s.name), action, forced));
 
-        const transitionMsg = common.length > 0 ?
-            `${joinName(common)} {${joinName(old)} -> ${joinName(newStates)}}` :
-            `${joinName(old)} -> ${joinName(newStates)}`
-        ;
+        const transitionMsg = toTransition(common, old, newStates);
         const forcedMsg = forced ? '(forced)' : '';
         const event = new StateChangedEvent(
             common.map(state => state.instance),
@@ -339,6 +412,10 @@ export class StateMachine<S, A extends string, P = {}> {
 }
 
 
-function joinName(named: ActiveState<{}, string, {}>[]): string {
-    return named.map(s => s.name).join('/');
+function toTransition(
+    common: ActiveState<{}, string, {}>[],
+    old: ActiveState<{}, string, {}>[],
+    newStates: ActiveState<{}, string, {}>[],
+): string {
+    return `${[...common, ...old].pop().name} -> ${[...common, ...newStates].pop().name}`;
 }
