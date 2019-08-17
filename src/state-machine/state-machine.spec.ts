@@ -695,6 +695,19 @@ describe('StateMachine', () => {
             });
         });
 
+        describe('currentIs', () => {
+            const fsm = StateMachine.fromNamed('name', NamedState.State1);
+            fsm.start();
+
+            it('(by string)', () => {
+                expect(fsm.currentIs(StringState.State1));
+            });
+
+            it('(by state)', () => {
+                expect(fsm.currentIs(NamedState.State1));
+            });
+        });
+
         describe('toChart', () => {
             it('should return only meta start map if state is empty', () => {
                 // Given
@@ -943,6 +956,26 @@ describe('StateMachine', () => {
             });
         });
 
+        it('current', () => {
+            // Given
+            const fsm = StateMachine.fromString('name', StringState.State1);
+            fsm.start();
+            // When
+            const result = fsm.current;
+            // Then
+            expect(result).toBe(StringState.State1);
+        });
+
+        it('currentRoot', () => {
+            // Given
+            const fsm = StateMachine.fromString('name', StringState.State1);
+            fsm.start();
+            // When
+            const result = fsm.currentRoot;
+            // Then
+            expect(result).toBe(StringState.State1);
+        });
+
         describe('historyCapacity', () => {
             it('should set normally if not negative value was set', () => {
                 // Given
@@ -967,7 +1000,7 @@ describe('StateMachine', () => {
                 // Then
                 expect(fsm.historyCapacity).toBe(0);
             });
-        })
+        });
 
         describe('histories', () => {
             it('should return histories', () => {
