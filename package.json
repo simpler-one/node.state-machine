@@ -34,6 +34,8 @@
   },
   "homepage": "https://github.com/work-work-komei/node.state-machine#readme",
   "dependencies": {
+    "@working-sloth/puml-writer": "^1.0.0",
+    "@working-sloth/statechart-interface": "^1.1.0",
     "rxjs": "^6.5.2"
   },
   "devDependencies": {
