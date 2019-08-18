@@ -105,15 +105,14 @@ if (fsm.can(SlothAction.Sleep)) {
 
 ### case: Named static state (rich state)
  真に驚くべきサンプルがあるが、ここに書くには余白が狭すぎる
- [See samples](samples)
+ [See samples](https://github.com/work-work-komei/node.state-machine.samples/tree/master/src)
 
 ### case: Typed dynamic state (ライフサイクル付きrich state)
  真に驚くべきサンプルがあるが、ここに書くには余白が狭すぎる
- [See samples](samples)
+ [See samples](https://github.com/work-work-komei/node.state-machine.samples/tree/master/src)
 
 ## 予定
 - PlantUMLからの逆変換: 明日やる
-- ステートのネスト: 明日やる
 - ドキュメントの充実: 明日やる
 - CLIからの遷移図エクスポート: 明日やる
 - 休憩: 毎日
