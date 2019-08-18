@@ -1,4 +1,6 @@
-import { StateMachine, PumlWriter, AutoIndex } from '@working-sloth/state-machine';
+import { StateMachine } from '@working-sloth/state-machine';
+import { PumlWriter, AutoIndex } from '@working-sloth/puml-writer';
+
 
 
 enum SlothAction {
