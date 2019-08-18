@@ -16,7 +16,7 @@ Let's be lazy.
     <tr>
         <th>Poor state<br>(Before)</th>
         <td>
-<pre style="margin: 0">
+<pre>
 if (fsm.current === 'Doing' || fsm.curent === 'Waiting' || ...) {
     showProgress();
 }
@@ -37,7 +37,7 @@ if (fsm.current === 'Cancel') {
     <tr>
         <th>Rich state<br>(After)</th>
         <td>
-<pre style="margin: 0">
+<pre>
 if (fsm.current.inProgress) {
     showProgress();
 }
@@ -104,15 +104,14 @@ if (fsm.can(SlothAction.Sleep)) {
 
 ### case: Named static state (rich state)
  I have a truly marvelous sample of this case which this margin is too narrow to contain.
- [See samples](samples)
+ [See samples](https://github.com/work-work-komei/node.state-machine.samples/tree/master/src)
 
 ### case: Typed dynamic state (rich state with life cycle)
  I have a truly marvelous sample of this case which this margin is too narrow to contain.
- [See samples](samples)
+ [See samples](https://github.com/work-work-komei/node.state-machine.samples/tree/master/src)
 
 ## Schedule
 - Create string-based fsm from PlantUML: someday
-- State nesting: someday
 - Crate docs: someday
 - Export statecharts from CLI: someday
 - Rest: every day
