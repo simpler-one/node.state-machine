@@ -58,7 +58,7 @@ fsm.current.show();
 - Rich object state: user defined class can be state
 - State with life-cycle: create/dispose
 - Export statecharts: PlantUML
-- Learning cost: basic takes only 1 step, rich state takes only 3 steps, full function takes 6 only steps to learn
+- Learning cost: basic takes only 1 step, rich state takes only 2 more steps, full function takes only 3 more steps to learn
 
 ## Quick start
 ### case: String state (most simple)
