@@ -120,5 +120,5 @@ if (fsm.can(SlothAction.Sleep)) {
 - Be stupid and diligent: never
 
 ## If you aren't satisfied
-- [Open an issue](https://github.com/work-work-komei/node.data-matrix/issues) such as "question" or "enhancement"
+- [Open an issue](https://github.com/work-work-komei/node.state-machine/issues) such as "question" or "enhancement"
 - e-mail: koba.work.work1127@gmail.com
