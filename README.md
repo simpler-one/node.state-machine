@@ -8,7 +8,7 @@ English | [日本語](README-jp.md)
 [![codecov](https://codecov.io/gh/work-work-komei/node.state-machine/branch/develop/graph/badge.svg)](https://codecov.io/gh/work-work-komei/node.state-machine)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-![StateMachine](samples/1.quick-start/state.png)
+![StateMachine](https://github.com/work-work-komei/node.state-machine.samples/blob/master/src/1.quick-start/state.png?raw=true)
 
 Diligent developer, is it your work to create state machine from scratch or take care of poor state machine?
 Let's be lazy.
@@ -120,5 +120,5 @@ if (fsm.can(SlothAction.Sleep)) {
 - Be stupid and diligent: never
 
 ## If you aren't satisfied
-- [Open an issue](https://github.com/work-work-komei/node.data-matrix/issues) such as "question" or "enhancement"
+- [Open an issue](https://github.com/work-work-komei/node.state-machine/issues) such as "question" or "enhancement"
 - e-mail: koba.work.work1127@gmail.com
