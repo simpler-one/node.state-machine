@@ -8,7 +8,7 @@ English | [日本語](README-jp.md)
 [![codecov](https://codecov.io/gh/work-work-komei/node.state-machine/branch/develop/graph/badge.svg)](https://codecov.io/gh/work-work-komei/node.state-machine)
 [![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
 
-![StateMachine](samples/1.quick-start/state.png)
+![StateMachine](https://github.com/work-work-komei/node.state-machine.samples/blob/master/src/1.quick-start/state.png?raw=true)
 
 Diligent developer, is it your work to create state machine from scratch or take care of poor state machine?
 Let's be lazy.
@@ -58,7 +58,7 @@ fsm.current.show();
 - Rich object state: user defined class can be state
 - State with life-cycle: create/dispose
 - Export statecharts: PlantUML
-- Learning cost: basic takes only 1 step, rich state takes only 3 steps, full function takes 6 only steps to learn
+- Learning cost: basic takes only 1 step, rich state takes only 2 more steps, full function takes only 3 more steps to learn
 
 ## Quick start
 ### case: String state (most simple)
@@ -120,5 +120,5 @@ if (fsm.can(SlothAction.Sleep)) {
 - Be stupid and diligent: never
 
 ## If you aren't satisfied
-- [Open an issue](https://github.com/work-work-komei/node.data-matrix/issues) such as "question" or "enhancement"
+- [Open an issue](https://github.com/work-work-komei/node.state-machine/issues) such as "question" or "enhancement"
 - e-mail: koba.work.work1127@gmail.com

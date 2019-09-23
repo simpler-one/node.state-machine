@@ -275,7 +275,7 @@ export class StateMachine<S, A extends string, P = {}> {
     }
 
     /**
-     * Reset state
+     * Reset state to meta start
      */
     public reset(): void {
         const old = this._current;
