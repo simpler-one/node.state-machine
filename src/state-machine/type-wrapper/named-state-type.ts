@@ -1,5 +1,5 @@
-import { NamedState, OnEnterState, OnLeaveState, StateType } from '../../interface';
-import { StateChangedEvent } from '../../event-args';
+import { NamedState, OnEnterState, OnLeaveState, StateType } from "../../interface";
+import { StateChangedEvent } from "../../event-args";
 
 
 export class NamedType<S extends NamedState, A extends string, P>

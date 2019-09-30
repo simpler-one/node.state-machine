@@ -1,6 +1,6 @@
 // tslint:disable:no-namespace
-import { StateMachine } from "./state-machine";
 import { StateChangedEvent } from "./event-args";
+import { StateMachine } from "./state-machine";
 
 
 export interface NamedState {

@@ -1,3 +1,8 @@
 {
-    "extends": ["tslint:recommended"]
+    "extends": ["tslint:recommended"],
+    "rules": {
+        "array-type": [true, "array"],
+        "interface-name": [false],
+        "no-consecutive-blank-lines": false
+    }
 }

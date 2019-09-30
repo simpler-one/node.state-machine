@@ -1,17 +1,17 @@
-import { StateType, StateMachineItem, NamedState, OnLeaveState, OnEnterState } from '../interface';
+import { StateType, StateMachineItem, NamedState, OnLeaveState, OnEnterState } from "../interface";
 import {
     StatechartWriter, Statechart, StatechartItem, StatechartTransition, MetaStartStateName, MetaAnytimeStateName
-} from '@working-sloth/statechart-interface';
-import { StateChangedEvent, StateChangeFailedEvent } from '../event-args';
-import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from '../state-meta';
-import { Subject, Observable } from 'rxjs';
-import { StateHistory } from '../state-history';
-import { StartType } from '../state-meta/meta-state';
-import { LinkedStateType } from './linked-state-type';
-import { MapBuilder } from './map-builder';
-import { NolItem } from '../private-interface';
-import { NamedTypeGetter, StringTypeGetter } from './type-getter';
-import { ActiveState } from './active-state';
+} from "@working-sloth/statechart-interface";
+import { StateChangedEvent, StateChangeFailedEvent } from "../event-args";
+import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from "../state-meta";
+import { Subject, Observable } from "rxjs";
+import { StateHistory } from "../state-history";
+import { StartType } from "../state-meta/meta-state";
+import { LinkedStateType } from "./linked-state-type";
+import { MapBuilder } from "./map-builder";
+import { NolItem } from "../private-interface";
+import { NamedTypeGetter, StringTypeGetter } from "./type-getter";
+import { ActiveState } from "./active-state";
 
 
 export class StateMachine<S, A extends string, P = {}> {
@@ -160,7 +160,7 @@ export class StateMachine<S, A extends string, P = {}> {
      */
     public currentIs(name: string): boolean;
     public currentIs(stateOrName: S | string): boolean {
-        return typeof stateOrName === 'string'
+        return typeof stateOrName === "string"
             ? this._current.some(cur => cur.name === stateOrName)
             : this._current.some(cur => cur.instance === stateOrName)
         ;
@@ -263,7 +263,7 @@ export class StateMachine<S, A extends string, P = {}> {
      */
     public require(action: A, expectedStateNameOwner: StateType<S, A, P>, params?: P): boolean;
     public require(action: A, expectedStateNameLike: string | NamedState | StateType<S, A, P>, params?: P): boolean {
-        const name = typeof expectedStateNameLike === 'string' ? expectedStateNameLike : expectedStateNameLike.name;
+        const name = typeof expectedStateNameLike === "string" ? expectedStateNameLike : expectedStateNameLike.name;
         const type = this.getDestination(action);
         if (type !== undefined && type.name === name) {
             this.setState(type, action, params, false);
@@ -394,7 +394,7 @@ export class StateMachine<S, A extends string, P = {}> {
         this.addHistory(StateHistory.ok([], old.map(s => s.name), newStates.map(s => s.name), action, forced));
 
         const transitionMsg = toTransition(common, old, newStates);
-        const forcedMsg = forced ? '(forced)' : '';
+        const forcedMsg = forced ? "(forced)" : "";
         const event = new StateChangedEvent(
             common.map(state => state.instance),
             old.map(state => state.instance),

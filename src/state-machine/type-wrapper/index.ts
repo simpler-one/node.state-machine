@@ -1,2 +1,2 @@
-export * from './named-state-type';
-export * from './string-state-type';
+export * from "./named-state-type";
+export * from "./string-state-type";
