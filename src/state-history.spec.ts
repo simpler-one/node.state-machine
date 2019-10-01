@@ -1,25 +1,21 @@
-import { StateHistory } from './state-history';
+import { StateHistory } from "./state-history";
 
-describe('StateHistory', () => {
-    describe('isError', () => {
-        it('should return false if newState is not undefined', () => {
+describe("StateHistory", () => {
+    describe("isError", () => {
+        it("should return false if newState is not undefined", () => {
             // Given
-            const history = new StateHistory<string>(new Date(), [], ['old'], ['new'], 'action', false);
-
+            const history = new StateHistory<string>(new Date(), [], ["old"], ["new"], "action", false);
             // When
             const isErr = history.isError;
-
             // Then
             expect(isErr).toBe(false);
         });
 
-        it('should return true if newState is undefined', () => {
+        it("should return true if newState is undefined", () => {
             // Given
-            const history = new StateHistory<string>(new Date(), [], ['old'], undefined, 'action', false);
-
+            const history = new StateHistory<string>(new Date(), [], ["old"], undefined, "action", false);
             // When
             const isErr = history.isError;
-
             // Then
             expect(isErr).toBe(true);
         });

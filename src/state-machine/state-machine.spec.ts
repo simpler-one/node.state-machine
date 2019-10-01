@@ -1,22 +1,22 @@
-import { StateMachine } from '.'
-import { MetaState, MetaStateAction } from '../state-meta'
-import { StateType, OnEnterState, OnLeaveState } from '../interface';
-import { buildDataMatrix } from '@working-sloth/data-matrix';
-import { StateHistory } from '../state-history';
-import { StateChangedEvent } from '../event-args';
-import { MetaStartStateName, Statechart } from '@working-sloth/statechart-interface';
+import { StateMachine } from "."
+import { MetaState, MetaStateAction } from "../state-meta"
+import { StateType, OnEnterState, OnLeaveState } from "../interface";
+import { buildDataMatrix } from "@working-sloth/data-matrix";
+import { StateHistory } from "../state-history";
+import { StateChangedEvent } from "../event-args";
+import { MetaStartStateName, Statechart } from "@working-sloth/statechart-interface";
 
 enum StringState {
-    State1 = 'State1',
-    State2 = 'State2',
-    State3 = 'State3',
-    State4 = 'State4',
+    State1 = "State1",
+    State2 = "State2",
+    State3 = "State3",
+    State4 = "State4",
 }
 
 class NamedState {
-    public static readonly State1 = new NamedState('State1');
-    public static readonly State2 = new NamedState('State2');
-    public static readonly State3 = new NamedState('State3');
+    public static readonly State1 = new NamedState("State1");
+    public static readonly State2 = new NamedState("State2");
+    public static readonly State3 = new NamedState("State3");
 
     constructor(public readonly name: string) {
     }
@@ -87,17 +87,17 @@ class FullStateType implements StateType<StringState, Action>, OnEnterState, OnL
 }
 
 enum Action {
-    Action1 = 'Action1',
-    Action2 = 'Action2',
-    Action3 = 'Action3'
+    Action1 = "Action1",
+    Action2 = "Action2",
+    Action3 = "Action3"
 }
 
-describe('StateMachine', () => {
-    describe('static', () => {
-        describe('fromString()', () => {
-            it('should create a machine with meta start state', () => {
+describe("StateMachine", () => {
+    describe("static", () => {
+        describe("fromString()", () => {
+            it("should create a machine with meta start state", () => {
                 // Given
-                const name = 'name';
+                const name = "name";
 
                 // When
                 const fsm = StateMachine.fromString<StringState, Action>(name, StringState.State1);
@@ -108,10 +108,10 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('fromNamed()', () => {
-            it('should create a machine with meta start state', () => {
+        describe("fromNamed()", () => {
+            it("should create a machine with meta start state", () => {
                 // Given
-                const name = 'name';
+                const name = "name";
 
                 // When
                 const fsm = StateMachine.fromNamed<NamedState, Action>(name, NamedState.State1);
@@ -122,10 +122,10 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('fromType()', () => {
-            it('should create a machine with meta start state', () => {
+        describe("fromType()", () => {
+            it("should create a machine with meta start state", () => {
                 // Given
-                const name = 'name';
+                const name = "name";
 
                 // When
                 const fsm = StateMachine.fromType<StringState, Action>(name, MinimumStateType.State1);
@@ -137,14 +137,14 @@ describe('StateMachine', () => {
         });
     });
 
-    describe('instance', () => {
-        describe('do', () => {
+    describe("instance", () => {
+        describe("do", () => {
             const startTests = buildDataMatrix<{type: string, fsm: StateMachine<{}, Action>, expect: {}}>([
-                'type       fsm                                                                             expect',
+                "type       fsm                                                                             expect",
             ], [
-                ['string',  StateMachine.fromString<StringState, Action>('name', StringState.State1),       StringState.State1],
-                ['named',   StateMachine.fromNamed<NamedState, Action>('name', NamedState.State1),          NamedState.State1],
-                ['typed',   StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1),    StringState.State1],
+                ["string",  StateMachine.fromString<StringState, Action>("name", StringState.State1),       StringState.State1],
+                ["named",   StateMachine.fromNamed<NamedState, Action>("name", NamedState.State1),          NamedState.State1],
+                ["typed",   StateMachine.fromType<StringState, Action>("name", MinimumStateType.State1),    StringState.State1],
             ]);
             for (const test of startTests) {
                 it(`should transit to user-defined start state when do start if ${test.type} state is start`, () => {
@@ -165,9 +165,9 @@ describe('StateMachine', () => {
                 });
             }
 
-            it('should transit if transition is defined', () => {
+            it("should transit if transition is defined", () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", MinimumStateType.State1,
                 {
                     state: MinimumStateType.State1,
                     transitions: [
@@ -183,10 +183,10 @@ describe('StateMachine', () => {
                 expect(fsm.current).toBe(StringState.State2);
             });
 
-            it('should transit if child transition is defined', () => {
+            it("should transit if child transition is defined", () => {
                 // Given
                 let event: StateChangedEvent<StringState, Action>;
-                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", FullStateType.State1,
                 {
                     state: FullStateType.State1,
                     transitions: [
@@ -223,9 +223,9 @@ describe('StateMachine', () => {
                 expect(FullStateType.State3.enterCalled).toBe(1);
             });
 
-            it('should transit if parent transition is defined', () => {
+            it("should transit if parent transition is defined", () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", FullStateType.State1,
                 {
                     state: FullStateType.State1,
                     transitions: [
@@ -253,10 +253,10 @@ describe('StateMachine', () => {
                 expect(fsm.currentStates).toEqual([StringState.State1]);
             });
 
-            it('should transit if child to parent transition is defined', () => {
+            it("should transit if child to parent transition is defined", () => {
                 // Given
                 let event: StateChangedEvent<StringState, Action>;
-                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", FullStateType.State1,
                 {
                     state: FullStateType.State1,
                     transitions: [
@@ -296,10 +296,10 @@ describe('StateMachine', () => {
                 expect(FullStateType.State3.leaveCalled).toBe(1);
             });
 
-            it('should transit if parent to child transition is defined', () => {
+            it("should transit if parent to child transition is defined", () => {
                 // Given
                 let event: StateChangedEvent<StringState, Action>;
-                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", FullStateType.State1,
                 {
                     state: FullStateType.State1,
                     transitions: [
@@ -338,10 +338,10 @@ describe('StateMachine', () => {
                 expect(FullStateType.State3.enterCalled).toBe(1);
             });
 
-            it('should transit if child to child transition is defined', () => {
+            it("should transit if child to child transition is defined", () => {
                 // Given
                 let event: StateChangedEvent<StringState, Action>;
-                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", FullStateType.State1,
                 {
                     state: FullStateType.State1,
                     transitions: [
@@ -385,11 +385,11 @@ describe('StateMachine', () => {
                 expect(FullStateType.State4.enterCalled).toBe(1);
             });
 
-            it('should NOT transit to next state when do action if transition is NOT defined', () => {
+            it("should NOT transit to next state when do action if transition is NOT defined", () => {
                 // Given
                 let changedEventCalled = false;
                 let failedEventCalled = false;
-                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", MinimumStateType.State1,
                 {
                     state: MinimumStateType.State1,
                     transitions: [
@@ -408,9 +408,9 @@ describe('StateMachine', () => {
                 expect(failedEventCalled).toBe(true);
             });
 
-            it('should transit to next state when do action if anytime transition is defined', () => {
+            it("should transit to next state when do action if anytime transition is defined", () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", MinimumStateType.State1,
                 {
                     state: MetaState.Anytime,
                     transitions: [
@@ -430,9 +430,9 @@ describe('StateMachine', () => {
                 expect(fsm.current).toBe(StringState.State2);
             });
 
-            it('should call enter/leave event when do action if event handler is defined', () => {
+            it("should call enter/leave event when do action if event handler is defined", () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", FullStateType.State1,
                 {
                     state: MetaState.Anytime,
                     transitions: [
@@ -459,15 +459,15 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('forceSet', () => {
+        describe("forceSet", () => {
             it(`should throw if state is NOT defined`, () => {
                 // Given
-                const fsm = StateMachine.fromString('name', StringState.State1);
+                const fsm = StateMachine.fromString("name", StringState.State1);
                 let err = false;
 
                 // When
                 try {
-                    fsm.forceSet(StringState.State2, '');
+                    fsm.forceSet(StringState.State2, "");
                 } catch (e) {
                     err = true;
                 }
@@ -477,10 +477,10 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('forceIfFail', () => {
+        describe("forceIfFail", () => {
             it(`should transit normally if transition is defined`, () => {
                 // Given
-                const fsm = StateMachine.fromString('name', StringState.State1,
+                const fsm = StateMachine.fromString("name", StringState.State1,
                 {
                     state: StringState.State1,
                     transitions: [
@@ -499,7 +499,7 @@ describe('StateMachine', () => {
 
             it(`should transit forcibly if transition is NOT defined`, () => {
                 // Given
-                const fsm = StateMachine.fromNamed('name', NamedState.State1,
+                const fsm = StateMachine.fromNamed("name", NamedState.State1,
                 {
                     state: NamedState.State1,
                     transitions: [
@@ -521,10 +521,10 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('require', () => {
+        describe("require", () => {
             it(`should transit normally if transition is defined and state is expected`, () => {
                 // Given
-                const fsm = StateMachine.fromString('name', StringState.State1,
+                const fsm = StateMachine.fromString("name", StringState.State1,
                 {
                     state: StringState.State1,
                     transitions: [
@@ -543,7 +543,7 @@ describe('StateMachine', () => {
 
             it(`should transit forcibly if transition is NOT defined`, () => {
                 // Given
-                const fsm = StateMachine.fromNamed('name', NamedState.State1,
+                const fsm = StateMachine.fromNamed("name", NamedState.State1,
                 {
                     state: NamedState.State1,
                     transitions: [
@@ -566,7 +566,7 @@ describe('StateMachine', () => {
 
             it(`should transit forcibly if transition is defined and state is NOT expected`, () => {
                 // Given
-                const fsm = StateMachine.fromNamed('name', NamedState.State1,
+                const fsm = StateMachine.fromNamed("name", NamedState.State1,
                 {
                     state: NamedState.State1,
                     transitions: [
@@ -589,10 +589,10 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('reset', () => {
-            it('should become meta start state when reset', () => {
+        describe("reset", () => {
+            it("should become meta start state when reset", () => {
                 // Given
-                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1);
+                const fsm = StateMachine.fromString<StringState, Action>("name", StringState.State1);
                 fsm.start();
     
                 // When
@@ -602,9 +602,9 @@ describe('StateMachine', () => {
                 expect(fsm.current).toBe(MetaState.Start);
             });
 
-            it('should called "onLeave" event callback when reset if callback is defined', () => {
+            it("should called 'onLeave' event callback when reset if callback is defined", () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', FullStateType.State1);
+                const fsm = StateMachine.fromType<StringState, Action>("name", FullStateType.State1);
                 fsm.start();
                 const enterCalled = FullStateType.State1.enterCalled;
                 const leaveCalled = FullStateType.State1.leaveCalled;
@@ -619,10 +619,10 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('restart', () => {
-            it('should become user-defined start state when restart if current is NOT user-defined start', () => {
+        describe("restart", () => {
+            it("should become user-defined start state when restart if current is NOT user-defined start", () => {
                 // Given
-                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1);
+                const fsm = StateMachine.fromString<StringState, Action>("name", StringState.State1);
                 fsm.start();
     
                 // When
@@ -632,9 +632,9 @@ describe('StateMachine', () => {
                 expect(fsm.current).toBe(StringState.State1);
             });
 
-            it('should become user-defined start state when restart', () => {
+            it("should become user-defined start state when restart", () => {
                 // Given
-                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1);
+                const fsm = StateMachine.fromString<StringState, Action>("name", StringState.State1);
                 // When
                 fsm.restart();
                 // Then
@@ -642,10 +642,10 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('can', () => {
-            it('should return true when try to do start if state is start', () => {
+        describe("can", () => {
+            it("should return true when try to do start if state is start", () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1);
+                const fsm = StateMachine.fromType<StringState, Action>("name", MinimumStateType.State1);
     
                 // When
                 const result = fsm.can(MetaStateAction.DoStart);
@@ -654,9 +654,9 @@ describe('StateMachine', () => {
                 expect(result).toBe(true);
             });
 
-            it('should return true when try to do action if transition is defined', () => {
+            it("should return true when try to do action if transition is defined", () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", MinimumStateType.State1,
                 {
                     state: MinimumStateType.State1,
                     transitions: [
@@ -672,9 +672,9 @@ describe('StateMachine', () => {
                 expect(result).toBe(true);
             });
 
-            it('should return false when try to do action if transition is NOT defined', () => {
+            it("should return false when try to do action if transition is NOT defined", () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", MinimumStateType.State1,
                 {
                     state: MinimumStateType.State1,
                     transitions: [
@@ -689,9 +689,9 @@ describe('StateMachine', () => {
                 expect(result).toBe(false);
             });
 
-            it('should return true when try to do action if anytime transition is defined', () => {
+            it("should return true when try to do action if anytime transition is defined", () => {
                 // Given
-                const fsm = StateMachine.fromType<StringState, Action>('name', MinimumStateType.State1,
+                const fsm = StateMachine.fromType<StringState, Action>("name", MinimumStateType.State1,
                 {
                     state: MetaState.Anytime,
                     transitions: [
@@ -713,23 +713,23 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('currentIs', () => {
-            const fsm = StateMachine.fromNamed('name', NamedState.State1);
+        describe("currentIs", () => {
+            const fsm = StateMachine.fromNamed("name", NamedState.State1);
             fsm.start();
 
-            it('(by string)', () => {
+            it("(by string)", () => {
                 expect(fsm.currentIs(StringState.State1));
             });
 
-            it('(by state)', () => {
+            it("(by state)", () => {
                 expect(fsm.currentIs(NamedState.State1));
             });
         });
 
-        describe('toChart', () => {
-            it('should return only meta start map if state is empty', () => {
+        describe("toChart", () => {
+            it("should return only meta start map if state is empty", () => {
                 // Given
-                const name = 'name';
+                const name = "name";
                 const fsm = StateMachine.fromString<StringState, Action>(name, StringState.State1);
 
                 // When
@@ -753,9 +753,9 @@ describe('StateMachine', () => {
                 });
             });
 
-            it('should return user-defined map if some states are defined (without children)', () => {
+            it("should return user-defined map if some states are defined (without children)", () => {
                 // Given
-                const name = 'name';
+                const name = "name";
                 const fsm = StateMachine.fromString<StringState, Action>(
                     name,
                     StringState.State1,
@@ -795,9 +795,9 @@ describe('StateMachine', () => {
                 });
             });
 
-            it('should return user-defined map if some states are defined (with children)', () => {
+            it("should return user-defined map if some states are defined (with children)", () => {
                 // Given
-                const name = 'name';
+                const name = "name";
                 const fsm = StateMachine.fromString<StringState, Action>(
                     name,
                     StringState.State1,
@@ -841,9 +841,9 @@ describe('StateMachine', () => {
                 });
             });
 
-            it('should return user-defined map if some states are defined (with start children)', () => {
+            it("should return user-defined map if some states are defined (with start children)", () => {
                 // Given
-                const name = 'name';
+                const name = "name";
                 const fsm = StateMachine.fromString<StringState, Action>(
                     name,
                     StringState.State1,
@@ -895,9 +895,9 @@ describe('StateMachine', () => {
                 });
             });
 
-            it('should return same map each other', () => {
+            it("should return same map each other", () => {
                 // Given
-                const name = 'name';
+                const name = "name";
                 const stringFsm = StateMachine.fromString<StringState, Action>(
                     name,
                     StringState.State1,
@@ -998,10 +998,10 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('export', () => {
-            it('should give equal map to toChart', () => {
+        describe("export", () => {
+            it("should give equal map to toChart", () => {
                 // Given
-                const name = 'name';
+                const name = "name";
                 const fsm = StateMachine.fromString<StringState, Action>(
                     name,
                     StringState.State1,
@@ -1012,7 +1012,7 @@ describe('StateMachine', () => {
                         ]
                     }
                 );
-                const result = 'result';
+                const result = "result";
                 let actualMap: Statechart;
                 const writer = (map: Statechart) => {
                     actualMap = map;
@@ -1028,9 +1028,9 @@ describe('StateMachine', () => {
             });
         });
 
-        it('current', () => {
+        it("current", () => {
             // Given
-            const fsm = StateMachine.fromString('name', StringState.State1);
+            const fsm = StateMachine.fromString("name", StringState.State1);
             fsm.start();
             // When
             const result = fsm.current;
@@ -1038,9 +1038,9 @@ describe('StateMachine', () => {
             expect(result).toBe(StringState.State1);
         });
 
-        it('currentRoot', () => {
+        it("currentRoot", () => {
             // Given
-            const fsm = StateMachine.fromString('name', StringState.State1);
+            const fsm = StateMachine.fromString("name", StringState.State1);
             fsm.start();
             // When
             const result = fsm.currentRoot;
@@ -1048,11 +1048,11 @@ describe('StateMachine', () => {
             expect(result).toBe(StringState.State1);
         });
 
-        describe('historyCapacity', () => {
-            it('should set normally if not negative value was set', () => {
+        describe("historyCapacity", () => {
+            it("should set normally if not negative value was set", () => {
                 // Given
                 const capacity = 10;
-                const fsm = StateMachine.fromString('name', StringState.State1);
+                const fsm = StateMachine.fromString("name", StringState.State1);
 
                 // When
                 fsm.historyCapacity = capacity;
@@ -1061,10 +1061,10 @@ describe('StateMachine', () => {
                 expect(fsm.historyCapacity).toBe(capacity);
             });
 
-            it('should set zero if negative value was set', () => {
+            it("should set zero if negative value was set", () => {
                 // Given
                 const capacity = -1;
-                const fsm = StateMachine.fromString('name', StringState.State1);
+                const fsm = StateMachine.fromString("name", StringState.State1);
 
                 // When
                 fsm.historyCapacity = capacity;
@@ -1074,10 +1074,10 @@ describe('StateMachine', () => {
             });
         });
 
-        describe('histories', () => {
-            it('should return histories', () => {
+        describe("histories", () => {
+            it("should return histories", () => {
                 // Given
-                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
+                const fsm = StateMachine.fromString<StringState, Action>("name", StringState.State1,
                 {
                     state: StringState.State1,
                     transitions: [
@@ -1112,9 +1112,9 @@ describe('StateMachine', () => {
                 }
             });
 
-            it('should return limited size histories if history is overflow', () => {
+            it("should return limited size histories if history is overflow", () => {
                 // Given
-                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
+                const fsm = StateMachine.fromString<StringState, Action>("name", StringState.State1,
                 {
                     state: StringState.State1,
                     transitions: [
@@ -1139,9 +1139,9 @@ describe('StateMachine', () => {
                 expect(histories.length).toEqual(fsm.historyCapacity);
             });
 
-            it('should return limited size histories if history capacity is reduced', () => {
+            it("should return limited size histories if history capacity is reduced", () => {
                 // Given
-                const fsm = StateMachine.fromString<StringState, Action>('name', StringState.State1,
+                const fsm = StateMachine.fromString<StringState, Action>("name", StringState.State1,
                 {
                     state: StringState.State1,
                     transitions: [

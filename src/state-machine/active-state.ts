@@ -1,4 +1,4 @@
-import { LinkedStateType } from './linked-state-type';
+import { LinkedStateType } from "./linked-state-type";
 
 
 export class ActiveState<S, A extends string, P> {

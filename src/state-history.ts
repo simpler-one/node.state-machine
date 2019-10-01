@@ -3,15 +3,6 @@ export class StateHistory<A extends string> {
         return this.newState === undefined;
     }
 
-    constructor(
-        public readonly date: Date,
-        public readonly commonParents: string[] | [],
-        public readonly oldState: string[] | [],
-        public readonly newState: string[] | [] | undefined,
-        public readonly action: A,
-        public readonly forced: boolean,
-    ) {
-    }
 
     public static ok<A extends string>(
         commonParents: string[] | [],
@@ -29,5 +20,15 @@ export class StateHistory<A extends string> {
         action: A,
     ): StateHistory<A> {
         return new StateHistory(new Date(), commonParents, oldState, undefined, action, false);
+    }
+
+    constructor(
+        public readonly date: Date,
+        public readonly commonParents: string[] | [],
+        public readonly oldState: string[] | [],
+        public readonly newState: string[] | [] | undefined,
+        public readonly action: A,
+        public readonly forced: boolean,
+    ) {
     }
 }
