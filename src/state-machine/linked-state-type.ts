@@ -1,4 +1,4 @@
-import { StateType } from '../interface';
+import { StateType } from "../interface";
 
 
 export class LinkedStateType<S, A extends string, P> {

@@ -1,8 +1,8 @@
-import { OnEnterState, OnLeaveState } from './interface'
+import { OnEnterState, OnLeaveState } from "./interface";
 
-describe('interface.OnEnterState', () => {
-    describe('get()', () => {
-        it('should return function', () => {
+describe("interface.OnEnterState", () => {
+    describe("get()", () => {
+        it("should return function", () => {
             // Given
             const obj = { onEnterState: () => undefined };
             // When
@@ -13,9 +13,9 @@ describe('interface.OnEnterState', () => {
     });
 });
 
-describe('interface.OnLeaveState', () => {
-    describe('get()', () => {
-        it('should return function', () => {
+describe("interface.OnLeaveState", () => {
+    describe("get()", () => {
+        it("should return function", () => {
             // Given
             const obj = { onLeaveState: () => undefined };
             // When
