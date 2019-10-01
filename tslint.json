@@ -3,6 +3,7 @@
     "rules": {
         "array-type": [true, "array"],
         "interface-name": [false],
+        "no-angle-bracket-type-assertion": false,
         "no-consecutive-blank-lines": false,
         "whitespace": [true,
             "check-branch",
