@@ -6,7 +6,7 @@ describe("interface.OnEnterState", () => {
             // Given
             const obj = { onEnterState: () => undefined };
             // When
-            const result =  OnEnterState.get(obj);
+            const result = OnEnterState.get(obj);
             // Then
             expect(result).toBeTruthy();
         });
@@ -19,7 +19,7 @@ describe("interface.OnLeaveState", () => {
             // Given
             const obj = { onLeaveState: () => undefined };
             // When
-            const result =  OnLeaveState.get(obj);
+            const result = OnLeaveState.get(obj);
             // Then
             expect(result).toBeTruthy();
         });

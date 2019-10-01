@@ -10,7 +10,7 @@
     "test": "rimraf spec/built && tsc -p spec && istanbul cover node_modules/jasmine/bin/jasmine.js -x \"**/*.spec.js\"",
     "remapcov": "cat coverage/coverage.json | ./node_modules/.bin/remap-istanbul > coverage/coverage-remap.json && mv -f coverage/coverage-remap.json coverage/coverage.json",
     "remapcov:win": "type coverage\\coverage.json | .\\node_modules\\.bin\\remap-istanbul > coverage\\coverage-remap.json && del coverage\\coverage.json && ren coverage\\coverage-remap.json coverage.json",
-    "lint": "tslint ./src/*.ts",
+    "lint": "eslint ./src/*.ts && tslint ./src/*.ts",
     "exec": "ts-node -P .config/tsconfig.base.json --files"
   },
   "repository": {
@@ -40,8 +40,12 @@
   },
   "devDependencies": {
     "@types/jasmine": "^3.3.13",
+    "@typescript-eslint/eslint-plugin": "^2.3.2",
+    "@typescript-eslint/parser": "^2.3.2",
     "@working-sloth/data-matrix": "^2.0.0",
     "codecov": "^3.5.0",
+    "eslint": "^6.5.1",
+    "eslint-config-google": "^0.14.0",
     "jasmine": "^3.4.0",
     "remap-istanbul": "^0.13.0",
     "rimraf": "^2.6.3",
