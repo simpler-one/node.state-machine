@@ -4,8 +4,11 @@
 samples/
 spec/
 src/
+.eslintrc.json
 .gitignore
+.remarkrc
 .travis.yml
+tslint.json
 
 #---------------
 

@@ -4,8 +4,11 @@ dist/
 # samples : necessary
 spec/built/
 # src/ : necessary
+# .eslintrc.json : necessary
 # .gitignore : necessary
+# .remarkrc : necessary
 # .travis.yml : necessary
+# tslint.json : necessary
 
 #---------------
 
