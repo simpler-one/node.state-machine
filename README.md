@@ -17,7 +17,7 @@ Let's be lazy.
         <th>Poor state<br>(Before)</th>
         <td>
 <pre>
-if (fsm.current === 'Doing' || fsm.curent === 'Waiting' || ...) {
+if (fsm.current === 'Doing' || fsm.current === 'Waiting' || ...) {
     showProgress();
 }
 <br>
@@ -53,12 +53,12 @@ fsm.current.show();
  Finite state machine for JavaScript and TypeScript.
 
 ## Why? 
-- Readable: state machine definition is so readable that you easily understand transitions
-- Generic typing: states, actions and optional params
-- Rich object state: user defined class can be state
-- State with life-cycle: create/dispose
-- Export statecharts: PlantUML
-- Learning cost: basic takes only 1 step, rich state takes only 2 more steps, full function takes only 3 more steps to learn
+-   Readable: state machine definition is so readable that you easily understand transitions
+-   Generic typing: states, actions and optional params
+-   Rich object state: user defined class can be state
+-   State with life-cycle: create/dispose
+-   Export statecharts: PlantUML
+-   Learning cost: basic takes only 1 step, rich state takes only 2 more steps, full function takes only 3 more steps to learn
 
 ## Quick start
 ### case: String state (most simple)
@@ -111,14 +111,14 @@ if (fsm.can(SlothAction.Sleep)) {
  [See samples](https://github.com/work-work-komei/node.state-machine.samples/tree/master/src)
 
 ## Schedule
-- Create string-based fsm from PlantUML: someday
-- Crate docs: someday
-- Export statecharts from CLI: someday
-- Rest: every day
-- Sleep: every day
-- Be clever and lazy: soon
-- Be stupid and diligent: never
+-   Create string-based fsm from PlantUML: someday
+-   Crate docs: someday
+-   Export statecharts from CLI: someday
+-   Rest: every day
+-   Sleep: every day
+-   Be clever and lazy: soon
+-   Be stupid and diligent: never
 
 ## If you aren't satisfied
-- [Open an issue](https://github.com/work-work-komei/node.state-machine/issues) such as "question" or "enhancement"
-- e-mail: koba.work.work1127@gmail.com
+-   [Open an issue](https://github.com/work-work-komei/node.state-machine/issues) such as "question" or "enhancement"
+-   e-mail: koba.work.work1127@gmail.com
