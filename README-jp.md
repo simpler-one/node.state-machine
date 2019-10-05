@@ -18,7 +18,7 @@
         <th>Poor state<br>(Before)</th>
         <td>
 <pre>
-if (fsm.current === 'Doing' || fsm.curent === 'Waiting' || ...) {
+if (fsm.current === 'Doing' || fsm.current === 'Waiting' || ...) {
     showProgress();
 }
 <br>
@@ -53,12 +53,12 @@ fsm.current.show();
  JavaScriptとTypeScript用のステートマシンです
 
 ## 特徴
-- 読みやすい: ステートマシン定義は読みやすく、簡単に遷移を把握できます
-- ジェネリック型対応: ステート、アクション、オプション引数すべて
-- Rich state: ステートオブジェクトにユーザー定義クラスが使えます
-- ライフサイクル: 生成/破棄
-- 状態遷移図のエクスポート: PlantUML
-- でも学習コストがお高いんでしょ？: 基本機能は１ステップ、Rich stateは更に２ステップ、全機能は更に３ステップのみで習得できます
+-   読みやすい: ステートマシン定義は読みやすく、簡単に遷移を把握できます
+-   ジェネリック型対応: ステート、アクション、オプション引数すべて
+-   Rich state: ステートオブジェクトにユーザー定義クラスが使えます
+-   ライフサイクル: 生成/破棄
+-   状態遷移図のエクスポート: PlantUML
+-   でも学習コストがお高いんでしょ？: 基本機能は１ステップ、Rich stateは更に２ステップ、全機能は更に３ステップのみで習得できます
 
 ## Quick start
 
@@ -112,14 +112,14 @@ if (fsm.can(SlothAction.Sleep)) {
  [See samples](https://github.com/work-work-komei/node.state-machine.samples/tree/master/src)
 
 ## 予定
-- PlantUMLからの逆変換: 明日やる
-- ドキュメントの充実: 明日やる
-- CLIからの遷移図エクスポート: 明日やる
-- 休憩: 毎日
-- おふとん: 毎日
-- 有能な怠け者になる: もうすぐ
-- 無能な働き者になる: 一昨日
+-   PlantUMLからの逆変換: 明日やる
+-   ドキュメントの充実: 明日やる
+-   CLIからの遷移図エクスポート: 明日やる
+-   休憩: 毎日
+-   おふとん: 毎日
+-   有能な怠け者になる: もうすぐ
+-   無能な働き者になる: 一昨日
 
 ## ご満足いただけなかった場合
-- 「question」または「enhancement」として[Issueを作成](https://github.com/work-work-komei/node.data-matrix/issues)
-- e-mail：koba.work.work1127@gmail.com
+-   「question」または「enhancement」として[Issueを作成](https://github.com/work-work-komei/node.data-matrix/issues)
+-   e-mail：koba.work.work1127@gmail.com
