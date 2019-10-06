@@ -5,7 +5,7 @@ import { NolItem } from "../../private-interface";
 
 export abstract class TypeGetter<S, A extends string> {
     private map: Map<string, StateType<S, A>> = new Map();
-    
+
     public get(state: S): StateType<S, A> {
         if (state === undefined) {
             return undefined;

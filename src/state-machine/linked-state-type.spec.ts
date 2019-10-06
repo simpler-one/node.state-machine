@@ -1,8 +1,8 @@
-import { LinkedStateType } from "./linked-state-type"
+import { LinkedStateType } from "./linked-state-type";
 import { StateType } from "../interface";
 
 class SType implements StateType<string, string> {
-    getState() { return undefined };
+    public getState() { return undefined };
 
     constructor(
         public readonly name: string,
@@ -23,6 +23,6 @@ describe("LinkedStateType", () => {
 
             // Then
             expect(result).toBe(child);
-        })
+        });
     });
 });

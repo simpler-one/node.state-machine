@@ -5,6 +5,7 @@
         "interface-name": [false],
         "no-angle-bracket-type-assertion": false,
         "no-consecutive-blank-lines": false,
+        "trailing-comma": false,
         "whitespace": [true,
             "check-branch",
             "check-decl",
@@ -14,6 +15,11 @@
             "check-type",
             "check-type-operator",
             "check-preblock"
+        ]
+    },
+    "linterOptions": {
+        "exclude": [
+            "*.spec.ts"
         ]
     }
 }

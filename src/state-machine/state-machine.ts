@@ -71,32 +71,6 @@ export class StateMachine<S, A extends string, P = {}> {
     private readonly _stateChanged: Subject<StateChangedEvent<S, A, P>> = new Subject();
     private readonly _stateChangeFailed: Subject<StateChangeFailedEvent<S, A, P>> = new Subject();
 
-    protected constructor(
-        public readonly name: string,
-        start: StateType<S, A, P>,
-        items: NolItem<S, A, P>[]
-    ) {
-        const anytimeI: number = items.findIndex(item => `${item.state}` === MetaAnytimeStateName);
-        let anytimeTransitions: [A, StateType<S, A, P>][] = [];
-        if (anytimeI >= 0) {
-            anytimeTransitions = items.splice(anytimeI, 1)[0].transitions;
-        }
-
-        this.map = MapBuilder.build(items, anytimeTransitions);
-
-        const metaStart = new LinkedStateType<S, A, P>(StartType, undefined);
-        this.map.set(MetaStartStateName, metaStart);
-        let startNode = this.map.get(start.name);
-        if (!startNode) {
-            startNode = new LinkedStateType(start, undefined);
-            this.map.set(start.name, startNode);
-        }
-
-        metaStart.setTransition(MetaAction.DoStart, startNode);
-
-        this._current = [new ActiveState(metaStart, MetaState.Start)];
-    }
-
 
     public static fromString<S extends string, A extends string>(
         name: string,
@@ -148,6 +122,34 @@ export class StateMachine<S, A extends string, P = {}> {
             children: startChild.concat(type.children.map(child => this.toChartItem(child))),
         };
     }
+
+
+    protected constructor(
+        public readonly name: string,
+        start: StateType<S, A, P>,
+        items: NolItem<S, A, P>[],
+    ) {
+        const anytimeI: number = items.findIndex(item => `${item.state}` === MetaAnytimeStateName);
+        let anytimeTransitions: [A, StateType<S, A, P>][] = [];
+        if (anytimeI >= 0) {
+            anytimeTransitions = items.splice(anytimeI, 1)[0].transitions;
+        }
+
+        this.map = MapBuilder.build(items, anytimeTransitions);
+
+        const metaStart = new LinkedStateType<S, A, P>(StartType, undefined);
+        this.map.set(MetaStartStateName, metaStart);
+        let startNode = this.map.get(start.name);
+        if (!startNode) {
+            startNode = new LinkedStateType(start, undefined);
+            this.map.set(start.name, startNode);
+        }
+
+        metaStart.setTransition(MetaAction.DoStart, startNode);
+
+        this._current = [new ActiveState(metaStart, MetaState.Start)];
+    }
+
 
     /**
      * Check current state
@@ -241,7 +243,7 @@ export class StateMachine<S, A extends string, P = {}> {
      * @returns transited normally
      * @throws RangeError
      */
-    public require(action: A, expectedStateName: string, params?: P): boolean 
+    public require(action: A, expectedStateName: string, params?: P): boolean
     /**
      * Require state to equal expected after the action.
      * If the action makes state expected one, do nothing
@@ -251,7 +253,7 @@ export class StateMachine<S, A extends string, P = {}> {
      * @returns transited normally
      * @throws RangeError
      */
-    public require(action: A, expectedStateNameOwner: NamedState, params?: P): boolean 
+    public require(action: A, expectedStateNameOwner: NamedState, params?: P): boolean
     /**
      * Require state to equal expected after the action.
      * If the action makes state expected one, do nothing
@@ -405,7 +407,7 @@ export class StateMachine<S, A extends string, P = {}> {
         );
 
         this._stateChanged.next(event);
-        
+
         old.forEach(w => OnLeaveState.tryCall(w.linked.type, event));
         newStates.forEach(w => OnEnterState.tryCall(w.linked.type, event));
     }
