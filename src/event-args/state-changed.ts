@@ -46,7 +46,7 @@ export class StateChangedEvent<S, A, P = {}> {
         public readonly action: A,
         public readonly params: P,
         public readonly forced: boolean,
-        public readonly message: string,    
+        public readonly message: string,
     ) {
     }
 }

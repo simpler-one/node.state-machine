@@ -10,7 +10,7 @@ export class StateChangeFailedEvent<S, A, P = {}> {
         public readonly currentStates: S[] | [undefined],
         public readonly action: A,
         public readonly params: P,
-        public readonly message: string,    
+        public readonly message: string,
     ) {
     }
 }

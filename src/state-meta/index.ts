@@ -4,4 +4,4 @@ import * as MetaStateAction from "./meta-state-action";
 export {
     MetaState,
     MetaStateAction,
-}
+};

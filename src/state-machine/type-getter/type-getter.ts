@@ -1,11 +1,11 @@
-import { StateType, StateMachineItem } from "../../interface";
-import { MetaState } from "../../state-meta";
+import { StateMachineItem, StateType } from "../../interface";
 import { NolItem } from "../../private-interface";
+import { MetaState } from "../../state-meta";
 
 
 export abstract class TypeGetter<S, A extends string> {
     private map: Map<string, StateType<S, A>> = new Map();
-    
+
     public get(state: S): StateType<S, A> {
         if (state === undefined) {
             return undefined;
@@ -33,6 +33,9 @@ export abstract class TypeGetter<S, A extends string> {
         return items.map(item => this.convertOne(item));
     }
 
+    protected abstract nameOf(state: S): string;
+    protected abstract wrap(state: S): StateType<S, A>;
+
     private convertOne(item: StateMachineItem<S, A>): NolItem<S, A> {
         return {
             state: this.get(item.state),
@@ -41,7 +44,4 @@ export abstract class TypeGetter<S, A extends string> {
             startChild: this.get(item.startChild),
         };
     }
-
-    protected abstract nameOf(state: S): string;
-    protected abstract wrap(state: S): StateType<S, A>;
 }

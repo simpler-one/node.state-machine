@@ -1,10 +1,10 @@
-import { NamedState, OnEnterState, OnLeaveState, StateType } from "../../interface";
 import { StateChangedEvent } from "../../event-args";
+import { NamedState, OnEnterState, OnLeaveState, StateType } from "../../interface";
 
 
 export class NamedType<S extends NamedState, A extends string, P>
-    implements StateType<S, A, P>, OnEnterState.Any, OnLeaveState.Any
-{
+implements StateType<S, A, P>, OnEnterState.Any, OnLeaveState.Any {
+
     public get name(): string {
         return this.state.name;
     }

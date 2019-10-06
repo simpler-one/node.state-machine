@@ -1,20 +1,75 @@
-import { StateType, StateMachineItem, NamedState, OnLeaveState, OnEnterState } from "../interface";
 import {
-    StatechartWriter, Statechart, StatechartItem, StatechartTransition, MetaStartStateName, MetaAnytimeStateName
+    MetaAnytimeStateName, MetaStartStateName, Statechart, StatechartItem, StatechartTransition, StatechartWriter
 } from "@working-sloth/statechart-interface";
+import { Observable, Subject } from "rxjs";
 import { StateChangedEvent, StateChangeFailedEvent } from "../event-args";
-import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from "../state-meta";
-import { Subject, Observable } from "rxjs";
+import { NamedState, OnEnterState, OnLeaveState, StateMachineItem, StateType } from "../interface";
+import { NolItem } from "../private-interface";
 import { StateHistory } from "../state-history";
+import { MetaState, MetaStateAction, MetaStateAction as MetaAction } from "../state-meta";
 import { StartType } from "../state-meta/meta-state";
+import { ActiveState } from "./active-state";
 import { LinkedStateType } from "./linked-state-type";
 import { MapBuilder } from "./map-builder";
-import { NolItem } from "../private-interface";
 import { NamedTypeGetter, StringTypeGetter } from "./type-getter";
-import { ActiveState } from "./active-state";
 
 
 export class StateMachine<S, A extends string, P = {}> {
+
+    //
+    // Static
+
+    public static fromString<S extends string, A extends string>(
+        name: string,
+        start: S,
+        ...items: StateMachineItem<S, A>[]
+    ): StateMachine<S, A> {
+        const getter = new StringTypeGetter<S, A>();
+        return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
+    }
+
+    public static fromNamed<S extends NamedState, A extends string>(
+        name: string,
+        start: S,
+        ...items: StateMachineItem<S, A>[]
+    ): StateMachine<S, A> {
+        const getter = new NamedTypeGetter<S, A>();
+        return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
+    }
+
+    public static fromType<S, A extends string, P = {}>(
+        name: string,
+        start: StateType<S, A, P>,
+        ...items: StateMachineItem<StateType<S, A, P>, A>[]
+    ): StateMachine<S, A, P> {
+        return new StateMachine<S, A, P>(name, start, [...items]);
+    }
+
+    private static toChartItem<S, A extends string, P>(
+        type: LinkedStateType<S, A, P>
+    ): StatechartItem {
+        const startChild: StatechartItem[] = [];
+        if (type.startChild) {
+            startChild.push({
+                name: MetaStartStateName,
+                transitions: [{
+                    action: MetaAction.DoStart,
+                    destination: type.startChild.name,
+                }],
+                children: [],
+            });
+        }
+
+        return {
+            name: type.name,
+            transitions: Array.from(type.mapEntries()).map(transition => ({
+                action: transition[0],
+                destination: transition[1].name,
+            } as StatechartTransition)),
+            children: startChild.concat(type.children.map(child => this.toChartItem(child))),
+        };
+    }
+
 
     //
     // Public var
@@ -71,10 +126,11 @@ export class StateMachine<S, A extends string, P = {}> {
     private readonly _stateChanged: Subject<StateChangedEvent<S, A, P>> = new Subject();
     private readonly _stateChangeFailed: Subject<StateChangeFailedEvent<S, A, P>> = new Subject();
 
+
     protected constructor(
         public readonly name: string,
         start: StateType<S, A, P>,
-        items: NolItem<S, A, P>[]
+        items: NolItem<S, A, P>[],
     ) {
         const anytimeI: number = items.findIndex(item => `${item.state}` === MetaAnytimeStateName);
         let anytimeTransitions: [A, StateType<S, A, P>][] = [];
@@ -97,57 +153,6 @@ export class StateMachine<S, A extends string, P = {}> {
         this._current = [new ActiveState(metaStart, MetaState.Start)];
     }
 
-
-    public static fromString<S extends string, A extends string>(
-        name: string,
-        start: S,
-        ...items: StateMachineItem<S, A>[]
-    ): StateMachine<S, A> {
-        const getter = new StringTypeGetter<S, A>();
-        return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
-    }
-
-    public static fromNamed<S extends NamedState, A extends string>(
-        name: string,
-        start: S,
-        ...items: StateMachineItem<S, A>[]
-    ): StateMachine<S, A> {
-        const getter = new NamedTypeGetter<S, A>();
-        return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
-    }
-
-    public static fromType<S, A extends string, P = {}>(
-        name: string,
-        start: StateType<S, A, P>,
-        ...items: StateMachineItem<StateType<S, A, P>, A>[]
-    ): StateMachine<S, A, P> {
-        return new StateMachine<S, A, P>(name, start, [...items]);
-    }
-
-    private static toChartItem<S, A extends string, P>(
-        type: LinkedStateType<S, A, P>
-    ): StatechartItem {
-        const startChild: StatechartItem[] = [];
-        if (type.startChild) {
-            startChild.push({
-                name: MetaStartStateName,
-                transitions: [{
-                    action: MetaAction.DoStart,
-                    destination: type.startChild.name,
-                }],
-                children: [],
-            });
-        }
-
-        return {
-            name: type.name,
-            transitions: Array.from(type.mapEntries()).map(transition => ({
-                action: transition[0],
-                destination: transition[1].name,
-            } as StatechartTransition)),
-            children: startChild.concat(type.children.map(child => this.toChartItem(child))),
-        };
-    }
 
     /**
      * Check current state
@@ -241,7 +246,7 @@ export class StateMachine<S, A extends string, P = {}> {
      * @returns transited normally
      * @throws RangeError
      */
-    public require(action: A, expectedStateName: string, params?: P): boolean 
+    public require(action: A, expectedStateName: string, params?: P): boolean;
     /**
      * Require state to equal expected after the action.
      * If the action makes state expected one, do nothing
@@ -251,7 +256,7 @@ export class StateMachine<S, A extends string, P = {}> {
      * @returns transited normally
      * @throws RangeError
      */
-    public require(action: A, expectedStateNameOwner: NamedState, params?: P): boolean 
+    public require(action: A, expectedStateNameOwner: NamedState, params?: P): boolean;
     /**
      * Require state to equal expected after the action.
      * If the action makes state expected one, do nothing
@@ -295,6 +300,7 @@ export class StateMachine<S, A extends string, P = {}> {
     /**
      * Check availability of the action in current state.
      * @param action action
+     * @returns availability
      */
     public can(action: A): boolean {
         return this.getDestination(action) !== undefined;
@@ -319,6 +325,7 @@ export class StateMachine<S, A extends string, P = {}> {
     /**
      * Export state machine
      * @param writer writer
+     * @returns statechart string
      */
     public export(writer: StatechartWriter): string {
         return writer(this.toChart());
@@ -326,6 +333,7 @@ export class StateMachine<S, A extends string, P = {}> {
 
     /**
      * To statechart
+     * @returns statechart object
      */
     public toChart(): Statechart {
         return {
@@ -405,7 +413,7 @@ export class StateMachine<S, A extends string, P = {}> {
         );
 
         this._stateChanged.next(event);
-        
+
         old.forEach(w => OnLeaveState.tryCall(w.linked.type, event));
         newStates.forEach(w => OnEnterState.tryCall(w.linked.type, event));
     }

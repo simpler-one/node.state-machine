@@ -21,7 +21,7 @@ export class LinkedStateType<S, A extends string, P> {
         while (parent) {
             parents.push(parent);
             parent = parent.parent;
-        } 
+        }
 
         return parents.reverse();
     }
