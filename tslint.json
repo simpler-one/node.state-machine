@@ -9,6 +9,14 @@
         "object-literal-sort-keys": false,
         "trailing-comma": false,
         "unified-signatures": false,
+        "variable-name": {
+            "options": [
+                "ban-keywords",
+                "check-format",
+                "allow-leading-underscore",
+                "allow-pascal-case"
+            ]
+        },
         "whitespace": [true,
             "check-branch",
             "check-decl",
