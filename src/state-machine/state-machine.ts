@@ -17,6 +17,61 @@ import { ActiveState } from "./active-state";
 export class StateMachine<S, A extends string, P = {}> {
 
     //
+    // Static
+
+    public static fromString<S extends string, A extends string>(
+        name: string,
+        start: S,
+        ...items: StateMachineItem<S, A>[]
+    ): StateMachine<S, A> {
+        const getter = new StringTypeGetter<S, A>();
+        return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
+    }
+
+    public static fromNamed<S extends NamedState, A extends string>(
+        name: string,
+        start: S,
+        ...items: StateMachineItem<S, A>[]
+    ): StateMachine<S, A> {
+        const getter = new NamedTypeGetter<S, A>();
+        return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
+    }
+
+    public static fromType<S, A extends string, P = {}>(
+        name: string,
+        start: StateType<S, A, P>,
+        ...items: StateMachineItem<StateType<S, A, P>, A>[]
+    ): StateMachine<S, A, P> {
+        return new StateMachine<S, A, P>(name, start, [...items]);
+    }
+
+    private static toChartItem<S, A extends string, P>(
+        type: LinkedStateType<S, A, P>
+    ): StatechartItem {
+        const startChild: StatechartItem[] = [];
+        if (type.startChild) {
+            startChild.push({
+                name: MetaStartStateName,
+                transitions: [{
+                    action: MetaAction.DoStart,
+                    destination: type.startChild.name,
+                }],
+                children: [],
+            });
+        }
+
+        return {
+            name: type.name,
+            transitions: Array.from(type.mapEntries()).map(transition => ({
+                action: transition[0],
+                destination: transition[1].name,
+            } as StatechartTransition)),
+            children: startChild.concat(type.children.map(child => this.toChartItem(child))),
+        };
+    }
+
+
+    //
     // Public var
 
     /** Current leaf state */
@@ -70,58 +125,6 @@ export class StateMachine<S, A extends string, P = {}> {
 
     private readonly _stateChanged: Subject<StateChangedEvent<S, A, P>> = new Subject();
     private readonly _stateChangeFailed: Subject<StateChangeFailedEvent<S, A, P>> = new Subject();
-
-
-    public static fromString<S extends string, A extends string>(
-        name: string,
-        start: S,
-        ...items: StateMachineItem<S, A>[]
-    ): StateMachine<S, A> {
-        const getter = new StringTypeGetter<S, A>();
-        return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
-    }
-
-    public static fromNamed<S extends NamedState, A extends string>(
-        name: string,
-        start: S,
-        ...items: StateMachineItem<S, A>[]
-    ): StateMachine<S, A> {
-        const getter = new NamedTypeGetter<S, A>();
-        return new StateMachine<S, A>(name, getter.get(start), getter.convert(items));
-    }
-
-    public static fromType<S, A extends string, P = {}>(
-        name: string,
-        start: StateType<S, A, P>,
-        ...items: StateMachineItem<StateType<S, A, P>, A>[]
-    ): StateMachine<S, A, P> {
-        return new StateMachine<S, A, P>(name, start, [...items]);
-    }
-
-    private static toChartItem<S, A extends string, P>(
-        type: LinkedStateType<S, A, P>
-    ): StatechartItem {
-        const startChild: StatechartItem[] = [];
-        if (type.startChild) {
-            startChild.push({
-                name: MetaStartStateName,
-                transitions: [{
-                    action: MetaAction.DoStart,
-                    destination: type.startChild.name,
-                }],
-                children: [],
-            });
-        }
-
-        return {
-            name: type.name,
-            transitions: Array.from(type.mapEntries()).map(transition => ({
-                action: transition[0],
-                destination: transition[1].name,
-            } as StatechartTransition)),
-            children: startChild.concat(type.children.map(child => this.toChartItem(child))),
-        };
-    }
 
 
     protected constructor(
@@ -243,7 +246,7 @@ export class StateMachine<S, A extends string, P = {}> {
      * @returns transited normally
      * @throws RangeError
      */
-    public require(action: A, expectedStateName: string, params?: P): boolean
+    public require(action: A, expectedStateName: string, params?: P): boolean;
     /**
      * Require state to equal expected after the action.
      * If the action makes state expected one, do nothing
@@ -253,7 +256,7 @@ export class StateMachine<S, A extends string, P = {}> {
      * @returns transited normally
      * @throws RangeError
      */
-    public require(action: A, expectedStateNameOwner: NamedState, params?: P): boolean
+    public require(action: A, expectedStateNameOwner: NamedState, params?: P): boolean;
     /**
      * Require state to equal expected after the action.
      * If the action makes state expected one, do nothing

@@ -33,6 +33,9 @@ export abstract class TypeGetter<S, A extends string> {
         return items.map(item => this.convertOne(item));
     }
 
+    protected abstract nameOf(state: S): string;
+    protected abstract wrap(state: S): StateType<S, A>;
+
     private convertOne(item: StateMachineItem<S, A>): NolItem<S, A> {
         return {
             state: this.get(item.state),
@@ -41,7 +44,4 @@ export abstract class TypeGetter<S, A extends string> {
             startChild: this.get(item.startChild),
         };
     }
-
-    protected abstract nameOf(state: S): string;
-    protected abstract wrap(state: S): StateType<S, A>;
 }

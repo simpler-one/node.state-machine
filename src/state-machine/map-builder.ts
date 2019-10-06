@@ -5,11 +5,6 @@ import { NolItem } from "../private-interface";
 
 export class MapBuilder<S, A extends string, P> {
 
-    private readonly map: Map<string, LinkedStateType<S, A, P>> = new Map();
-    private readonly itemMap: Map<string, NolItem<S, A, P>> = new Map();
-    private readonly typeMap: Map<string, StateType<S, A, P>> = new Map();
-    private readonly parentMap: Map<string, StateType<S, A, P>> = new Map();
-
     public static build<S, A extends string, P>(
         items: NolItem<S, A, P>[],
         anytimeTransitions: [A, StateType<S, A, P>][],
@@ -18,6 +13,11 @@ export class MapBuilder<S, A extends string, P> {
         builder.build(items);
         return builder.map;
     }
+
+    private readonly map: Map<string, LinkedStateType<S, A, P>> = new Map();
+    private readonly itemMap: Map<string, NolItem<S, A, P>> = new Map();
+    private readonly typeMap: Map<string, StateType<S, A, P>> = new Map();
+    private readonly parentMap: Map<string, StateType<S, A, P>> = new Map();
 
     constructor(
         private readonly anytime: [A, StateType<S, A, P>][],
@@ -64,7 +64,7 @@ export class MapBuilder<S, A extends string, P> {
             return type;
         }
 
-        let parent: LinkedStateType<S, A, P> = undefined;
+        let parent: LinkedStateType<S, A, P>;
         const parentType = this.parentMap.get(name);
         if (parentType) {
             parent = this.map.get(parentType.name);
