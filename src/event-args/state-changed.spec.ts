@@ -1,5 +1,5 @@
-import { StateChangedEvent } from "./state-changed";
 import { buildDataMatrix } from "@working-sloth/data-matrix";
+import { StateChangedEvent } from "./state-changed";
 
 describe("StateChangedEvent", () => {
     const CommonStates = ["0"];
@@ -7,7 +7,7 @@ describe("StateChangedEvent", () => {
     const NewStates = ["4", "5"];
     const Arg = new StateChangedEvent(CommonStates, OldStates, NewStates, "action", undefined, false, "message");
 
-    type Test = { label: string, input: {}, expect: {} };
+    interface Test { label: string; input: {}; expect: {}; }
     const tests = buildDataMatrix<Test>([
         "label              input               expect"
     ], [
