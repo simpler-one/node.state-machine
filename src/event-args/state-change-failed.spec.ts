@@ -1,5 +1,5 @@
-import { StateChangeFailedEvent } from "./state-change-failed";
 import { buildDataMatrix } from "@working-sloth/data-matrix";
+import { StateChangeFailedEvent } from "./state-change-failed";
 
 describe("StateChangeFailedEvent", () => {
     const CurStates = ["1", "2", "3"];

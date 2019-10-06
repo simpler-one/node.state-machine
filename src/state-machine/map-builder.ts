@@ -1,6 +1,6 @@
-import { LinkedStateType } from "./linked-state-type";
 import { StateType } from "../interface";
 import { NolItem } from "../private-interface";
+import { LinkedStateType } from "./linked-state-type";
 
 
 export class MapBuilder<S, A extends string, P> {

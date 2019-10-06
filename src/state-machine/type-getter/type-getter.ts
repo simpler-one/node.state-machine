@@ -1,6 +1,6 @@
-import { StateType, StateMachineItem } from "../../interface";
-import { MetaState } from "../../state-meta";
+import { StateMachineItem, StateType } from "../../interface";
 import { NolItem } from "../../private-interface";
+import { MetaState } from "../../state-meta";
 
 
 export abstract class TypeGetter<S, A extends string> {

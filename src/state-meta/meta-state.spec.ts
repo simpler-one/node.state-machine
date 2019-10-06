@@ -1,7 +1,7 @@
-import { Anytime, StartType } from "./meta-state";
+import { MetaAnytimeStateName, MetaStartStateName } from "@working-sloth/statechart-interface";
 import { StateType } from "../interface";
 import { StateMachine } from "../state-machine";
-import { MetaAnytimeStateName, MetaStartStateName } from "@working-sloth/statechart-interface";
+import { Anytime, StartType } from "./meta-state";
 
 
 

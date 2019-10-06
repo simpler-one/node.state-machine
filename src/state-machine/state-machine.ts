@@ -1,17 +1,17 @@
-import { StateType, StateMachineItem, NamedState, OnLeaveState, OnEnterState } from "../interface";
 import {
-    StatechartWriter, Statechart, StatechartItem, StatechartTransition, MetaStartStateName, MetaAnytimeStateName
+    MetaAnytimeStateName, MetaStartStateName, Statechart, StatechartItem, StatechartTransition, StatechartWriter
 } from "@working-sloth/statechart-interface";
+import { Observable, Subject } from "rxjs";
 import { StateChangedEvent, StateChangeFailedEvent } from "../event-args";
-import { MetaState, MetaStateAction as MetaAction, MetaStateAction } from "../state-meta";
-import { Subject, Observable } from "rxjs";
+import { NamedState, OnEnterState, OnLeaveState, StateMachineItem, StateType } from "../interface";
+import { NolItem } from "../private-interface";
 import { StateHistory } from "../state-history";
+import { MetaState, MetaStateAction, MetaStateAction as MetaAction } from "../state-meta";
 import { StartType } from "../state-meta/meta-state";
+import { ActiveState } from "./active-state";
 import { LinkedStateType } from "./linked-state-type";
 import { MapBuilder } from "./map-builder";
-import { NolItem } from "../private-interface";
 import { NamedTypeGetter, StringTypeGetter } from "./type-getter";
-import { ActiveState } from "./active-state";
 
 
 export class StateMachine<S, A extends string, P = {}> {

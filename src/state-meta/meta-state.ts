@@ -1,4 +1,4 @@
-import { MetaStartStateName, MetaAnytimeStateName } from "@working-sloth/statechart-interface";
+import { MetaAnytimeStateName, MetaStartStateName } from "@working-sloth/statechart-interface";
 import { StateType } from "../interface";
 
 

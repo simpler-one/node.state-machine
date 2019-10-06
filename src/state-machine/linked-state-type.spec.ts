@@ -1,5 +1,5 @@
-import { LinkedStateType } from "./linked-state-type";
 import { StateType } from "../interface";
+import { LinkedStateType } from "./linked-state-type";
 
 class SType implements StateType<string, string> {
     constructor(

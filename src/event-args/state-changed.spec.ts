@@ -1,5 +1,5 @@
-import { StateChangedEvent } from "./state-changed";
 import { buildDataMatrix } from "@working-sloth/data-matrix";
+import { StateChangedEvent } from "./state-changed";
 
 describe("StateChangedEvent", () => {
     const CommonStates = ["0"];
