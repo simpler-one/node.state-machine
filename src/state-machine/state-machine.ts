@@ -300,6 +300,7 @@ export class StateMachine<S, A extends string, P = {}> {
     /**
      * Check availability of the action in current state.
      * @param action action
+     * @returns availability
      */
     public can(action: A): boolean {
         return this.getDestination(action) !== undefined;
@@ -324,6 +325,7 @@ export class StateMachine<S, A extends string, P = {}> {
     /**
      * Export state machine
      * @param writer writer
+     * @returns statechart string
      */
     public export(writer: StatechartWriter): string {
         return writer(this.toChart());
@@ -331,6 +333,7 @@ export class StateMachine<S, A extends string, P = {}> {
 
     /**
      * To statechart
+     * @returns statechart object
      */
     public toChart(): Statechart {
         return {

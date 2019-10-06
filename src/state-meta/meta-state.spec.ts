@@ -4,7 +4,6 @@ import { StateMachine } from "../state-machine";
 import { Anytime, StartType } from "./meta-state";
 
 
-
 describe("StartType", () => {
     const start: StateType<string, string> = StartType;
     it("getState()", () => {

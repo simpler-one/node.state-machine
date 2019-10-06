@@ -19,11 +19,29 @@
         "@typescript-eslint"
     ],
     "rules": {
+        "arrow-parens": "off",
+        "block-spacing": "off",
+        "brace-style": [2, "1tbs", {
+            "allowSingleLine": true
+        }],
+        "comma-dangle": "off",
         "indent": ["error", 4],
         "max-len": ["error", { "code": 120 }],
+        "no-multi-spaces": "off",
+        "no-multiple-empty-lines": [2, {"max": 3, "maxEOF": 1}],
         "no-unused-vars": "off",
         "object-curly-spacing": "off",
+        "padded-blocks": "off",
+        "operator-linebreak": "off",
         "quotes": ["error", "double"],
-        "require-jsdoc": "off"
+        "require-jsdoc": "off",
+        "valid-jsdoc": [2, {
+            "prefer": {
+                "return": "returns"
+            },
+            "requireParamType": false,
+            "requireReturn": false,
+            "requireReturnType": false
+        }]
     }
 }
