@@ -2,6 +2,7 @@
     "extends": ["tslint:recommended"],
     "rules": {
         "array-type": [true, "array"],
+        "arrow-parens": false,
         "interface-name": [false],
         "no-angle-bracket-type-assertion": false,
         "no-consecutive-blank-lines": false,
