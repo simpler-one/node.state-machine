@@ -7,7 +7,7 @@ describe("StateChangedEvent", () => {
     const NewStates = ["4", "5"];
     const Arg = new StateChangedEvent(CommonStates, OldStates, NewStates, "action", undefined, false, "message");
 
-    type Test = { label: string, input: {}, expect: {} };
+    interface Test { label: string; input: {}; expect: {}; }
     const tests = buildDataMatrix<Test>([
         "label              input               expect"
     ], [
